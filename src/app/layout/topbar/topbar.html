@@ -1,0 +1,16 @@
+<mat-toolbar class="toolbar">
+  <div class="left">
+    <span class="title">Iqra'a Dashboard</span>
+  </div>
+
+  <span class="spacer"></span>
+
+  <div class="right">
+    <span class="user">{{ displayName }}</span>
+
+    <button mat-stroked-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  </div>
+</mat-toolbar>

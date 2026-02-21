@@ -1,0 +1,505 @@
+// ============================================
+// Color Variables
+// ============================================
+$primary: #1e40af;
+$primary-light: #dbeafe;
+$primary-dark: #0c2340;
+$accent: #0891b2;
+$accent-light: #cffafe;
+$success: #16a34a;
+$success-light: #dcfce7;
+$warning: #d97706;
+$warning-light: #fef08a;
+$text-primary: #0f172a;
+$text-secondary: #475569;
+$text-light: #64748b;
+$bg: #f8fafc;
+$card-bg: #ffffff;
+$border: #e2e8f0;
+$hover-bg: #f1f5f9;
+
+// ============================================
+// Shadow Variables
+// ============================================
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+// ============================================
+// Transition Variables
+// ============================================
+$transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ============================================
+// Global Styles
+// ============================================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background: $bg;
+  color: $text-primary;
+  line-height: 1.6;
+}
+
+// ============================================
+// Container
+// ============================================
+.teachers-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+// ============================================
+// Header Section
+// ============================================
+.header-section {
+  margin-bottom: 32px;
+  animation: slideDown 0.5s ease-out;
+}
+
+.header-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  > div:first-child {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+.header-section h1 {
+  font-size: 36px;
+  font-weight: 800;
+  color: $primary-dark;
+  margin-bottom: 4px;
+  letter-spacing: -0.8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: $text-secondary;
+  font-weight: 500;
+  margin: 0;
+}
+
+// ============================================
+// Search Field
+// ============================================
+.search-field {
+  width: 100%;
+  max-width: 320px;
+  min-width: 200px;
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      padding-bottom: 0 !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding: 16px 0 12px 0 !important;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: $border !important;
+    }
+
+    &:hover {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #cbd5e1 !important;
+      }
+    }
+
+    &.mat-focused {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: $primary !important;
+        border-width: 2px !important;
+      }
+
+      .mat-mdc-form-field-label {
+        color: $primary !important;
+      }
+    }
+
+    .mat-mdc-form-field-label {
+      color: $text-secondary !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.3px !important;
+    }
+
+    .mdc-text-field__input {
+      color: $text-primary !important;
+      font-size: 14px !important;
+      caret-color: $primary !important;
+    }
+
+    .mat-icon {
+      color: $text-secondary !important;
+    }
+  }
+}
+
+// ============================================
+// Table Card
+// ============================================
+.table-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: 12px;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  animation: slideUp 0.6s ease-out 0.1s both;
+
+  ::ng-deep {
+    .mat-mdc-card-content {
+      padding: 0;
+    }
+  }
+}
+
+// ============================================
+// Table Wrapper
+// ============================================
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.teachers-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  // Header Row Styling
+  .mat-header-row {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid $border;
+    height: auto;
+
+    .mat-header-cell {
+      padding: 16px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: transparent;
+      border: none;
+
+      .header-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    }
+  }
+
+  // Data Row Styling
+  .table-row {
+    border-bottom: 1px solid $border;
+    transition: $transition-smooth;
+    height: auto;
+
+    &:hover {
+      background-color: $hover-bg;
+
+      .mat-cell {
+        color: $text-primary;
+      }
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .mat-cell {
+      padding: 18px 20px;
+      color: $text-primary;
+      font-size: 14px;
+      transition: $transition-smooth;
+    }
+  }
+}
+
+// ============================================
+// Table Cell Styling
+// ============================================
+.column-name {
+  width: 35%;
+  min-width: 200px;
+}
+
+.column-email {
+  width: 35%;
+  min-width: 200px;
+}
+
+.column-class {
+  width: 30%;
+  min-width: 150px;
+}
+
+// Name Cell with Avatar
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $primary-light, $accent-light);
+  color: $primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: $shadow-sm;
+}
+
+.name-text {
+  font-weight: 700;
+  color: $primary-dark;
+}
+
+// Email Cell
+.email-text {
+  color: $accent;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  word-break: break-all;
+  font-weight: 500;
+}
+
+// Class Badge
+.class-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: $primary-light;
+  color: $primary;
+  white-space: nowrap;
+  box-shadow: $shadow-sm;
+  transition: $transition-smooth;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-1px);
+  }
+
+  &.no-class {
+    background: $warning-light;
+    color: $warning;
+  }
+}
+
+// ============================================
+// Loading State
+// ============================================
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+
+  p {
+    color: $text-secondary;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $border;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+// ============================================
+// Empty State
+// ============================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 12px;
+  color: $text-secondary;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    opacity: 0.6;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  p {
+    font-size: 13px;
+    color: $text-secondary;
+    margin: 0;
+    max-width: 300px;
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================
+// Responsive Design
+// ============================================
+@media (max-width: 768px) {
+  .teachers-container {
+    padding: 16px 12px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+
+    > div:first-child {
+      min-width: auto;
+    }
+  }
+
+  .header-section h1 {
+    font-size: 28px;
+  }
+
+  .search-field {
+    max-width: 100%;
+  }
+
+  .column-name {
+    width: 50%;
+  }
+
+  .column-email {
+    width: 50%;
+    display: none;
+  }
+
+  .column-class {
+    width: 50%;
+    display: none;
+  }
+
+  .table-row .mat-cell {
+    padding: 14px 12px;
+  }
+
+  .name-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    padding: 60px 16px;
+  }
+
+  .loading-state {
+    padding: 40px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-section h1 {
+    font-size: 24px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .class-badge {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+}

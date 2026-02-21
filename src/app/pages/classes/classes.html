@@ -1,0 +1,74 @@
+<div class="classes-container">
+  <div class="header-section">
+    <div class="header-content">
+      <div>
+        <h1>Classes</h1>
+        <p class="subtitle">Manage classes in your school</p>
+      </div>
+
+      <div style="display:flex; gap:12px; align-items:center;">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search classes</mat-label>
+          <input matInput [(ngModel)]="q" placeholder="e.g. A1, Grade 7..." />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" (click)="addClass()">
+          + Add Class
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <mat-card class="table-card">
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading classes...</p>
+      </div>
+    } @else {
+      @if (error) {
+        <div class="empty-state">
+          <h3>{{ error }}</h3>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="filtered" class="classes-table">
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Class Name</th>
+              <td mat-cell *matCellDef="let c">
+                <span class="class-name">{{ c.name }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Actions -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let c">
+                <button mat-icon-button (click)="editClass(c)" aria-label="Edit class">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteClass(c)" aria-label="Delete class">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+        @if (!filtered.length) {
+          <div class="empty-state">
+            <div class="empty-icon">🏫</div>
+            <h3>No classes found</h3>
+            <p>Add your first class to start assigning students/teachers.</p>
+          </div>
+        }
+      }
+    }
+  </mat-card>
+</div>

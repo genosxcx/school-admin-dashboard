@@ -1,0 +1,103 @@
+<div class="teachers-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div>
+        <h1>Teachers</h1>
+        <p class="subtitle">Manage teachers in your school</p>
+      </div>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search teachers</mat-label>
+        <input matInput [(ngModel)]="q" placeholder="Name, email, class..." />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="addTeacher()">
+  + Add Teacher
+</button>
+
+    </div>
+  </div>
+
+
+  <!-- Table Section -->
+  <mat-card class="table-card">
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading teachers...</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="filtered" class="teachers-table">
+          <!-- Full Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef class="column-name">
+              <span class="header-label">Full Name</span>
+            </th>
+            <td mat-cell *matCellDef="let t">
+              <div class="name-cell">
+                <div class="avatar">{{ ((t.fullName || '?').charAt(0)).toUpperCase() }}</div>
+
+
+                <span class="name-text">{{ t.fullName || 'Unnamed' }}</span>
+
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef class="column-email">
+              <span class="header-label">Email</span>
+            </th>
+            <td mat-cell *matCellDef="let t">
+              <span class="email-text">{{ t.email || '—' }}</span>
+
+            </td>
+          </ng-container>
+
+          <!-- Class Column -->
+          <ng-container matColumnDef="classId">
+            <th mat-header-cell *matHeaderCellDef class="column-class">
+              <span class="header-label">Class</span>
+            </th>
+            <td mat-cell *matCellDef="let t">
+              <span class="class-badge" [class.no-class]="!t.classId">
+                {{ t.classId || 'Unassigned' }}
+              </span>
+            </td>
+          </ng-container>
+<!-- Actions Column -->
+<ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef>Actions</th>
+
+  <td mat-cell *matCellDef="let t">
+    <button mat-icon-button (click)="editTeacher(t)">
+      <mat-icon>edit</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="deleteTeacher(t)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </td>
+</ng-container>
+
+          <!-- Table Headers and Rows -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+        </table>
+        
+      </div>
+
+
+      @if (!filtered.length) {
+        <div class="empty-state">
+          <div class="empty-icon">👨‍🏫</div>
+          <h3>No teachers found</h3>
+          <p>Try adjusting your search filters</p>
+        </div>
+      }
+    }
+
+  </mat-card>
+</div>

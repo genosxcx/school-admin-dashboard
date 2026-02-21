@@ -1,0 +1,107 @@
+<div class="dashboard-page">
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading dashboard...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @else if (error) {
+    <mat-card class="error-card">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+    </mat-card>
+  }
+
+  <!-- Content -->
+  @else {
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1>Principal Dashboard</h1>
+        <span class="page-subtitle">Overview of school metrics and staff</span>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <mat-card class="kpi-card kpi-teachers">
+        <div class="kpi-icon">
+          <mat-icon>school</mat-icon>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ totalTeachers }}</div>
+          <div class="kpi-label">Total Teachers</div>
+        </div>
+        <div class="kpi-accent"></div>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-students">
+        <div class="kpi-icon">
+          <mat-icon>groups</mat-icon>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ totalStudents }}</div>
+          <div class="kpi-label">Total Students</div>
+        </div>
+        <div class="kpi-accent"></div>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-minutes">
+        <div class="kpi-icon">
+          <mat-icon>mic</mat-icon>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ totalMinutes }}</div>
+          <div class="kpi-label">Minutes Recorded</div>
+        </div>
+        <div class="kpi-accent"></div>
+      </mat-card>
+    </div>
+
+    <!-- Staff Directory -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon>badge</mat-icon>
+        <span class="section-title">Staff Directory</span>
+        <span class="badge">{{ teachers.length }}</span>
+      </div>
+
+      @if (teachers.length) {
+        <div class="teachers-grid">
+@for (teacher of teachers; track (teacher.id ?? teacher.email)) {            <mat-card class="teacher-card">
+              <div class="teacher-avatar">
+                {{ (teacher.fullName || teacher.email || '?').charAt(0).toUpperCase() }}
+              </div>
+              <div class="teacher-info">
+                <div class="teacher-name">{{ teacher.fullName || '—' }}</div>
+                <div class="teacher-email">
+                  <mat-icon>mail</mat-icon>
+                  {{ teacher.email }}
+                </div>
+                <div class="teacher-class">
+                  <mat-icon>class</mat-icon>
+                  @if (teacher.classId) {
+                    <span class="class-badge">{{ teacher.classId }}</span>
+                  } @else {
+                    <span class="no-class">No class assigned</span>
+                  }
+                </div>
+              </div>
+            </mat-card>
+          }
+        </div>
+      } @else {
+        <div class="empty-note">
+          <mat-icon>person_off</mat-icon>
+          <span>No teachers found</span>
+        </div>
+      }
+    </div>
+
+  }
+</div>
