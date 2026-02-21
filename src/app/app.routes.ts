@@ -13,30 +13,41 @@ import { Library } from './pages/library/library';
 import { Settings } from './pages/settings/settings';
 
 export const routes: Routes = [
-  { path: 'login', component: Login },
-
   {
-    path: '',
-    component: Shell,
-    canActivate: [authGuard], // ✅ only auth on shell
+    path: 'admin',
     children: [
-      // ✅ choose what teachers see as "home"
-      // If teachers should not see the dashboard, you can redirect '' to 'students'
-      // { path: '', pathMatch: 'full', redirectTo: 'students' },
+      { path: 'login', component: Login },
 
-      { path: '', component: DashboardHome }, // keep if both roles can view it
+      {
+        path: '',
+        component: Shell,
+        canActivate: [authGuard],
+        children: [
+          { path: '', component: DashboardHome },
 
-      // ✅ principal-only
-      { path: 'teachers', component: Teachers, canActivate: [roleGuard], data: { roles: ['PRINCIPAL', 'ADMIN'] } },
-      { path: 'classes', component: Classes, canActivate: [roleGuard], data: { roles: ['PRINCIPAL', 'ADMIN'] } },
+          // principal-only
+          {
+            path: 'teachers',
+            component: Teachers,
+            canActivate: [roleGuard],
+            data: { roles: ['PRINCIPAL', 'ADMIN'] },
+          },
+          {
+            path: 'classes',
+            component: Classes,
+            canActivate: [roleGuard],
+            data: { roles: ['PRINCIPAL', 'ADMIN'] },
+          },
 
-      // ✅ shared
-      { path: 'students', component: Students },
-      { path: 'library', component: Library },
-      { path: 'stats', component: Stats },
-      { path: 'settings', component: Settings },
+          // shared
+          { path: 'students', component: Students },
+          { path: 'library', component: Library },
+          { path: 'stats', component: Stats },
+          { path: 'settings', component: Settings },
+        ],
+      },
     ],
   },
 
-  { path: '**', redirectTo: 'login' },
+  { path: '**', redirectTo: 'admin/login' },
 ];

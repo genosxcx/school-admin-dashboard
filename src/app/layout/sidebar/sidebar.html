@@ -10,31 +10,31 @@
   </div>
 
   <mat-nav-list class="nav">
-    <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <a mat-list-item routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <mat-icon matListItemIcon>dashboard</mat-icon>
       <span matListItemTitle>Home</span>
     </a>
 
     @if (!(isTeacher$ | async)) {
-      <a mat-list-item routerLink="/teachers" routerLinkActive="active">
+      <a mat-list-item routerLink="/admin/teachers" routerLinkActive="active">
         <mat-icon matListItemIcon>school</mat-icon>
         <span matListItemTitle>Teachers</span>
       </a>
     }
 
-    <a mat-list-item routerLink="/students" routerLinkActive="active">
+    <a mat-list-item routerLink="/admin/students" routerLinkActive="active">
       <mat-icon matListItemIcon>groups</mat-icon>
       <span matListItemTitle>Students</span>
     </a>
 
     @if (!(isTeacher$ | async)) {
-      <a mat-list-item routerLink="/classes" routerLinkActive="active">
+      <a mat-list-item routerLink="/admin/classes" routerLinkActive="active">
         <mat-icon matListItemIcon>class</mat-icon>
         <span matListItemTitle>Classes</span>
       </a>
     }
 
-    <a mat-list-item routerLink="/stats" routerLinkActive="active">
+    <a mat-list-item routerLink="/admin/stats" routerLinkActive="active">
       <mat-icon matListItemIcon>bar_chart</mat-icon>
       <span matListItemTitle>Stats</span>
     </a>

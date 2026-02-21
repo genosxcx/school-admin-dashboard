@@ -72,7 +72,7 @@ export class Login {
     try {
       const { email, password } = this.form.getRawValue();
       await this.auth.login(email!, password!);
-      await this.router.navigateByUrl('/');
+      await this.router.navigateByUrl('/admin');
     } catch (e: any) {
       this.error = e?.message ?? 'Login failed';
     } finally {
