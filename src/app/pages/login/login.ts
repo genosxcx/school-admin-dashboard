@@ -38,6 +38,28 @@ export class Login {
     });
   }
 
+  fillTeacher() {
+    this.error = '';
+    this.form.patchValue({
+      email: 'teacher@test.com',
+      password: '123456',
+    });
+    this.form.markAsDirty();
+    this.form.get('email')?.markAsTouched();
+    this.form.get('password')?.markAsTouched();
+  }
+
+  fillPrincipal() {
+    this.error = '';
+    this.form.patchValue({
+      email: 'principal@test.com',
+      password: '123456',
+    });
+    this.form.markAsDirty();
+    this.form.get('email')?.markAsTouched();
+    this.form.get('password')?.markAsTouched();
+  }
+
   async submit() {
     this.error = '';
 

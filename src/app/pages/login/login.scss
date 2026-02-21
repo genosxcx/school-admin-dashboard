@@ -294,3 +294,22 @@ button {
     font-size: 14px;
   }
 }
+.quick-fill {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0 22px 0;
+}
+
+.quick-btn {
+  border-radius: 10px;
+  height: 42px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 480px) {
+  .quick-fill {
+    grid-template-columns: 1fr;
+  }
+}
