@@ -22,6 +22,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DataService, Student, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 import { StudentFormDialog, ClassOption } from './student-form-dialog/student-form-dialog';
+
 @Component({
   selector: 'app-students',
   standalone: true,
@@ -55,7 +56,11 @@ export class Students implements OnInit, OnDestroy {
   classes: SchoolClass[] = [];
   classNameById = new Map<string, string>();
 
-  displayedColumns = ['name', 'email', 'classId', 'actions'];
+  // ✅ teacher filtering
+  isTeacher = false;
+  teacherClassId = '';
+
+  displayedColumns: string[] = ['name', 'email', 'classId', 'actions'];
 
   get filtered(): Student[] {
     const s = this.q.trim().toLowerCase();
@@ -74,7 +79,7 @@ export class Students implements OnInit, OnDestroy {
   classLabel(st: Student): string {
     const id = (st.classId ?? '').toString();
     if (!id) return 'Unassigned';
-    return this.classNameById.get(id) ?? id; // fallback to id if not found
+    return this.classNameById.get(id) ?? id;
   }
 
   ngOnInit(): void {
@@ -84,6 +89,8 @@ export class Students implements OnInit, OnDestroy {
       this.students = [];
       this.classes = [];
       this.classNameById = new Map();
+      this.isTeacher = false;
+      this.teacherClassId = '';
     });
     this.cdr.detectChanges();
 
@@ -105,6 +112,22 @@ export class Students implements OnInit, OnDestroy {
       )
       .subscribe((claims) => {
         this.schoolId = claims.schoolId;
+        this.isTeacher = (claims.role ?? '').toString().toLowerCase() === 'teacher';
+        this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
+
+        // Optional: if teacher has no class assigned, block view
+        if (this.isTeacher && !this.teacherClassId) {
+          this.zone.run(() => {
+            this.error = 'Your account is not assigned to a class yet.';
+            this.loading = false;
+          });
+          this.cdr.detectChanges();
+          return;
+        }
+
+        // If teacher: you can hide actions if you want read-only
+        // this.displayedColumns = this.isTeacher ? ['name','email','classId'] : ['name','email','classId','actions'];
+
         this.loadAll();
       });
   }
@@ -114,15 +137,25 @@ export class Students implements OnInit, OnDestroy {
       this.zone.run(() => (this.loading = true));
       this.cdr.detectChanges();
 
+      // ✅ Teachers: load only their class + only students in their class
+      // ✅ Principals: load all classes + all students
       const [classes, students] = await Promise.all([
         this.data.getClasses(this.schoolId),
-        this.data.getStudents(this.schoolId),
+        this.isTeacher
+          ? this.data.getStudentsByClass(this.schoolId, this.teacherClassId)
+          : this.data.getStudents(this.schoolId),
       ]);
 
       this.zone.run(() => {
-        this.classes = classes ?? [];
+        const allClasses = classes ?? [];
+
+        // If teacher, keep only their class in the dropdown/list
+        this.classes = this.isTeacher
+          ? allClasses.filter((c) => c.id === this.teacherClassId)
+          : allClasses;
+
         this.classNameById = new Map(
-          (this.classes ?? []).filter(c => !!c.id).map(c => [c.id!, c.name])
+          (this.classes ?? []).filter((c) => !!c.id).map((c) => [c.id!, c.name])
         );
 
         this.students = students ?? [];
@@ -140,6 +173,7 @@ export class Students implements OnInit, OnDestroy {
   }
 
   private classOptions(): ClassOption[] {
+    // ✅ Teachers should only see their own class option
     return (this.classes ?? [])
       .filter((c) => !!c.id)
       .map((c) => ({ id: c.id!, name: c.name }));
@@ -150,17 +184,29 @@ export class Students implements OnInit, OnDestroy {
 
     const ref = this.dialog.open(StudentFormDialog, {
       width: '520px',
-      data: { title: 'Add student', classes: this.classOptions() },
+      data: {
+        title: 'Add student',
+        classes: this.classOptions(),
+        // ✅ preselect teacher class
+        initial: this.isTeacher ? { classId: this.teacherClassId } : undefined,
+        // (optional) if your dialog supports it, you can disable class selection for teachers
+        // lockClass: this.isTeacher,
+      },
     });
 
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
+    // ✅ force teacher classId no matter what comes back
+    const payload = this.isTeacher
+      ? { ...result, classId: this.teacherClassId }
+      : result;
+
     this.zone.run(() => (this.loading = true));
     this.cdr.detectChanges();
 
     try {
-      await this.data.createStudent(this.schoolId, result);
+      await this.data.createStudent(this.schoolId, payload);
       await this.loadAll();
     } catch (e) {
       console.error(e);
@@ -174,23 +220,34 @@ export class Students implements OnInit, OnDestroy {
   async editStudent(st: Student) {
     if (!st.id) return;
 
+    // ✅ safety: teacher can only edit students in their class
+    if (this.isTeacher && st.classId !== this.teacherClassId) {
+      alert('You can only edit students in your class.');
+      return;
+    }
+
     const ref = this.dialog.open(StudentFormDialog, {
       width: '520px',
       data: {
         title: 'Edit student',
         classes: this.classOptions(),
         initial: { fullName: st.fullName, email: st.email, classId: st.classId },
+        // lockClass: this.isTeacher,
       },
     });
 
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
+    const payload = this.isTeacher
+      ? { ...result, classId: this.teacherClassId }
+      : result;
+
     this.zone.run(() => (this.loading = true));
     this.cdr.detectChanges();
 
     try {
-      await this.data.updateStudent(st.id, result);
+      await this.data.updateStudent(st.id, payload);
       await this.loadAll();
     } catch (e) {
       console.error(e);
@@ -203,6 +260,12 @@ export class Students implements OnInit, OnDestroy {
 
   async deleteStudent(st: Student) {
     if (!st.id) return;
+
+    // ✅ safety: teacher can only delete students in their class
+    if (this.isTeacher && st.classId !== this.teacherClassId) {
+      alert('You can only delete students in your class.');
+      return;
+    }
 
     const ok = confirm(`Delete student "${st.fullName}"?`);
     if (!ok) return;

@@ -15,11 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import {
-  DataService,
-  SchoolClass,
-  Student,
-} from '../../core/services/data.service';
+import { DataService, SchoolClass, Student } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 
 type Summary = {
@@ -34,8 +30,8 @@ type ClassStats = {
   className: string;
   studentCount: number;
   totalMinutes: number;
-  avgGrade: number; // 0..100
-  avgCompletion: number; // 0..100
+  avgGrade: number;
+  avgCompletion: number;
 };
 
 @Component({
@@ -61,6 +57,10 @@ export class Stats implements OnInit, OnDestroy {
   loading = true;
   error = '';
   schoolId = '';
+
+  // ✅ teacher filtering
+  isTeacher = false;
+  teacherClassId = '';
 
   summary: Summary = { teachers: 0, students: 0, classes: 0, minutes: 0 };
 
@@ -94,6 +94,18 @@ export class Stats implements OnInit, OnDestroy {
       )
       .subscribe((claims) => {
         this.schoolId = claims.schoolId;
+        this.isTeacher = (claims.role ?? '').toString().toLowerCase() === 'teacher';
+        this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
+
+        if (this.isTeacher && !this.teacherClassId) {
+          this.zone.run(() => {
+            this.error = 'Your account is not assigned to a class yet.';
+            this.loading = false;
+          });
+          this.cdr.detectChanges();
+          return;
+        }
+
         this.loadOverview();
       });
   }
@@ -103,38 +115,70 @@ export class Stats implements OnInit, OnDestroy {
       this.zone.run(() => (this.loading = true));
       this.cdr.detectChanges();
 
-      const [
-        teachers,
-        students,
-        classes,
-        minutes,
-        classList,
-      ] = await Promise.all([
-        this.data.countTeachers(this.schoolId),
-        this.data.countStudents(this.schoolId),
-        this.data.countClasses(this.schoolId),
-        this.data.totalMinutesRecorded(this.schoolId),
-        this.data.getClasses(this.schoolId),
-      ]);
+      const classList = await this.data.getClasses(this.schoolId);
+
+      // ✅ teacher sees only their class in list
+      const visibleClasses = this.isTeacher
+        ? (classList ?? []).filter((c) => c.id === this.teacherClassId)
+        : (classList ?? []);
+
+      // Summary:
+      // - Principal: school-level summary (same as before)
+      // - Teacher: class-level summary (students/minutes based on their class)
+      if (!this.isTeacher) {
+        const [teachers, students, classes, minutes] = await Promise.all([
+          this.data.countTeachers(this.schoolId),
+          this.data.countStudents(this.schoolId),
+          this.data.countClasses(this.schoolId),
+          this.data.totalMinutesRecorded(this.schoolId),
+        ]);
+
+        this.zone.run(() => {
+          this.summary = {
+            teachers: teachers ?? 0,
+            students: students ?? 0,
+            classes: classes ?? 0,
+            minutes: Number(minutes ?? 0),
+          };
+        });
+      } else {
+        // class-level summary
+        const classStudents = await this.data.getStudentsByClass(this.schoolId, this.teacherClassId);
+
+        const safe = (classStudents ?? []).map((s: Student) => ({
+          ...s,
+          grade: Number(s.grade ?? 0),
+          completion: Number(s.completion ?? 0),
+          minutesRecorded: Number(s.minutesRecorded ?? 0),
+        }));
+
+        const totalMinutes = safe.reduce(
+          (sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0),
+          0
+        );
+
+        this.zone.run(() => {
+          this.summary = {
+            teachers: 1, // teacher view: not meaningful school-wide
+            students: safe.length,
+            classes: 1,
+            minutes: totalMinutes,
+          };
+        });
+      }
 
       this.zone.run(() => {
-        this.summary = {
-          teachers: teachers ?? 0,
-          students: students ?? 0,
-          classes: classes ?? 0,
-          minutes: Number(minutes ?? 0),
-        };
-
-        // ✅ Explicitly type a/b to avoid TS7006
-        this.classes = (classList ?? [])
+        this.classes = visibleClasses
           .slice()
-          .sort((a: SchoolClass, b: SchoolClass) =>
-            (a.name ?? '').localeCompare(b.name ?? '')
-          );
+          .sort((a: SchoolClass, b: SchoolClass) => (a.name ?? '').localeCompare(b.name ?? ''));
 
         this.loading = false;
 
-        if (!this.selectedClassId && this.classes.length) {
+        // ✅ auto-select
+        if (this.isTeacher) {
+          this.selectedClassId = this.teacherClassId;
+          this.selectClass(this.teacherClassId);
+        } else if (!this.selectedClassId && this.classes.length) {
           this.selectClass(this.classes[0].id!);
         }
       });
@@ -151,6 +195,9 @@ export class Stats implements OnInit, OnDestroy {
   }
 
   async selectClass(classId: string) {
+    // ✅ teachers cannot switch classes
+    if (this.isTeacher && classId !== this.teacherClassId) return;
+
     this.selectedClassId = classId;
 
     const cls = this.classes.find((c) => c.id === classId);
@@ -166,7 +213,6 @@ export class Stats implements OnInit, OnDestroy {
     try {
       const students = await this.data.getStudentsByClass(this.schoolId, classId);
 
-      // ✅ Explicitly type s to avoid TS7006
       const safeStudents: Student[] = (students ?? []).map((s: Student) => ({
         ...s,
         grade: Number(s.grade ?? 0),
@@ -176,7 +222,6 @@ export class Stats implements OnInit, OnDestroy {
 
       const studentCount = safeStudents.length;
 
-      // ✅ Explicitly type sum/s to avoid TS7006
       const totalMinutes = safeStudents.reduce(
         (sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0),
         0
@@ -192,8 +237,7 @@ export class Stats implements OnInit, OnDestroy {
         : 0;
 
       const avgGrade = studentCount
-        ? safeStudents.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) /
-          studentCount
+        ? safeStudents.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) / studentCount
         : 0;
 
       this.zone.run(() => {

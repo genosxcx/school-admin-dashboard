@@ -10,7 +10,12 @@ export type RoleClaims = {
   email?: string | null;
   schoolId?: string;
   role?: string;
+
+  // optional multi-class support
   classIds?: string[];
+
+  // ✅ single class for teacher
+  classId?: string;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -18,7 +23,7 @@ export class RoleService {
   private _claims = new BehaviorSubject<RoleClaims | null>(null);
   claims$ = this._claims.asObservable();
 
-  private loading = false; // prevent double-load spam
+  private loading = false;
 
   constructor() {
     console.log('[RoleService] Service initialized');
@@ -31,9 +36,8 @@ export class RoleService {
         return;
       }
 
-      // Only load once per session unless you explicitly refresh
       this.loadClaimsForUser(user).catch((e) =>
-        console.error('[RoleService] loadClaimsForUser error:', e)
+        console.error('[RoleService] loadClaimsForUser failed:', e)
       );
     });
   }
@@ -42,21 +46,14 @@ export class RoleService {
     return this._claims.value;
   }
 
-  /**
-   * Components/guards should ONLY call this.
-   * It will wait until auth is ready AND claims are loaded.
-   */
   async getClaims(): Promise<RoleClaims> {
-    // Already loaded
     if (this._claims.value) return this._claims.value;
 
-    // If auth already has a user but claims weren't loaded yet, trigger loading here too.
     const user = auth.currentUser;
     if (user && !this.loading) {
       await this.loadClaimsForUser(user);
     }
 
-    // Wait for claims from stream (with timeout so you don't hang forever)
     const claims = await firstValueFrom(
       this._claims.pipe(
         filter((c): c is RoleClaims => c !== null),
@@ -70,12 +67,10 @@ export class RoleService {
 
   private async loadClaimsForUser(user: User): Promise<void> {
     if (!user?.uid) {
-      console.warn('[RoleService] loadClaimsForUser called with invalid user');
       this._claims.next(null);
       return;
     }
 
-    // prevent duplicate loads
     if (this.loading) return;
     this.loading = true;
 
@@ -94,40 +89,54 @@ export class RoleService {
   private async loadClaims(user: User): Promise<RoleClaims> {
     if (!user?.uid) throw new Error('User object is invalid');
 
-    // 1) Custom token claims
-    try {
-      const token = await getIdTokenResult(user, true);
-      const c: any = token?.claims ?? {};
-      const schoolId = c['schoolId'];
+    // 1) Start with token claims if available
+    let base: RoleClaims = {
+      uid: user.uid,
+      email: user.email,
+      schoolId: '',
+      role: '',
+      classIds: [],
+      classId: '',
+    };
 
-      if (schoolId) {
-        return {
-          uid: user.uid,
-          email: user.email,
-          schoolId,
-          role: c['role'],
-          classIds: c['classIds'] ?? [],
-        };
-      }
+    try {
+      const token = await getIdTokenResult(user, true); // force refresh
+      const c: any = token?.claims ?? {};
+
+      base = {
+        ...base,
+        schoolId: (c['schoolId'] ?? base.schoolId ?? '').toString(),
+        role: (c['role'] ?? base.role ?? '').toString(),
+        classIds: Array.isArray(c['classIds']) ? c['classIds'] : base.classIds,
+        classId: (c['classId'] ?? base.classId ?? '').toString(),
+      };
     } catch (e) {
       console.warn('[RoleService] Custom claims failed:', e);
     }
 
-    // 2) Firestore fallback
-    const userRef = doc(db, 'users', user.uid);
-    const snap = await getDoc(userRef);
+    // 2) Always merge with Firestore user doc (this is what fixes your issue)
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const snap = await getDoc(userRef);
 
-    if (!snap.exists()) {
-      return { uid: user.uid, email: user.email, schoolId: '', role: '', classIds: [] };
+      if (snap.exists()) {
+        const data = snap.data() as any;
+
+        return {
+          ...base,
+          email: base.email ?? data?.email ?? null,
+          schoolId: base.schoolId || (data?.schoolId ?? ''),
+          role: base.role || (data?.role ?? ''),
+          classIds: (base.classIds?.length ? base.classIds : (data?.classIds ?? [])),
+          classId: base.classId || (data?.classId ?? ''),
+        };
+      }
+
+      // no firestore doc
+      return base;
+    } catch (e) {
+      console.error('[RoleService] Firestore lookup failed:', e);
+      return base; // still return what we have
     }
-
-    const data = snap.data() as any;
-    return {
-      uid: user.uid,
-      email: user.email ?? data?.email,
-      schoolId: data?.schoolId ?? '',
-      role: data?.role ?? '',
-      classIds: data?.classIds ?? [],
-    };
   }
 }

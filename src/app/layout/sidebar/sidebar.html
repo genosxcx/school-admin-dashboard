@@ -1,5 +1,5 @@
 <div class="brand">
-  <div class="logo">Iqra'a</div>
+  <div class="logo">Hya Naqra'a</div>
   <div class="sub">Admin Dashboard</div>
 </div>
 
@@ -9,33 +9,27 @@
     <span>Home</span>
   </a>
 
-  <a mat-list-item routerLink="/teachers" routerLinkActive="active">
-    <mat-icon>school</mat-icon>
-    <span>Teachers</span>
-  </a>
+  @if (!(isTeacher$ | async)) {
+    <a mat-list-item routerLink="/teachers" routerLinkActive="active">
+      <mat-icon>school</mat-icon>
+      <span>Teachers</span>
+    </a>
+  }
 
   <a mat-list-item routerLink="/students" routerLinkActive="active">
     <mat-icon>groups</mat-icon>
     <span>Students</span>
   </a>
 
-  <a mat-list-item routerLink="/classes" routerLinkActive="active">
-    <mat-icon>class</mat-icon>
-    <span>Classes</span>
-  </a>
-
-  <!-- <a mat-list-item routerLink="/library" routerLinkActive="active">
-    <mat-icon>menu_book</mat-icon>
-    <span>Library</span>
-  </a> -->
+  @if (!(isTeacher$ | async)) {
+    <a mat-list-item routerLink="/classes" routerLinkActive="active">
+      <mat-icon>class</mat-icon>
+      <span>Classes</span>
+    </a>
+  }
 
   <a mat-list-item routerLink="/stats" routerLinkActive="active">
     <mat-icon>bar_chart</mat-icon>
     <span>Stats</span>
-  </a> 
-
-  <!-- <a mat-list-item routerLink="/settings" routerLinkActive="active">
-    <mat-icon>settings</mat-icon>
-    <span>Settings</span>
-  </a> -->
+  </a>
 </mat-nav-list>

@@ -70,39 +70,41 @@
       <!-- Main Content -->
       <div class="content-grid">
 
-        <!-- Classes Sidebar -->
-        <div class="sidebar">
-          <mat-card class="classes-card">
-            <div class="section-header">
-              <mat-icon>class</mat-icon>
-              <span class="section-title">Classes</span>
-              <span class="badge">{{ classes.length }}</span>
-            </div>
+        <!-- Classes Sidebar (HIDE for teachers) -->
+        @if (!isTeacher) {
+          <div class="sidebar">
+            <mat-card class="classes-card">
+              <div class="section-header">
+                <mat-icon>class</mat-icon>
+                <span class="section-title">Classes</span>
+                <span class="badge">{{ classes.length }}</span>
+              </div>
 
-            <div class="class-list">
-              @for (c of classes; track c.id) {
-                <button
-                  class="class-item"
-                  [class.active]="c.id === selectedClassId"
-                  (click)="selectClass(c.id!)"
-                >
-                  <div class="class-avatar">
-                    {{ (c.name || '?').charAt(0).toUpperCase() }}
+              <div class="class-list">
+                @for (c of classes; track c.id) {
+                  <button
+                    class="class-item"
+                    [class.active]="c.id === selectedClassId"
+                    (click)="selectClass(c.id!)"
+                  >
+                    <div class="class-avatar">
+                      {{ (c.name || '?').charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="class-name">{{ c.name }}</span>
+                    <mat-icon class="arrow">chevron_right</mat-icon>
+                  </button>
+                }
+
+                @if (!classes.length) {
+                  <div class="empty-note">
+                    <mat-icon>inbox</mat-icon>
+                    <span>No classes yet</span>
                   </div>
-                  <span class="class-name">{{ c.name }}</span>
-                  <mat-icon class="arrow">chevron_right</mat-icon>
-                </button>
-              }
-
-              @if (!classes.length) {
-                <div class="empty-note">
-                  <mat-icon>inbox</mat-icon>
-                  <span>No classes yet</span>
-                </div>
-              }
-            </div>
-          </mat-card>
-        </div>
+                }
+              </div>
+            </mat-card>
+          </div>
+        }
 
         <!-- Main Panel -->
         <div class="main-panel">
@@ -131,7 +133,9 @@
                   <mat-icon>star_rate</mat-icon>
                 </div>
                 <div class="metric-body">
-                  <div class="metric-value">{{ minutesText(selectedClassStats.avgGrade) }}<span class="metric-unit">/100</span></div>
+                  <div class="metric-value">
+                    {{ minutesText(selectedClassStats.avgGrade) }}<span class="metric-unit">/100</span>
+                  </div>
                   <div class="metric-label">Avg. Grade</div>
                 </div>
               </mat-card>
@@ -141,7 +145,9 @@
                   <mat-icon>show_chart</mat-icon>
                 </div>
                 <div class="metric-body">
-                  <div class="metric-value">{{ minutesText(selectedClassStats.avgCompletion) }}<span class="metric-unit">%</span></div>
+                  <div class="metric-value">
+                    {{ minutesText(selectedClassStats.avgCompletion) }}<span class="metric-unit">%</span>
+                  </div>
                   <div class="metric-label">Avg. Completion</div>
                 </div>
               </mat-card>
@@ -186,6 +192,7 @@
                         <mat-progress-bar mode="determinate" [value]="completionPct(s)"></mat-progress-bar>
                         <span class="bar-value">{{ minutesText(completionPct(s)) }}%</span>
                       </div>
+
                       <div class="bar-row">
                         <span class="bar-label">Grade</span>
                         <mat-progress-bar mode="determinate" [value]="gradePct(s)" class="grade-bar"></mat-progress-bar>
