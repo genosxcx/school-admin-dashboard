@@ -1,35 +1,49 @@
-<div class="brand">
-  <div class="logo">Hya Naqra'a</div>
-  <div class="sub">Admin Dashboard</div>
-</div>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo-row">
+      <div class="logo-mark">HN</div>
+      <div class="brand-text">
+        <div class="logo">Hya Naqra'a</div>
+        <div class="sub">Admin Dashboard</div>
+      </div>
+    </div>
+  </div>
 
-<mat-nav-list class="nav">
-  <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-    <mat-icon>dashboard</mat-icon>
-    <span>Home</span>
-  </a>
-
-  @if (!(isTeacher$ | async)) {
-    <a mat-list-item routerLink="/teachers" routerLinkActive="active">
-      <mat-icon>school</mat-icon>
-      <span>Teachers</span>
+  <mat-nav-list class="nav">
+    <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <mat-icon matListItemIcon>dashboard</mat-icon>
+      <span matListItemTitle>Home</span>
     </a>
-  }
 
-  <a mat-list-item routerLink="/students" routerLinkActive="active">
-    <mat-icon>groups</mat-icon>
-    <span>Students</span>
-  </a>
+    @if (!(isTeacher$ | async)) {
+      <a mat-list-item routerLink="/teachers" routerLinkActive="active">
+        <mat-icon matListItemIcon>school</mat-icon>
+        <span matListItemTitle>Teachers</span>
+      </a>
+    }
 
-  @if (!(isTeacher$ | async)) {
-    <a mat-list-item routerLink="/classes" routerLinkActive="active">
-      <mat-icon>class</mat-icon>
-      <span>Classes</span>
+    <a mat-list-item routerLink="/students" routerLinkActive="active">
+      <mat-icon matListItemIcon>groups</mat-icon>
+      <span matListItemTitle>Students</span>
     </a>
-  }
 
-  <a mat-list-item routerLink="/stats" routerLinkActive="active">
-    <mat-icon>bar_chart</mat-icon>
-    <span>Stats</span>
-  </a>
-</mat-nav-list>
+    @if (!(isTeacher$ | async)) {
+      <a mat-list-item routerLink="/classes" routerLinkActive="active">
+        <mat-icon matListItemIcon>class</mat-icon>
+        <span matListItemTitle>Classes</span>
+      </a>
+    }
+
+    <a mat-list-item routerLink="/stats" routerLinkActive="active">
+      <mat-icon matListItemIcon>bar_chart</mat-icon>
+      <span matListItemTitle>Stats</span>
+    </a>
+  </mat-nav-list>
+
+  <div class="sidebar-footer">
+    <div class="hint">
+      <mat-icon>info</mat-icon>
+      <span>Use the menu to navigate</span>
+    </div>
+  </div>
+</aside>

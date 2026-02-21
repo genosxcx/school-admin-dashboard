@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.shell {
+  height: 100vh;
+  background: #f6f7fb;
+}
+
+.shell-sidenav {
+  width: 280px;
+  border-right: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.shell-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page {
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+}
+
+@media (max-width: 900px) {
+  .shell-sidenav {
+    width: 84px; // compact rail look
+  }
+  .page {
+    padding: 16px;
+  }
+}

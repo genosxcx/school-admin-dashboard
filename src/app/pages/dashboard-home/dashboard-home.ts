@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { filter, take } from 'rxjs/operators';
 import { RoleService } from '../../core/services/role.service';
 import { DataService } from '../../core/services/data.service';
-
+import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,

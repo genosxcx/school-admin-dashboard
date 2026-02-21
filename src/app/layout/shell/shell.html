@@ -1,13 +1,13 @@
-<mat-sidenav-container class="container">
-  <mat-sidenav mode="side" opened class="sidenav">
+<mat-sidenav-container class="shell">
+  <mat-sidenav mode="side" opened class="shell-sidenav">
     <app-sidebar></app-sidebar>
   </mat-sidenav>
 
-  <mat-sidenav-content>
+  <mat-sidenav-content class="shell-content">
     <app-topbar></app-topbar>
 
-    <div class="content">
+    <main class="page">
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

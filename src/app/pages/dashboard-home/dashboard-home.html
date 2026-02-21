@@ -8,12 +8,40 @@
     </div>
   }
 
-  <!-- Error -->
+  <!-- Error / Restricted -->
   @else if (error) {
-    <mat-card class="error-card">
-      <mat-icon>error_outline</mat-icon>
-      <p>{{ error }}</p>
-    </mat-card>
+
+    @if (error.toLowerCase().includes('not allowed')) {
+      <!-- Nice "restricted" state for teachers -->
+      <mat-card class="no-access-card">
+        <div class="no-access-inner">
+          <div class="no-access-icon">
+            <mat-icon>lock</mat-icon>
+          </div>
+
+          <div class="no-access-text">
+            <h2>Restricted</h2>
+            <p>
+              This page is only available to principals/admins.
+              If you think this is a mistake, please contact the school administrator.
+            </p>
+
+            <div class="no-access-actions">
+
+              
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    }
+    @else {
+      <!-- Real errors still look like errors -->
+      <mat-card class="error-card">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error }}</p>
+      </mat-card>
+    }
+
   }
 
   <!-- Content -->
@@ -73,16 +101,20 @@
 
       @if (teachers.length) {
         <div class="teachers-grid">
-@for (teacher of teachers; track (teacher.id ?? teacher.email)) {            <mat-card class="teacher-card">
+          @for (teacher of teachers; track (teacher.id ?? teacher.email)) {
+            <mat-card class="teacher-card">
               <div class="teacher-avatar">
                 {{ (teacher.fullName || teacher.email || '?').charAt(0).toUpperCase() }}
               </div>
+
               <div class="teacher-info">
                 <div class="teacher-name">{{ teacher.fullName || '—' }}</div>
+
                 <div class="teacher-email">
                   <mat-icon>mail</mat-icon>
                   {{ teacher.email }}
                 </div>
+
                 <div class="teacher-class">
                   <mat-icon>class</mat-icon>
                   @if (teacher.classId) {

@@ -1,6 +1,7 @@
-<mat-toolbar class="toolbar">
+<mat-toolbar class="topbar">
   <div class="left">
-    <span class="title">Hya Naqra'a Dashboard</span>
+    <span class="title">Hya Naqra'a</span>
+    <span class="subtitle">Dashboard</span>
   </div>
 
   <span class="spacer"></span>
@@ -8,7 +9,7 @@
   <div class="right">
     <span class="user">{{ displayName }}</span>
 
-    <button mat-stroked-button (click)="logout()">
+    <button mat-stroked-button color="primary" (click)="logout()">
       <mat-icon>logout</mat-icon>
       Logout
     </button>
