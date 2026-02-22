@@ -1,32 +1,21 @@
 <div class="login-wrapper">
   <div class="login-card">
     <div class="login-header">
-      <h1>Sign In</h1>
-      <p>Welcome back to your school portal</p>
+      <h1>Super Admin</h1>
+      <p>Login to review principal registration requests</p>
     </div>
 
-    <!-- Quick fill buttons -->
-    <div class="quick-fill">
+    <!-- <div class="quick-fill">
       <button
         mat-stroked-button
         type="button"
         class="quick-btn"
-        (click)="fillTeacher()"
+        (click)="fillSuperAdmin()"
         [disabled]="loading"
       >
-        Teacher Login
+        Super Admin Login
       </button>
-
-      <button
-        mat-stroked-button
-        type="button"
-        class="quick-btn"
-        (click)="fillPrincipal()"
-        [disabled]="loading"
-      >
-        Principal Login
-      </button>
-    </div>
+    </div> -->
 
     <form (ngSubmit)="submit()" [formGroup]="form">
       <mat-form-field appearance="outline" class="field">
@@ -52,16 +41,6 @@
       <button mat-raised-button color="primary" class="btn" [disabled]="loading">
         {{ loading ? 'Signing in...' : 'Sign in' }}
       </button>
-      <div class="register-row">
-  <button
-    mat-stroked-button
-    type="button"
-    class="btn"
-    [disabled]="loading"
-    routerLink="/admin/register">
-    Register as Principal
-  </button>
-</div>
     </form>
   </div>
 </div>

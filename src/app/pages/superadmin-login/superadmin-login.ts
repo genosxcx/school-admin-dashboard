@@ -1,64 +1,44 @@
 import { Component } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { RouterModule } from '@angular/router';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-superadmin-login',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
   ],
-  templateUrl: './login.html',
-  styleUrls: ['./login.scss'],
+  templateUrl: './superadmin-login.html',
+  styleUrls: ['./superadmin-login.scss'],
 })
-export class Login {
+export class SuperadminLogin {
   loading = false;
   error = '';
 
-  form;
+  private SUPERADMIN_EMAIL = 'ayansar85@gmail.com';
+
+  form!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router
   ) {
+    // ✅ Create form here (after fb is available)
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
-  }
-
-  fillTeacher() {
-    this.error = '';
-    this.form.patchValue({
-      email: 'teacher@test.com',
-      password: '123456',
-    });
-    this.form.markAsDirty();
-    this.form.get('email')?.markAsTouched();
-    this.form.get('password')?.markAsTouched();
-  }
-
-  fillPrincipal() {
-    this.error = '';
-    this.form.patchValue({
-      email: 'principal@test.com',
-      password: '123456',
-    });
-    this.form.markAsDirty();
-    this.form.get('email')?.markAsTouched();
-    this.form.get('password')?.markAsTouched();
   }
 
   async submit() {
@@ -70,10 +50,17 @@ export class Login {
     }
 
     this.loading = true;
+
     try {
       const { email, password } = this.form.getRawValue();
+
+      if ((email ?? '').toLowerCase() !== this.SUPERADMIN_EMAIL.toLowerCase()) {
+        throw new Error('Access denied.');
+      }
+
       await this.auth.login(email!, password!);
-      await this.router.navigateByUrl('/admin');
+      await this.router.navigateByUrl('/superadmin/requests');
+
     } catch (e: any) {
       this.error = e?.message ?? 'Login failed';
     } finally {

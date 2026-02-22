@@ -1,0 +1,88 @@
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Principal Requests</h1>
+      <p>Approve or reject principal registrations</p>
+    </div>
+
+    <button mat-stroked-button type="button" (click)="load()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  @if (error) {
+    <div class="err">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <div class="muted">Loading requests...</div>
+  } @else {
+    @if (requests.length === 0) {
+      <mat-card class="empty">
+        <mat-icon>inbox</mat-icon>
+        <div>
+          <div class="title">No requests</div>
+          <div class="muted">When principals register, they’ll appear here.</div>
+        </div>
+      </mat-card>
+    } @else {
+      <div class="grid">
+        @for (r of requests; track r.id) {
+          <mat-card class="req">
+            <div class="row">
+              <div class="left">
+                <div class="name">{{ r.fullName }}</div>
+
+                <div class="meta">
+                  <span class="pill">{{ r.status }}</span>
+                  <span class="dot">•</span>
+                  <span class="email">{{ r.email }}</span>
+                </div>
+
+                <div class="school">
+                  <mat-icon>school</mat-icon>
+                  <span>{{ r.schoolName }}</span>
+                </div>
+
+                @if (r.schoolId) {
+                  <div class="schoolId">
+                    <mat-icon>badge</mat-icon>
+                    <span>School ID: <b>{{ r.schoolId }}</b></span>
+                  </div>
+                } @else {
+                  <div class="schoolId">
+                    <mat-icon>key</mat-icon>
+                    <span>Request ID: <b>{{ r.id }}</b></span>
+                  </div>
+                }
+              </div>
+
+              <div class="actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  (click)="approve(r)"
+                  [disabled]="r.status !== 'PENDING'"
+                >
+                  Approve
+                </button>
+
+                <button
+                  mat-stroked-button
+                  color="warn"
+                  type="button"
+                  (click)="reject(r)"
+                  [disabled]="r.status !== 'PENDING'"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>
