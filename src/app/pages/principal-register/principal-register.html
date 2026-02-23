@@ -1,57 +1,137 @@
-<div class="login-wrapper">
-  <div class="login-card">
-    <div class="login-header">
+<div class="registration-container">
+  <!-- Decorative background elements -->
+  <div class="bg-decoration"></div>
+  
+  <div class="registration-card">
+    <!-- Header section -->
+    <div class="registration-header">
+      <div class="header-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L15.09 8.26H22L17.55 12.52L19.64 18.78L12 14.52L4.36 18.78L6.45 12.52L2 8.26H8.91L12 2Z"/>
+        </svg>
+      </div>
       <h1>Principal Registration</h1>
-      <p>Submit a request — Super Admin must approve it.</p>
+      <p>Submit a request — Super Admin must approve it</p>
     </div>
 
-    <form (ngSubmit)="submit()" [formGroup]="form">
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Full Name</mat-label>
-        <input matInput formControlName="fullName" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="email" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>School Name</mat-label>
-        <input matInput formControlName="schoolName" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Password</mat-label>
-        <input matInput formControlName="password" type="password" />
-        @if (form.get('password')!.touched && form.get('password')!.invalid) {
-          <mat-error>Password must be at least 6 characters</mat-error>
+    <!-- Form section -->
+    <form (ngSubmit)="submit()" [formGroup]="form" class="registration-form">
+      <!-- Full Name Field -->
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Full Name</mat-label>
+          <input matInput formControlName="fullName" />
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+        @if (form.get('fullName')?.touched && form.get('fullName')?.invalid) {
+          <span class="field-error">Please enter your full name</span>
         }
-      </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Confirm Password</mat-label>
-        <input matInput formControlName="confirmPassword" type="password" />
-        @if (form.get('confirmPassword')!.touched && form.get('confirmPassword')!.invalid) {
-          <mat-error>Please confirm your password</mat-error>
+      <!-- Email Field -->
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email Address</mat-label>
+          <input matInput formControlName="email" type="email" />
+          <mat-icon matPrefix>mail</mat-icon>
+        </mat-form-field>
+        @if (form.get('email')?.touched && form.get('email')?.invalid) {
+          <span class="field-error">Please enter a valid email address</span>
         }
-      </mat-form-field>
+      </div>
 
-      @if (form.get('confirmPassword')!.touched && form.get('password')!.value !== form.get('confirmPassword')!.value) {
-        <div class="err">Passwords do not match</div>
-      }
+      <!-- School Name Field -->
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>School Name</mat-label>
+          <input matInput formControlName="schoolName" />
+          <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+        @if (form.get('schoolName')?.touched && form.get('schoolName')?.invalid) {
+          <span class="field-error">Please enter your school name</span>
+        }
+      </div>
 
+      <!-- Password Field -->
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" [type]="showPassword ? 'text' : 'password'" />
+          <button 
+            mat-icon-button 
+            matSuffix 
+            (click)="togglePasswordVisibility()" 
+            type="button"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        <div class="password-requirements">
+          <span class="req" [class.met]="form.get('password')?.value?.length! >= 6">
+            <mat-icon>{{ form.get('password')?.value?.length! >= 6 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            At least 6 characters
+          </span>
+        </div>
+        @if (form.get('password')?.touched && form.get('password')?.invalid) {
+          <span class="field-error">Password must be at least 6 characters</span>
+        }
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput formControlName="confirmPassword" [type]="showPassword ? 'text' : 'password'" />
+          <button 
+            mat-icon-button 
+            matSuffix 
+            (click)="togglePasswordVisibility()" 
+            type="button"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        @if (form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value && form.get('password')?.value !== form.get('confirmPassword')?.value) {
+          <span class="field-error">Passwords do not match</span>
+        }
+        @if (form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value && form.get('password')?.value === form.get('confirmPassword')?.value) {
+          <span class="field-success">Passwords match</span>
+        }
+      </div>
+
+      <!-- Alert Messages -->
       @if (error) {
-        <div class="err">{{ error }}</div>
+        <div class="alert alert-error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ error }}</span>
+        </div>
       }
 
-      <button mat-raised-button color="primary" class="btn" [disabled]="loading">
-        {{ loading ? 'Sending...' : 'Send request' }}
-      </button>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="btn-submit" 
+          [disabled]="loading || !form.valid">
+          <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+          <span>{{ loading ? 'Sending request...' : 'Send request' }}</span>
+        </button>
+        <button 
+          mat-stroked-button 
+          type="button" 
+          class="btn-back" 
+          routerLink="/admin/login" 
+          [disabled]="loading">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Back to login</span>
+        </button>
+      </div>
 
-      <button mat-stroked-button type="button" class="btn secondary" routerLink="/admin/login" [disabled]="loading">
-        Back to login
-      </button>
+      <!-- Footer text -->
+      <p class="footer-text">
+        By registering, you agree to our <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>
+      </p>
     </form>
   </div>
 </div>

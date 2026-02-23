@@ -1,88 +1,170 @@
-<div class="wrap">
-  <div class="topbar">
-    <div>
-      <h1>Principal Requests</h1>
-      <p>Approve or reject principal registrations</p>
-    </div>
-
-    <button mat-stroked-button type="button" (click)="load()" [disabled]="loading">
-      <mat-icon>refresh</mat-icon>
-      Refresh
-    </button>
+<div class="dashboard-container">
+  <!-- Decorative background -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
   </div>
 
-  @if (error) {
-    <div class="err">{{ error }}</div>
-  }
-
-  @if (loading) {
-    <div class="muted">Loading requests...</div>
-  } @else {
-    @if (requests.length === 0) {
-      <mat-card class="empty">
-        <mat-icon>inbox</mat-icon>
-        <div>
-          <div class="title">No requests</div>
-          <div class="muted">When principals register, they’ll appear here.</div>
+  <div class="dashboard-wrapper">
+    <!-- Header/Topbar -->
+    <div class="topbar">
+      <div class="topbar-content">
+        <div class="topbar-left">
+          <div class="topbar-icon">
+            <mat-icon>assignment_ind</mat-icon>
+          </div>
+          <div class="topbar-text">
+            <h1>Principal Requests</h1>
+            <p>Approve or reject principal registrations</p>
+          </div>
         </div>
-      </mat-card>
-    } @else {
-      <div class="grid">
-        @for (r of requests; track r.id) {
-          <mat-card class="req">
-            <div class="row">
-              <div class="left">
-                <div class="name">{{ r.fullName }}</div>
 
-                <div class="meta">
-                  <span class="pill">{{ r.status }}</span>
-                  <span class="dot">•</span>
-                  <span class="email">{{ r.email }}</span>
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="load()"
+          [disabled]="loading"
+          class="refresh-btn"
+        >
+          <mat-icon [class.spinning]="loading">refresh</mat-icon>
+          <span>{{ loading ? 'Loading...' : 'Refresh' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    @if (error) {
+      <div class="alert alert-error">
+        <mat-icon>error_outline</mat-icon>
+        <div class="alert-content">
+          <div class="alert-title">Something went wrong</div>
+          <div class="alert-message">{{ error }}</div>
+        </div>
+        <button
+          mat-icon-button
+          (click)="error = ''"
+          class="alert-close"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    }
+
+    <!-- Content -->
+    <div class="content">
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="48"></mat-spinner>
+          <div class="loading-text">Fetching principal requests...</div>
+        </div>
+      } @else {
+        @if (requests.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">
+              <mat-icon>inbox</mat-icon>
+            </div>
+            <div class="empty-content">
+              <h2>No pending requests</h2>
+              <p>When principals register, their requests will appear here for approval.</p>
+            </div>
+          </div>
+        } @else {
+          <div class="requests-grid">
+            @for (r of requests; track r.id) {
+              <div class="request-card" [class.approved]="r.status === 'APPROVED'" [class.rejected]="r.status === 'REJECTED'">
+                <!-- Card Header -->
+                <div class="card-header">
+                  <div class="status-badge" [class]="'status-' + r.status.toLowerCase()">
+                    {{ r.status }}
+                  </div>
+                  <div class="card-id">ID: {{ r.id.slice(0, 8) }}...</div>
                 </div>
 
-                <div class="school">
-                  <mat-icon>school</mat-icon>
-                  <span>{{ r.schoolName }}</span>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <!-- Profile Section -->
+                  <div class="profile-section">
+                    <div class="avatar">
+                      <mat-icon>person</mat-icon>
+                    </div>
+                    <div class="profile-info">
+                      <h3 class="principal-name">{{ r.fullName }}</h3>
+                      <div class="email-info">
+                        <mat-icon>mail</mat-icon>
+                        <a [href]="'mailto:' + r.email">{{ r.email }}</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- School Information -->
+                  <div class="info-row">
+                    <div class="info-item">
+                      <mat-icon>school</mat-icon>
+                      <div class="info-text">
+                        <span class="info-label">School</span>
+                        <span class="info-value">{{ r.schoolName }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Request/School ID -->
+                  @if (r.schoolId) {
+                    <div class="info-row">
+                      <div class="info-item">
+                        <mat-icon>badge</mat-icon>
+                        <div class="info-text">
+                          <span class="info-label">School ID</span>
+                          <span class="info-value code">{{ r.schoolId }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="info-row">
+                      <div class="info-item">
+                        <mat-icon>key</mat-icon>
+                        <div class="info-text">
+                          <span class="info-label">Request ID</span>
+                          <span class="info-value code">{{ r.id }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
                 </div>
 
-                @if (r.schoolId) {
-                  <div class="schoolId">
-                    <mat-icon>badge</mat-icon>
-                    <span>School ID: <b>{{ r.schoolId }}</b></span>
+                <!-- Card Footer - Actions -->
+                @if (r.status === 'PENDING') {
+                  <div class="card-footer">
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      type="button"
+                      (click)="approve(r)"
+                      class="action-btn approve-btn"
+                    >
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Approve</span>
+                    </button>
+                    <button
+                      mat-stroked-button
+                      color="warn"
+                      type="button"
+                      (click)="reject(r)"
+                      class="action-btn reject-btn"
+                    >
+                      <mat-icon>cancel</mat-icon>
+                      <span>Reject</span>
+                    </button>
                   </div>
                 } @else {
-                  <div class="schoolId">
-                    <mat-icon>key</mat-icon>
-                    <span>Request ID: <b>{{ r.id }}</b></span>
+                  <div class="card-footer disabled">
+                    <span class="status-text">{{ r.status === 'APPROVED' ? '✓ Approved' : '✗ Rejected' }}</span>
                   </div>
                 }
               </div>
-
-              <div class="actions">
-                <button
-                  mat-raised-button
-                  color="primary"
-                  type="button"
-                  (click)="approve(r)"
-                  [disabled]="r.status !== 'PENDING'"
-                >
-                  Approve
-                </button>
-
-                <button
-                  mat-stroked-button
-                  color="warn"
-                  type="button"
-                  (click)="reject(r)"
-                  [disabled]="r.status !== 'PENDING'"
-                >
-                  Reject
-                </button>
-              </div>
-            </div>
-          </mat-card>
+            }
+          </div>
         }
-      </div>
-    }
-  }
+      }
+    </div>
+  </div>
 </div>
