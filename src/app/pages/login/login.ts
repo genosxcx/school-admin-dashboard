@@ -42,8 +42,8 @@ export class Login {
   fillTeacher() {
     this.error = '';
     this.form.patchValue({
-      email: 'teacher@test.com',
-      password: '123456',
+      email: 'abd@test.com',
+      password: 'FPhAwdb0',
     });
     this.form.markAsDirty();
     this.form.get('email')?.markAsTouched();
@@ -53,14 +53,24 @@ export class Login {
   fillPrincipal() {
     this.error = '';
     this.form.patchValue({
-      email: 'principal@test.com',
-      password: '123456',
+      email: 'principal2@test.com',
+      password: '123123',
     });
     this.form.markAsDirty();
     this.form.get('email')?.markAsTouched();
     this.form.get('password')?.markAsTouched();
   }
 
+  fillsubjectTeacher() {
+    this.error = '';
+    this.form.patchValue({
+      email: 'aya@test.com',
+      password: 'LG0DzW$t',
+    });
+    this.form.markAsDirty();
+    this.form.get('email')?.markAsTouched();
+    this.form.get('password')?.markAsTouched();
+  }
   async submit() {
     this.error = '';
 

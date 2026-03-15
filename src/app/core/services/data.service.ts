@@ -10,6 +10,10 @@ import {
   where,
   getCountFromServer,
 } from 'firebase/firestore';
+import { initializeApp, deleteApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc } from 'firebase/firestore'; // Make sure setDoc is imported
+import { environment } from '../../../environments/environment';
 import { db } from '../../firebase';
 
 // ---------------- TYPES ----------------
@@ -22,7 +26,15 @@ export type Teacher = {
   email?: string;
   classId?: string;
 };
-
+export type SubjectTeacher = {
+  id?: string;
+  role?: 'subject_teacher';
+  schoolId: string;
+  fullName: string;
+  email?: string;
+  subject?: string; // e.g., "Arabic Reading", "Math"
+  classIds?: string[]; // Array of connected class IDs
+};
 export type Student = {
   id?: string;
   role?: 'student';
@@ -42,7 +54,16 @@ export type SchoolClass = {
   schoolId: string;
   name: string; // shown in UI (e.g., "A1")
 };
-
+export type Assignment = {
+  id?: string;
+  schoolId: string;
+  teacherId: string;
+  title: string;
+  description: string;
+  classIds: string[];
+  fileUrl?: string;
+  createdAt: number;
+};
 @Injectable({ providedIn: 'root' })
 export class DataService {
   // ---------------- HELPERS ----------------
@@ -82,17 +103,57 @@ export class DataService {
 
   async createTeacher(
     schoolId: string,
-    payload: { fullName: string; email?: string; classId?: string }
+    payload: { fullName: string; email?: string; classId?: string; password?: string }
   ) {
-    const ref = collection(db, 'users');
-    const docRef = await addDoc(ref, {
-      role: 'teacher',
-      schoolId,
-      fullName: payload.fullName.trim(),
-      email: (payload.email ?? '').trim(),
-      classId: (payload.classId ?? '').trim(),
-    });
-    return docRef.id;
+    let authUid = '';
+
+    // 1. Create the Auth account using a secondary Firebase app instance
+    if (payload.email && payload.password) {
+      // Create a uniquely named secondary app
+      const secondaryAppName = 'SecondaryAppTeacher_' + Date.now();
+      const secondaryApp = initializeApp(environment.firebase, secondaryAppName);
+      const secondaryAuth = getAuth(secondaryApp);
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          secondaryAuth, 
+          payload.email.trim(), 
+          payload.password
+        );
+        authUid = userCredential.user.uid;
+      } catch (error) {
+        console.error("Failed to create Auth user:", error);
+        throw error; // Stop execution if auth creation fails
+      } finally {
+        // Always delete the secondary app to prevent memory leaks and conflicts
+        await deleteApp(secondaryApp);
+      }
+    }
+
+    // 2. Save the data to Firestore
+    if (authUid) {
+      const docRef = doc(db, 'users', authUid);
+      await setDoc(docRef, {
+        role: 'teacher',
+        schoolId,
+        fullName: payload.fullName.trim(),
+        email: (payload.email ?? '').trim(),
+        classId: (payload.classId ?? '').trim(),
+        status: 'APPROVED' // ✅ Add this line
+      });
+      return authUid;
+    } else {
+      const ref = collection(db, 'users');
+      const docRef = await addDoc(ref, {
+        role: 'teacher',
+        schoolId,
+        fullName: payload.fullName.trim(),
+        email: (payload.email ?? '').trim(),
+        classId: (payload.classId ?? '').trim(),
+        status: 'APPROVED' // ✅ Add this line
+      });
+      return docRef.id;
+    }
   }
 
   async updateTeacher(
@@ -122,7 +183,116 @@ export class DataService {
     const agg = await getCountFromServer(qy);
     return agg.data().count ?? 0;
   }
+// ---------------- SUBJECT TEACHERS (users collection) ----------------
 
+  async getSubjectTeachers(schoolId: string): Promise<SubjectTeacher[]> {
+    const ref = collection(db, 'users');
+    const qy = query(
+      ref,
+      where('role', '==', 'subject_teacher'),
+      where('schoolId', '==', schoolId)
+    );
+    const snap = await getDocs(qy);
+
+    return snap.docs.map((d) => {
+      const data = d.data() as any;
+      return {
+        id: d.id,
+        role: data.role,
+        schoolId: data.schoolId,
+        fullName: this.normalizeFullName(data),
+        email: (data.email ?? '').toString(),
+        subject: (data.subject ?? '').toString(),
+        // Ensure classIds is always an array
+        classIds: Array.isArray(data.classIds) ? data.classIds : [],
+      } as SubjectTeacher;
+    });
+  }
+
+  async createSubjectTeacher(
+    schoolId: string,
+    payload: { fullName: string; email?: string; subject?: string; classIds?: string[], password?: string }
+  ) {
+    let authUid = '';
+
+    // 1. Create the Auth account using a secondary Firebase app instance
+    if (payload.email && payload.password) {
+      // Create a uniquely named secondary app
+      const secondaryAppName = 'SecondaryApp_' + Date.now();
+      const secondaryApp = initializeApp(environment.firebase, secondaryAppName);
+      const secondaryAuth = getAuth(secondaryApp);
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          secondaryAuth, 
+          payload.email.trim(), 
+          payload.password
+        );
+        authUid = userCredential.user.uid;
+      } catch (error) {
+        console.error("Failed to create Auth user:", error);
+        throw error; // Stop execution if auth creation fails
+      } finally {
+        // Always delete the secondary app to prevent memory leaks and conflicts
+        await deleteApp(secondaryApp);
+      }
+    }
+
+// 2. Save the data to Firestore
+    if (authUid) {
+      const docRef = doc(db, 'users', authUid);
+      await setDoc(docRef, {
+        role: 'subject_teacher',
+        schoolId,
+        fullName: payload.fullName.trim(),
+        email: (payload.email ?? '').trim(),
+        subject: (payload.subject ?? '').trim(),
+        classIds: payload.classIds ?? [],
+        status: 'APPROVED' // ✅ Add this line
+      });
+      return authUid;
+    } else {
+      const ref = collection(db, 'users');
+      const docRef = await addDoc(ref, {
+        role: 'subject_teacher',
+        schoolId,
+        fullName: payload.fullName.trim(),
+        email: (payload.email ?? '').trim(),
+        subject: (payload.subject ?? '').trim(),
+        classIds: payload.classIds ?? [],
+        status: 'APPROVED' // ✅ Add this line
+      });
+      return docRef.id;
+    }  }
+
+  async updateSubjectTeacher(
+    teacherId: string,
+    patch: Partial<Pick<SubjectTeacher, 'fullName' | 'email' | 'subject' | 'classIds'>>
+  ) {
+    const ref = doc(db, 'users', teacherId);
+    await updateDoc(ref, {
+      ...(patch.fullName !== undefined ? { fullName: patch.fullName.trim() } : {}),
+      ...(patch.email !== undefined ? { email: (patch.email ?? '').trim() } : {}),
+      ...(patch.subject !== undefined ? { subject: (patch.subject ?? '').trim() } : {}),
+      ...(patch.classIds !== undefined ? { classIds: patch.classIds } : {}),
+    });
+  }
+
+  async deleteSubjectTeacher(teacherId: string) {
+    const ref = doc(db, 'users', teacherId);
+    await deleteDoc(ref);
+  }
+
+  async countSubjectTeachers(schoolId: string): Promise<number> {
+    const ref = collection(db, 'users');
+    const qy = query(
+      ref,
+      where('role', '==', 'subject_teacher'),
+      where('schoolId', '==', schoolId)
+    );
+    const agg = await getCountFromServer(qy);
+    return agg.data().count ?? 0;
+  }
   // ---------------- STUDENTS (users collection) ----------------
 
   async getStudents(schoolId: string): Promise<Student[]> {
@@ -180,24 +350,55 @@ export class DataService {
     });
   }
 
-  async createStudent(
+async createStudent(
     schoolId: string,
-    payload: { fullName: string; email?: string; classId?: string }
+    payload: { fullName: string; email?: string; classId?: string; password?: string }
   ) {
-    const ref = collection(db, 'users');
-    const docRef = await addDoc(ref, {
+    let authUid = '';
+
+    // 1. Create the Auth account using a secondary Firebase app instance
+    if (payload.email && payload.password) {
+      const secondaryAppName = 'SecondaryAppStudent_' + Date.now();
+      const secondaryApp = initializeApp(environment.firebase, secondaryAppName);
+      const secondaryAuth = getAuth(secondaryApp);
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          secondaryAuth, 
+          payload.email.trim(), 
+          payload.password
+        );
+        authUid = userCredential.user.uid;
+      } catch (error) {
+        console.error("Failed to create Auth user for student:", error);
+        throw error; 
+      } finally {
+        await deleteApp(secondaryApp);
+      }
+    }
+
+    const studentData = {
       role: 'student',
       schoolId,
       fullName: payload.fullName.trim(),
       email: (payload.email ?? '').trim(),
       classId: (payload.classId ?? '').trim(),
-
-      // optional defaults for stats
+      status: 'APPROVED', // Automatically approve them
       grade: 0,
       completion: 0,
       minutesRecorded: 0,
-    });
-    return docRef.id;
+    };
+
+    // 2. Save the data to Firestore
+    if (authUid) {
+      const docRef = doc(db, 'users', authUid);
+      await setDoc(docRef, studentData);
+      return authUid;
+    } else {
+      const ref = collection(db, 'users');
+      const docRef = await addDoc(ref, studentData);
+      return docRef.id;
+    }
   }
 
   async updateStudent(
@@ -233,7 +434,48 @@ export class DataService {
     const agg = await getCountFromServer(qy);
     return agg.data().count ?? 0;
   }
+async getStudentsForSubjectTeacher(schoolId: string, classIds: string[]): Promise<Student[]> {
+    if (!classIds || classIds.length === 0) return [];
 
+    // Firestore 'in' queries are limited to 10 items per batch. 
+    // If a teacher has more than 10 classes, we have to split the request.
+    const chunks = [];
+    for (let i = 0; i < classIds.length; i += 10) {
+      chunks.push(classIds.slice(i, i + 10));
+    }
+
+    const ref = collection(db, 'users');
+    let allStudents: Student[] = [];
+
+    for (const chunk of chunks) {
+      const qy = query(
+        ref,
+        where('role', '==', 'student'),
+        where('schoolId', '==', schoolId),
+        where('classId', 'in', chunk) // Get students in ANY of these classes
+      );
+      const snap = await getDocs(qy);
+      
+      const chunkStudents = snap.docs.map((d) => {
+        const data = d.data() as any;
+        return {
+          id: d.id,
+          role: data.role,
+          schoolId: data.schoolId,
+          fullName: this.normalizeFullName(data),
+          email: (data.email ?? '').toString(),
+          classId: (data.classId ?? '').toString(),
+          grade: this.toNumber(data.grade, 0),
+          completion: this.toNumber(data.completion, 0),
+          minutesRecorded: this.toNumber(data.minutesRecorded, 0),
+        } as Student;
+      });
+
+      allStudents = [...allStudents, ...chunkStudents];
+    }
+
+    return allStudents;
+  }
   // ---------------- CLASSES (classes collection) ----------------
 
   async getClasses(schoolId: string): Promise<SchoolClass[]> {
@@ -303,5 +545,42 @@ export class DataService {
   async totalMinutes(schoolId: string): Promise<number> {
     // keep old API but make it real
     return this.totalMinutesRecorded(schoolId);
+  }
+
+  // ---------------- ASSIGNMENTS (assignments collection) ----------------
+
+  async getAssignmentsForTeacher(schoolId: string, teacherId: string): Promise<Assignment[]> {
+    const ref = collection(db, 'assignments');
+    const qy = query(
+      ref,
+      where('schoolId', '==', schoolId),
+      where('teacherId', '==', teacherId)
+    );
+    const snap = await getDocs(qy);
+
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Assignment));
+  }
+
+  async createAssignment(
+    schoolId: string,
+    teacherId: string,
+    payload: { title: string; description: string; classIds: string[]; fileUrl?: string }
+  ) {
+    const ref = collection(db, 'assignments');
+    const docRef = await addDoc(ref, {
+      schoolId,
+      teacherId,
+      title: payload.title.trim(),
+      description: payload.description.trim(),
+      classIds: payload.classIds ?? [],
+      fileUrl: payload.fileUrl ?? '',
+      createdAt: Date.now()
+    });
+    return docRef.id;
+  }
+
+  async deleteAssignment(assignmentId: string) {
+    const ref = doc(db, 'assignments', assignmentId);
+    await deleteDoc(ref);
   }
 }

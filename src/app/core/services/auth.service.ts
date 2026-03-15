@@ -5,6 +5,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
 } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -50,41 +51,47 @@ export class AuthService {
       return null;
     }
   }
-
 async login(email: string, password: string) {
-  console.log('[AuthService] Logging in user:', email);
+    console.log('[AuthService] Logging in user:', email);
 
-  const SUPERADMIN_EMAIL = 'ayansar85@gmail.com';
+    const SUPERADMIN_EMAIL = 'ayansar85@gmail.com';
 
-  const cred = await signInWithEmailAndPassword(auth, email, password);
+    const cred = await signInWithEmailAndPassword(auth, email, password);
 
-  // ✅ Superadmin bypass
-  if ((email ?? '').toLowerCase() === SUPERADMIN_EMAIL.toLowerCase()) {
-    console.log('[AuthService] Superadmin login allowed');
+    // ✅ Superadmin bypass
+    if ((email ?? '').toLowerCase() === SUPERADMIN_EMAIL.toLowerCase()) {
+      console.log('[AuthService] Superadmin login allowed');
+      return cred;
+    }
+
+    const uid = cred.user.uid;
+
+    // ✅ Check approval for everyone else
+    const snap = await getDoc(doc(db, 'users', uid));
+
+    if (!snap.exists()) {
+      await signOut(auth);
+      throw new Error('Your account is pending approval.');
+    }
+
+    const data = snap.data() as any;
+
+    // ✅ FIXED: Check for either the boolean 'approved' OR the string 'status'
+    if (data?.approved !== true && data?.status !== 'APPROVED') {
+      await signOut(auth);
+      throw new Error('Your account is pending approval.');
+    }
+
     return cred;
   }
-
-  const uid = cred.user.uid;
-
-  // ✅ Check approval for everyone else
-  const snap = await getDoc(doc(db, 'users', uid));
-
-  if (!snap.exists()) {
-    await signOut(auth);
-    throw new Error('Your account is pending approval.');
-  }
-
-  const data = snap.data() as any;
-
-  if (data?.approved !== true) {
-    await signOut(auth);
-    throw new Error('Your account is pending approval.');
-  }
-
-  return cred;
-}
   logout() {
     console.log('[AuthService] Logging out');
     return signOut(auth);
+  }
+  async changePassword(newPassword: string): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) throw new Error('No user is currently logged in.');
+    
+    await updatePassword(user, newPassword);
   }
 }

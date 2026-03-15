@@ -58,9 +58,14 @@ export class Stats implements OnInit, OnDestroy {
   error = '';
   schoolId = '';
 
-  // ✅ teacher filtering
+  // ✅ Role checking
+  isPrincipal = false;
   isTeacher = false;
+  isSubjectTeacher = false;
+
+  // ✅ Class filters
   teacherClassId = '';
+  subjectTeacherClassIds: string[] = [];
 
   summary: Summary = { teachers: 0, students: 0, classes: 0, minutes: 0 };
 
@@ -94,12 +99,27 @@ export class Stats implements OnInit, OnDestroy {
       )
       .subscribe((claims) => {
         this.schoolId = claims.schoolId;
-        this.isTeacher = (claims.role ?? '').toString().toLowerCase() === 'teacher';
-        this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
+        
+        const roleStr = (claims.role ?? '').toString().toLowerCase();
+        this.isPrincipal = roleStr === 'principal' || roleStr === 'admin';
+        this.isTeacher = roleStr === 'teacher';
+        this.isSubjectTeacher = roleStr === 'subject_teacher';
+
+        this.teacherClassId = (claims.classId ?? '').toString();
+        this.subjectTeacherClassIds = Array.isArray(claims.classIds) ? claims.classIds : [];
 
         if (this.isTeacher && !this.teacherClassId) {
           this.zone.run(() => {
             this.error = 'Your account is not assigned to a class yet.';
+            this.loading = false;
+          });
+          this.cdr.detectChanges();
+          return;
+        }
+
+        if (this.isSubjectTeacher && this.subjectTeacherClassIds.length === 0) {
+          this.zone.run(() => {
+            this.error = 'Your account is not assigned to any classes yet.';
             this.loading = false;
           });
           this.cdr.detectChanges();
@@ -117,15 +137,16 @@ export class Stats implements OnInit, OnDestroy {
 
       const classList = await this.data.getClasses(this.schoolId);
 
-      // ✅ teacher sees only their class in list
-      const visibleClasses = this.isTeacher
-        ? (classList ?? []).filter((c) => c.id === this.teacherClassId)
-        : (classList ?? []);
+      // ✅ Filter classes based on role
+      let visibleClasses = classList ?? [];
+      if (this.isTeacher) {
+        visibleClasses = visibleClasses.filter((c) => c.id === this.teacherClassId);
+      } else if (this.isSubjectTeacher) {
+        visibleClasses = visibleClasses.filter((c) => c.id && this.subjectTeacherClassIds.includes(c.id));
+      }
 
-      // Summary:
-      // - Principal: school-level summary (same as before)
-      // - Teacher: class-level summary (students/minutes based on their class)
-      if (!this.isTeacher) {
+      // Summary Logic
+      if (this.isPrincipal) {
         const [teachers, students, classes, minutes] = await Promise.all([
           this.data.countTeachers(this.schoolId),
           this.data.countStudents(this.schoolId),
@@ -141,30 +162,14 @@ export class Stats implements OnInit, OnDestroy {
             minutes: Number(minutes ?? 0),
           };
         });
-      } else {
-        // class-level summary
+      } else if (this.isTeacher) {
+        // Home teacher class-level summary
         const classStudents = await this.data.getStudentsByClass(this.schoolId, this.teacherClassId);
-
-        const safe = (classStudents ?? []).map((s: Student) => ({
-          ...s,
-          grade: Number(s.grade ?? 0),
-          completion: Number(s.completion ?? 0),
-          minutesRecorded: Number(s.minutesRecorded ?? 0),
-        }));
-
-        const totalMinutes = safe.reduce(
-          (sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0),
-          0
-        );
-
-        this.zone.run(() => {
-          this.summary = {
-            teachers: 1, // teacher view: not meaningful school-wide
-            students: safe.length,
-            classes: 1,
-            minutes: totalMinutes,
-          };
-        });
+        this.calculateSummaryFromStudents(classStudents, 1);
+      } else if (this.isSubjectTeacher) {
+        // Subject teacher multi-class summary
+        const allStudents = await this.data.getStudentsForSubjectTeacher(this.schoolId, this.subjectTeacherClassIds);
+        this.calculateSummaryFromStudents(allStudents, visibleClasses.length);
       }
 
       this.zone.run(() => {
@@ -174,11 +179,12 @@ export class Stats implements OnInit, OnDestroy {
 
         this.loading = false;
 
-        // ✅ auto-select
+        // ✅ Auto-select logic
         if (this.isTeacher) {
           this.selectedClassId = this.teacherClassId;
           this.selectClass(this.teacherClassId);
-        } else if (!this.selectedClassId && this.classes.length) {
+        } else if (this.classes.length > 0) {
+          // Both Principal and Subject Teacher auto-select the first visible class
           this.selectClass(this.classes[0].id!);
         }
       });
@@ -194,9 +200,34 @@ export class Stats implements OnInit, OnDestroy {
     }
   }
 
+  // ✅ Extracted summary calculation so both teacher types can use it
+  private calculateSummaryFromStudents(students: Student[], classCount: number) {
+    const safe = (students ?? []).map((s: Student) => ({
+      ...s,
+      grade: Number(s.grade ?? 0),
+      completion: Number(s.completion ?? 0),
+      minutesRecorded: Number(s.minutesRecorded ?? 0),
+    }));
+
+    const totalMinutes = safe.reduce(
+      (sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0),
+      0
+    );
+
+    this.zone.run(() => {
+      this.summary = {
+        teachers: 1, // teacher view: not meaningful school-wide
+        students: safe.length,
+        classes: classCount,
+        minutes: totalMinutes,
+      };
+    });
+  }
+
   async selectClass(classId: string) {
-    // ✅ teachers cannot switch classes
+    // ✅ Security: Ensure teachers can only select authorized classes
     if (this.isTeacher && classId !== this.teacherClassId) return;
+    if (this.isSubjectTeacher && !this.subjectTeacherClassIds.includes(classId)) return;
 
     this.selectedClassId = classId;
 

@@ -10,11 +10,8 @@ export type RoleClaims = {
   email?: string | null;
   schoolId?: string;
   role?: string;
-
-  // optional multi-class support
+  status?: string; // Tracks 'APPROVED' vs 'PENDING'
   classIds?: string[];
-
-  // ✅ single class for teacher
   classId?: string;
 };
 
@@ -89,12 +86,13 @@ export class RoleService {
   private async loadClaims(user: User): Promise<RoleClaims> {
     if (!user?.uid) throw new Error('User object is invalid');
 
-    // 1) Start with token claims if available
+    // 1) Start with default values, including an empty status
     let base: RoleClaims = {
       uid: user.uid,
       email: user.email,
       schoolId: '',
       role: '',
+      status: '',
       classIds: [],
       classId: '',
     };
@@ -107,6 +105,7 @@ export class RoleService {
         ...base,
         schoolId: (c['schoolId'] ?? base.schoolId ?? '').toString(),
         role: (c['role'] ?? base.role ?? '').toString(),
+        status: (c['status'] ?? base.status ?? '').toString(),
         classIds: Array.isArray(c['classIds']) ? c['classIds'] : base.classIds,
         classId: (c['classId'] ?? base.classId ?? '').toString(),
       };
@@ -114,7 +113,7 @@ export class RoleService {
       console.warn('[RoleService] Custom claims failed:', e);
     }
 
-    // 2) Always merge with Firestore user doc (this is what fixes your issue)
+    // 2) Merge with Firestore user doc to fetch the latest status
     try {
       const userRef = doc(db, 'users', user.uid);
       const snap = await getDoc(userRef);
@@ -127,16 +126,16 @@ export class RoleService {
           email: base.email ?? data?.email ?? null,
           schoolId: base.schoolId || (data?.schoolId ?? ''),
           role: base.role || (data?.role ?? ''),
+          status: base.status || (data?.status ?? ''), 
           classIds: (base.classIds?.length ? base.classIds : (data?.classIds ?? [])),
           classId: base.classId || (data?.classId ?? ''),
         };
       }
 
-      // no firestore doc
       return base;
     } catch (e) {
       console.error('[RoleService] Firestore lookup failed:', e);
-      return base; // still return what we have
+      return base; 
     }
   }
 }

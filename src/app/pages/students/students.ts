@@ -179,7 +179,7 @@ export class Students implements OnInit, OnDestroy {
       .map((c) => ({ id: c.id!, name: c.name }));
   }
 
-  async addStudent() {
+ async addStudent() {
     if (!this.schoolId) return;
 
     const ref = this.dialog.open(StudentFormDialog, {
@@ -187,17 +187,15 @@ export class Students implements OnInit, OnDestroy {
       data: {
         title: 'Add student',
         classes: this.classOptions(),
-        // ✅ preselect teacher class
         initial: this.isTeacher ? { classId: this.teacherClassId } : undefined,
-        // (optional) if your dialog supports it, you can disable class selection for teachers
-        // lockClass: this.isTeacher,
+        lockClass: this.isTeacher, // ✅ Hide dropdown for teachers
       },
     });
 
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
-    // ✅ force teacher classId no matter what comes back
+    // ✅ Force teacher classId no matter what comes back
     const payload = this.isTeacher
       ? { ...result, classId: this.teacherClassId }
       : result;
@@ -220,7 +218,6 @@ export class Students implements OnInit, OnDestroy {
   async editStudent(st: Student) {
     if (!st.id) return;
 
-    // ✅ safety: teacher can only edit students in their class
     if (this.isTeacher && st.classId !== this.teacherClassId) {
       alert('You can only edit students in your class.');
       return;
@@ -232,7 +229,7 @@ export class Students implements OnInit, OnDestroy {
         title: 'Edit student',
         classes: this.classOptions(),
         initial: { fullName: st.fullName, email: st.email, classId: st.classId },
-        // lockClass: this.isTeacher,
+        lockClass: this.isTeacher, // ✅ Hide dropdown for teachers
       },
     });
 
@@ -247,6 +244,7 @@ export class Students implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
+      // ✅ We don't send the password when updating, just the standard fields
       await this.data.updateStudent(st.id, payload);
       await this.loadAll();
     } catch (e) {
@@ -257,7 +255,6 @@ export class Students implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
-
   async deleteStudent(st: Student) {
     if (!st.id) return;
 

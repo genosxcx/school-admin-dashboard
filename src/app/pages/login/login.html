@@ -6,7 +6,7 @@
     </div>
 
     <!-- Quick fill buttons -->
-    <div class="quick-fill">
+    <!--<div class="quick-fill">
       <button
         mat-stroked-button
         type="button"
@@ -14,7 +14,7 @@
         (click)="fillTeacher()"
         [disabled]="loading"
       >
-        Teacher Login
+        Home Teacher Login
       </button>
 
       <button
@@ -26,8 +26,16 @@
       >
         Principal Login
       </button>
-    </div>
-
+      <button
+        mat-stroked-button
+        type="button"
+        class="quick-btn"
+        (click)="fillsubjectTeacher()"
+        [disabled]="loading"
+      >
+        Subject Teacher Login
+      </button>
+    </div>-->
     <form (ngSubmit)="submit()" [formGroup]="form">
       <mat-form-field appearance="outline" class="field">
         <mat-label>Email</mat-label>

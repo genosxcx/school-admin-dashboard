@@ -1,1 +1,42 @@
-<p>settings works!</p>
+<div class="page-header">
+  <h2>Settings</h2>
+</div>
+
+<mat-card class="settings-card">
+  <mat-card-header>
+    <mat-card-title>Change Password</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form-layout">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>New Password</mat-label>
+        <input matInput type="password" formControlName="newPassword" />
+        <mat-error *ngIf="form.get('newPassword')?.hasError('minlength')">
+          Password must be at least 6 characters.
+        </mat-error>
+        <mat-error *ngIf="form.get('newPassword')?.hasError('required')">
+          New password is required.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Confirm New Password</mat-label>
+        <input matInput type="password" formControlName="confirmPassword" />
+        <mat-error *ngIf="form.hasError('mismatch') && form.get('confirmPassword')?.touched">
+          Passwords do not match.
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
+          {{ loading ? 'Updating...' : 'Update Password' }}
+        </button>
+      </div>
+
+    </form>
+  </mat-card-content>
+</mat-card>

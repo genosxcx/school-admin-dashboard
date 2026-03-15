@@ -9,17 +9,24 @@ export const roleGuard: CanActivateFn = async (route) => {
   try {
     const claims = await roleSvc.getClaims();
 
-    // if no schoolId, treat as not allowed
-    if (!claims?.schoolId) return router.parseUrl('/login');
+    // If no schoolId, treat as not allowed and send to login
+    if (!claims?.schoolId) return router.parseUrl('/admin/login');
 
-    // optional: check required role from route data
-    const required = route.data?.['role'] as string | undefined;
-    if (required && claims.role !== required) {
-      return router.parseUrl('/login');
+    // Look for the 'roles' array defined in your routes.ts
+    const allowedRoles = route.data?.['roles'] as string[] | undefined;
+    
+    if (allowedRoles && claims.role) {
+      // Check if the user's role is inside the allowedRoles array (case-insensitive)
+      const hasRole = allowedRoles.map(r => r.toUpperCase()).includes(claims.role.toUpperCase());
+      
+      if (!hasRole) {
+        // If they don't have the right role, send them to the main dashboard instead of login
+        return router.parseUrl('/admin'); 
+      }
     }
 
     return true;
   } catch (e) {
-    return router.parseUrl('/login');
+    return router.parseUrl('/admin/login');
   }
 };

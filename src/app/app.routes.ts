@@ -14,10 +14,22 @@ import { Settings } from './pages/settings/settings';
 import { PrincipalRegister } from './pages/principal-register/principal-register';
 import { SuperadminLogin } from './pages/superadmin-login/superadmin-login';
 import { SuperadminRequests } from './pages/superadmin-requests/superadmin-requests';
+import { SubjectTeachers } from './pages/subject-teachers/subject-teachers/subject-teachers';
+
+// ✅ Import the new Assignments component
+import { Assignments } from './pages/assignments/assignments';
+
 export const routes: Routes = [
   // ✅ SUPERADMIN as separate area (top-level)
-  { path: 'superadmin', component: SuperadminLogin },
-{ path: 'superadmin/requests', component: SuperadminRequests, canActivate: [superAdminGuard] },
+  { 
+    path: 'superadmin', 
+    component: SuperadminLogin 
+  },
+  { 
+    path: 'superadmin/requests', 
+    component: SuperadminRequests, 
+    canActivate: [superAdminGuard] 
+  },
 
   // ✅ ADMIN area
   {
@@ -41,17 +53,26 @@ export const routes: Routes = [
             data: { roles: ['PRINCIPAL', 'ADMIN'] },
           },
           {
+            path: 'subject-teachers',
+            component: SubjectTeachers,
+            canActivate: [roleGuard],
+            data: { roles: ['PRINCIPAL', 'ADMIN'] },
+          },
+          {
             path: 'classes',
             component: Classes,
             canActivate: [roleGuard],
             data: { roles: ['PRINCIPAL', 'ADMIN'] },
           },
 
-          // shared
+          // shared (Accessible to Teachers, Subject Teachers, and Principals)
           { path: 'students', component: Students },
           { path: 'library', component: Library },
           { path: 'stats', component: Stats },
           { path: 'settings', component: Settings },
+          
+          // ✅ ADD THIS NEW ROUTE HERE
+          { path: 'assignments', component: Assignments },
         ],
       },
     ],
