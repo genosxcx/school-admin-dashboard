@@ -5,7 +5,8 @@ import {
   query,
   updateDoc,
   doc,
-setDoc
+setDoc,
+where
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -111,5 +112,23 @@ async approveRequest(requestId: string, uid: string) {
     createdAt: serverTimestamp(),
   });
 }
+
+// --- PARENT REQUESTS ---
+
+  async listParentRequests(): Promise<any[]> {
+    const qy = query(collection(db, 'users'), where('role', '==', 'parent'));
+    const snap = await getDocs(qy);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+
+  async approveParent(userId: string): Promise<void> {
+    const ref = doc(db, 'users', userId);
+    await updateDoc(ref, { status: 'APPROVED' });
+  }
+
+  async rejectParent(userId: string): Promise<void> {
+    const ref = doc(db, 'users', userId);
+    await updateDoc(ref, { status: 'REJECTED' });
+  }
 
 }

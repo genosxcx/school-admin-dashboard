@@ -1,0 +1,54 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header>
+      <mat-card-title>Parent Registration</mat-card-title>
+      <mat-card-subtitle>Create an account to homeschool your kids</mat-card-subtitle>
+    </mat-card-header>
+
+<mat-card-content>
+      <div *ngIf="success" style="text-align: center; padding: 24px 0;">
+        <h3 style="color: #4caf50; margin-bottom: 16px;">Registration Successful!</h3>
+        <p>Your account has been created and is currently pending approval.</p>
+        <p>You will be redirected to the login page shortly.</p>
+      </div>
+
+      <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+      <form *ngIf="!success" [formGroup]="form" (ngSubmit)="submit()" class="form-layout">
+        <mat-form-field appearance="outline">
+          <mat-label>Full Name</mat-label>
+          <input matInput formControlName="fullName" placeholder="e.g. John Doe" />
+          <mat-error *ngIf="form.get('fullName')?.hasError('required')">Name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="john@example.com" />
+          <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">Invalid email address</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" />
+          <mat-error *ngIf="form.get('password')?.hasError('minlength')">Must be at least 6 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" />
+          <mat-error *ngIf="form.hasError('mismatch') && form.get('confirmPassword')?.touched">
+            Passwords do not match
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading" class="submit-btn">
+          {{ loading ? 'Creating Account...' : 'Sign Up' }}
+        </button>
+      </form>
+    </mat-card-content>
+    <div class="card-footer">
+      Already have an account? <a routerLink="/admin/login">Log In</a>
+    </div>
+  </mat-card>
+</div>

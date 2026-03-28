@@ -112,11 +112,23 @@ export class Students implements OnInit, OnDestroy {
       )
       .subscribe((claims) => {
         this.schoolId = claims.schoolId;
-        this.isTeacher = (claims.role ?? '').toString().toLowerCase() === 'teacher';
-        this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
+        
+        const roleStr = (claims.role ?? '').toString().toLowerCase();
+        this.isTeacher = roleStr === 'teacher';
+        
+        // ✅ Add a check for the parent
+        const isParent = roleStr === 'parent'; 
 
-        // Optional: if teacher has no class assigned, block view
-        if (this.isTeacher && !this.teacherClassId) {
+        // ✅ If it's a teacher OR a parent, we want to lock the class dropdown!
+        this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
+        
+        // If they are a parent, trick the UI into treating them like a locked-in Home Teacher
+        if (isParent) {
+            this.isTeacher = true; 
+        }
+
+        // Only throw the unassigned error if they are a real teacher without a class
+        if (this.isTeacher && !this.teacherClassId && !isParent) {
           this.zone.run(() => {
             this.error = 'Your account is not assigned to a class yet.';
             this.loading = false;
@@ -124,9 +136,6 @@ export class Students implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           return;
         }
-
-        // If teacher: you can hide actions if you want read-only
-        // this.displayedColumns = this.isTeacher ? ['name','email','classId'] : ['name','email','classId','actions'];
 
         this.loadAll();
       });
@@ -137,8 +146,6 @@ export class Students implements OnInit, OnDestroy {
       this.zone.run(() => (this.loading = true));
       this.cdr.detectChanges();
 
-      // ✅ Teachers: load only their class + only students in their class
-      // ✅ Principals: load all classes + all students
       const [classes, students] = await Promise.all([
         this.data.getClasses(this.schoolId),
         this.isTeacher
@@ -149,7 +156,12 @@ export class Students implements OnInit, OnDestroy {
       this.zone.run(() => {
         const allClasses = classes ?? [];
 
-        // If teacher, keep only their class in the dropdown/list
+        // ✅ If this is a Parent and they don't have a teacherClassId yet, 
+        // grab the ID of their auto-generated "My Family" class so the dropdown locks correctly.
+        if (this.isTeacher && !this.teacherClassId && allClasses.length > 0) {
+            this.teacherClassId = allClasses[0].id!;
+        }
+
         this.classes = this.isTeacher
           ? allClasses.filter((c) => c.id === this.teacherClassId)
           : allClasses;
@@ -173,7 +185,6 @@ export class Students implements OnInit, OnDestroy {
   }
 
   private classOptions(): ClassOption[] {
-    // ✅ Teachers should only see their own class option
     return (this.classes ?? [])
       .filter((c) => !!c.id)
       .map((c) => ({ id: c.id!, name: c.name }));
@@ -188,14 +199,13 @@ export class Students implements OnInit, OnDestroy {
         title: 'Add student',
         classes: this.classOptions(),
         initial: this.isTeacher ? { classId: this.teacherClassId } : undefined,
-        lockClass: this.isTeacher, // ✅ Hide dropdown for teachers
+        lockClass: this.isTeacher, 
       },
     });
 
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
-    // ✅ Force teacher classId no matter what comes back
     const payload = this.isTeacher
       ? { ...result, classId: this.teacherClassId }
       : result;
@@ -229,7 +239,7 @@ export class Students implements OnInit, OnDestroy {
         title: 'Edit student',
         classes: this.classOptions(),
         initial: { fullName: st.fullName, email: st.email, classId: st.classId },
-        lockClass: this.isTeacher, // ✅ Hide dropdown for teachers
+        lockClass: this.isTeacher, 
       },
     });
 
@@ -244,7 +254,6 @@ export class Students implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      // ✅ We don't send the password when updating, just the standard fields
       await this.data.updateStudent(st.id, payload);
       await this.loadAll();
     } catch (e) {
@@ -255,10 +264,10 @@ export class Students implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
+  
   async deleteStudent(st: Student) {
     if (!st.id) return;
 
-    // ✅ safety: teacher can only delete students in their class
     if (this.isTeacher && st.classId !== this.teacherClassId) {
       alert('You can only delete students in your class.');
       return;

@@ -16,11 +16,11 @@ import { SuperadminLogin } from './pages/superadmin-login/superadmin-login';
 import { SuperadminRequests } from './pages/superadmin-requests/superadmin-requests';
 import { SubjectTeachers } from './pages/subject-teachers/subject-teachers/subject-teachers';
 
-// ✅ Import the new Assignments component
 import { Assignments } from './pages/assignments/assignments';
 
+import { ParentRegister } from './pages/parent-register/parent-register';
+
 export const routes: Routes = [
-  // ✅ SUPERADMIN as separate area (top-level)
   { 
     path: 'superadmin', 
     component: SuperadminLogin 
@@ -31,12 +31,13 @@ export const routes: Routes = [
     canActivate: [superAdminGuard] 
   },
 
-  // ✅ ADMIN area
   {
     path: 'admin',
     children: [
       { path: 'login', component: Login },
       { path: 'register', component: PrincipalRegister },
+      
+      { path: 'parent-register', component: ParentRegister },
 
       {
         path: '',
@@ -65,19 +66,16 @@ export const routes: Routes = [
             data: { roles: ['PRINCIPAL', 'ADMIN'] },
           },
 
-          // shared (Accessible to Teachers, Subject Teachers, and Principals)
+          // shared (Accessible to Teachers, Subject Teachers, Principals, and Parents)
           { path: 'students', component: Students },
           { path: 'library', component: Library },
           { path: 'stats', component: Stats },
           { path: 'settings', component: Settings },
-          
-          // ✅ ADD THIS NEW ROUTE HERE
           { path: 'assignments', component: Assignments },
         ],
       },
     ],
   },
 
-  // ✅ everything else goes to admin login
   { path: '**', redirectTo: 'admin/login' },
 ];

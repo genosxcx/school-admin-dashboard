@@ -33,4 +33,9 @@ export class Sidebar {
   isPrincipal$ = this.roleSvc.claims$.pipe(
     map((claims) => ['principal', 'admin'].includes((claims?.role ?? '').toString().toLowerCase()))
   );
+
+  // ✅ Added Parent Check
+  isParent$ = this.roleSvc.claims$.pipe(
+    map((claims) => (claims?.role ?? '').toString().toLowerCase() === 'parent')
+  );
 }

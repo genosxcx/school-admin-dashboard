@@ -39,7 +39,14 @@
       </a>
     }
 
-    @if ((isSubjectTeacher$ | async) || (isPrincipal$ | async)) {
+    @if (isParent$ | async) {
+      <a mat-list-item routerLink="/admin/students" routerLinkActive="active">
+        <mat-icon matListItemIcon>family_restroom</mat-icon>
+        <span matListItemTitle>My Kids</span>
+      </a>
+    }
+
+    @if ((isSubjectTeacher$ | async) || (isPrincipal$ | async) || (isParent$ | async)) {
       <a mat-list-item routerLink="/admin/assignments" routerLinkActive="active">
         <mat-icon matListItemIcon>assignment</mat-icon>
         <span matListItemTitle>Assignments</span>
@@ -50,8 +57,6 @@
       <mat-icon matListItemIcon>bar_chart</mat-icon>
       <span matListItemTitle>Stats</span>
     </a>
-
-  
 
     <a mat-list-item routerLink="/admin/settings" routerLinkActive="active">
       <mat-icon matListItemIcon>settings</mat-icon>

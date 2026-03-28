@@ -6,10 +6,12 @@ import {
   PrincipalRequest,
   SuperadminService,
 } from '../../core/services/superadmin.service';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs'; // ✅ Imported Tabs
 
 @Component({
   selector: 'app-superadmin-requests',
@@ -20,6 +22,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTabsModule, // ✅ Added to imports
   ],
   templateUrl: './superadmin-requests.html',
   styleUrls: ['./superadmin-requests.scss'],
@@ -30,29 +33,26 @@ export class SuperadminRequests implements OnInit {
 
   loading = true;
   error = '';
-  requests: PrincipalRequest[] = [];
+  
+  // ✅ Separate arrays for Principals and Parents
+  principalRequests: PrincipalRequest[] = [];
+  parentRequests: any[] = []; 
 
   ngOnInit(): void {
     this.initializeAuth();
   }
 
-  /**
-   * Wait for Firebase auth to initialize
-   */
   private async initializeAuth(): Promise<void> {
     this.loading = true;
     this.cdr.detectChanges();
 
     try {
-      // ✅ Wait for Firebase to restore auth session
       await new Promise<void>((resolve) => {
         const unsub = onAuthStateChanged(auth, () => {
           unsub();
           resolve();
         });
       });
-
-      // Load requests after auth is ready
       await this.load();
     } catch (error) {
       console.error('Auth initialization error:', error);
@@ -62,115 +62,79 @@ export class SuperadminRequests implements OnInit {
     }
   }
 
-  /**
-   * Load principal requests from service
-   */
   async load(): Promise<void> {
     this.loading = true;
     this.error = '';
     this.cdr.detectChanges();
 
     try {
-      console.log('Current user:', auth.currentUser?.email);
+      // ✅ Fetch both concurrently
+      const [principals, parents] = await Promise.all([
+        this.svc.listRequests(),
+        this.svc.listParentRequests()
+      ]);
 
-      // Fetch requests from service
-      this.requests = await this.svc.listRequests();
+      const statusOrder: { [key: string]: number } = { PENDING: 0, APPROVED: 1, REJECTED: 2 };
 
-      // Sort: pending first, then approved, then rejected
-      this.requests.sort((a, b) => {
-        const statusOrder: { [key: string]: number } = {
-          PENDING: 0,
-          APPROVED: 1,
-          REJECTED: 2,
-        };
-        return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
-      });
+      this.principalRequests = principals.sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
+      this.parentRequests = parents.sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
 
-      console.log('Loaded requests:', this.requests);
-
-      if (this.requests.length === 0) {
-        console.log('No requests found');
-      }
     } catch (error: any) {
       console.error('Failed to load requests:', error);
-      this.error =
-        error?.message ?? 'Failed to load requests. Please try again.';
+      this.error = error?.message ?? 'Failed to load requests. Please try again.';
     } finally {
       this.loading = false;
-      this.cdr.detectChanges(); // ✅ Force UI update
+      this.cdr.detectChanges();
     }
   }
 
-  /**
-   * Approve a principal request
-   */
-  async approve(request: PrincipalRequest): Promise<void> {
+  // --- PRINCIPAL ACTIONS ---
+  async approvePrincipal(request: PrincipalRequest): Promise<void> {
     this.error = '';
-
     try {
-      // Call service to approve
-      const schoolId = await this.svc.approveRequest(
-        request.id,
-        request.uid
-      );
-
-      // Update local state
+      const schoolId = await this.svc.approveRequest(request.id, request.uid);
       request.status = 'APPROVED';
       request.schoolId = schoolId;
-
       this.cdr.detectChanges();
-
-      // Re-sort list
-      this.requests.sort((a, b) => {
-        const statusOrder: { [key: string]: number } = {
-          PENDING: 0,
-          APPROVED: 1,
-          REJECTED: 2,
-        };
-        return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
-      });
-
-      console.log('Request approved:', request.id, 'School ID:', schoolId);
     } catch (error: any) {
-      console.error('Approve failed:', error);
-      this.error = error?.message ?? 'Failed to approve request. Please try again.';
-
-      // Reload on error to sync state
+      this.error = error?.message ?? 'Failed to approve. Please try again.';
       await this.load();
     }
   }
 
-  /**
-   * Reject a principal request
-   */
-  async reject(request: PrincipalRequest): Promise<void> {
+  async rejectPrincipal(request: PrincipalRequest): Promise<void> {
     this.error = '';
-
     try {
-      // Call service to reject
       await this.svc.rejectRequest(request.id);
-
-      // Update local state
       request.status = 'REJECTED';
-
       this.cdr.detectChanges();
-
-      // Re-sort list
-      this.requests.sort((a, b) => {
-        const statusOrder: { [key: string]: number } = {
-          PENDING: 0,
-          APPROVED: 1,
-          REJECTED: 2,
-        };
-        return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
-      });
-
-      console.log('Request rejected:', request.id);
     } catch (error: any) {
-      console.error('Reject failed:', error);
-      this.error = error?.message ?? 'Failed to reject request. Please try again.';
+      this.error = error?.message ?? 'Failed to reject. Please try again.';
+      await this.load();
+    }
+  }
 
-      // Reload on error to sync state
+  // --- PARENT ACTIONS ---
+  async approveParent(request: any): Promise<void> {
+    this.error = '';
+    try {
+      await this.svc.approveParent(request.id);
+      request.status = 'APPROVED';
+      this.cdr.detectChanges();
+    } catch (error: any) {
+      this.error = error?.message ?? 'Failed to approve parent. Please try again.';
+      await this.load();
+    }
+  }
+
+  async rejectParent(request: any): Promise<void> {
+    this.error = '';
+    try {
+      await this.svc.rejectParent(request.id);
+      request.status = 'REJECTED';
+      this.cdr.detectChanges();
+    } catch (error: any) {
+      this.error = error?.message ?? 'Failed to reject parent. Please try again.';
       await this.load();
     }
   }

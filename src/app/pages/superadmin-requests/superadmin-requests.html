@@ -51,119 +51,137 @@
     }
 
     <!-- Content -->
-    <div class="content">
+<div class="content">
       @if (loading) {
         <div class="loading-state">
           <mat-spinner diameter="48"></mat-spinner>
-          <div class="loading-text">Fetching principal requests...</div>
+          <div class="loading-text">Fetching requests...</div>
         </div>
       } @else {
-        @if (requests.length === 0) {
-          <div class="empty-state">
-            <div class="empty-icon">
-              <mat-icon>inbox</mat-icon>
-            </div>
-            <div class="empty-content">
-              <h2>No pending requests</h2>
-              <p>When principals register, their requests will appear here for approval.</p>
-            </div>
-          </div>
-        } @else {
-          <div class="requests-grid">
-            @for (r of requests; track r.id) {
-              <div class="request-card" [class.approved]="r.status === 'APPROVED'" [class.rejected]="r.status === 'REJECTED'">
-                <!-- Card Header -->
-                <div class="card-header">
-                  <div class="status-badge" [class]="'status-' + r.status.toLowerCase()">
-                    {{ r.status }}
+        
+        <mat-tab-group animationDuration="0ms" class="custom-tabs">
+          
+          <mat-tab label="Principal Requests">
+            <div class="tab-padding">
+              @if (principalRequests.length === 0) {
+                <div class="empty-state">
+                  <div class="empty-icon"><mat-icon>inbox</mat-icon></div>
+                  <div class="empty-content">
+                    <h2>No principal requests</h2>
+                    <p>When principals register, they will appear here.</p>
                   </div>
-                  <div class="card-id">ID: {{ r.id.slice(0, 8) }}...</div>
                 </div>
-
-                <!-- Card Body -->
-                <div class="card-body">
-                  <!-- Profile Section -->
-                  <div class="profile-section">
-                    <div class="avatar">
-                      <mat-icon>person</mat-icon>
-                    </div>
-                    <div class="profile-info">
-                      <h3 class="principal-name">{{ r.fullName }}</h3>
-                      <div class="email-info">
-                        <mat-icon>mail</mat-icon>
-                        <a [href]="'mailto:' + r.email">{{ r.email }}</a>
+              } @else {
+                <div class="requests-grid">
+                  @for (r of principalRequests; track r.id) {
+                    <div class="request-card" [class.approved]="r.status === 'APPROVED'" [class.rejected]="r.status === 'REJECTED'">
+                      <div class="card-header">
+                        <div class="status-badge" [class]="'status-' + r.status.toLowerCase()">{{ r.status }}</div>
+                        <div class="card-id">ID: {{ r.id.slice(0, 8) }}...</div>
                       </div>
-                    </div>
-                  </div>
-
-                  <!-- School Information -->
-                  <div class="info-row">
-                    <div class="info-item">
-                      <mat-icon>school</mat-icon>
-                      <div class="info-text">
-                        <span class="info-label">School</span>
-                        <span class="info-value">{{ r.schoolName }}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Request/School ID -->
-                  @if (r.schoolId) {
-                    <div class="info-row">
-                      <div class="info-item">
-                        <mat-icon>badge</mat-icon>
-                        <div class="info-text">
-                          <span class="info-label">School ID</span>
-                          <span class="info-value code">{{ r.schoolId }}</span>
+                      <div class="card-body">
+                        <div class="profile-section">
+                          <div class="avatar"><mat-icon>person</mat-icon></div>
+                          <div class="profile-info">
+                            <h3 class="principal-name">{{ r.fullName }}</h3>
+                            <div class="email-info">
+                              <mat-icon>mail</mat-icon>
+                              <a [href]="'mailto:' + r.email">{{ r.email }}</a>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <mat-icon>school</mat-icon>
+                            <div class="info-text">
+                              <span class="info-label">School</span>
+                              <span class="info-value">{{ r.schoolName }}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  } @else {
-                    <div class="info-row">
-                      <div class="info-item">
-                        <mat-icon>key</mat-icon>
-                        <div class="info-text">
-                          <span class="info-label">Request ID</span>
-                          <span class="info-value code">{{ r.id }}</span>
+                      @if (r.status === 'PENDING') {
+                        <div class="card-footer">
+                          <button mat-raised-button color="primary" (click)="approvePrincipal(r)" class="action-btn approve-btn">
+                            <mat-icon>check_circle</mat-icon><span>Approve</span>
+                          </button>
+                          <button mat-stroked-button color="warn" (click)="rejectPrincipal(r)" class="action-btn reject-btn">
+                            <mat-icon>cancel</mat-icon><span>Reject</span>
+                          </button>
                         </div>
-                      </div>
+                      } @else {
+                        <div class="card-footer disabled">
+                          <span class="status-text">{{ r.status === 'APPROVED' ? '✓ Approved' : '✗ Rejected' }}</span>
+                        </div>
+                      }
                     </div>
                   }
                 </div>
+              }
+            </div>
+          </mat-tab>
 
-                <!-- Card Footer - Actions -->
-                @if (r.status === 'PENDING') {
-                  <div class="card-footer">
-                    <button
-                      mat-raised-button
-                      color="primary"
-                      type="button"
-                      (click)="approve(r)"
-                      class="action-btn approve-btn"
-                    >
-                      <mat-icon>check_circle</mat-icon>
-                      <span>Approve</span>
-                    </button>
-                    <button
-                      mat-stroked-button
-                      color="warn"
-                      type="button"
-                      (click)="reject(r)"
-                      class="action-btn reject-btn"
-                    >
-                      <mat-icon>cancel</mat-icon>
-                      <span>Reject</span>
-                    </button>
+          <mat-tab label="Parent Requests">
+            <div class="tab-padding">
+              @if (parentRequests.length === 0) {
+                <div class="empty-state">
+                  <div class="empty-icon"><mat-icon>family_restroom</mat-icon></div>
+                  <div class="empty-content">
+                    <h2>No parent requests</h2>
+                    <p>When parents register for homeschooling, they will appear here.</p>
                   </div>
-                } @else {
-                  <div class="card-footer disabled">
-                    <span class="status-text">{{ r.status === 'APPROVED' ? '✓ Approved' : '✗ Rejected' }}</span>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        }
+                </div>
+              } @else {
+                <div class="requests-grid">
+                  @for (r of parentRequests; track r.id) {
+                    <div class="request-card" [class.approved]="r.status === 'APPROVED'" [class.rejected]="r.status === 'REJECTED'">
+                      <div class="card-header">
+                        <div class="status-badge" [class]="'status-' + r.status.toLowerCase()">{{ r.status }}</div>
+                        <div class="card-id">ID: {{ r.id.slice(0, 8) }}...</div>
+                      </div>
+                      <div class="card-body">
+                        <div class="profile-section">
+                          <div class="avatar"><mat-icon>family_restroom</mat-icon></div>
+                          <div class="profile-info">
+                            <h3 class="principal-name">{{ r.fullName }}</h3>
+                            <div class="email-info">
+                              <mat-icon>mail</mat-icon>
+                              <a [href]="'mailto:' + r.email">{{ r.email }}</a>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <mat-icon>home</mat-icon>
+                            <div class="info-text">
+                              <span class="info-label">Account Type</span>
+                              <span class="info-value">Homeschooling Family</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      @if (r.status === 'PENDING') {
+                        <div class="card-footer">
+                          <button mat-raised-button color="primary" (click)="approveParent(r)" class="action-btn approve-btn">
+                            <mat-icon>check_circle</mat-icon><span>Approve</span>
+                          </button>
+                          <button mat-stroked-button color="warn" (click)="rejectParent(r)" class="action-btn reject-btn">
+                            <mat-icon>cancel</mat-icon><span>Reject</span>
+                          </button>
+                        </div>
+                      } @else {
+                        <div class="card-footer disabled">
+                          <span class="status-text">{{ r.status === 'APPROVED' ? '✓ Approved' : '✗ Rejected' }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+        </mat-tab-group>
       }
     </div>
   </div>

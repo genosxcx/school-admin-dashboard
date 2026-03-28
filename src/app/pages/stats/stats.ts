@@ -101,7 +101,8 @@ export class Stats implements OnInit, OnDestroy {
         this.schoolId = claims.schoolId;
         
         const roleStr = (claims.role ?? '').toString().toLowerCase();
-        this.isPrincipal = roleStr === 'principal' || roleStr === 'admin';
+      
+        this.isPrincipal = roleStr === 'principal' || roleStr === 'admin' || roleStr === 'parent';
         this.isTeacher = roleStr === 'teacher';
         this.isSubjectTeacher = roleStr === 'subject_teacher';
 
