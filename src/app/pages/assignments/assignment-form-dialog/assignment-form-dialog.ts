@@ -18,6 +18,8 @@ export type AssignmentFormResult = {
   title: string;
   description: string;
   classIds: string[];
+  startTime: string | null; // Added
+  endTime: string | null;   // Added
 };
 
 @Component({
@@ -54,6 +56,18 @@ export type AssignmentFormResult = {
           </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <div class="time-row">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Start Time (Shows to students)</mat-label>
+          <input matInput type="datetime-local" [(ngModel)]="startTime" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>End Time (Due Date)</mat-label>
+          <input matInput type="datetime-local" [(ngModel)]="endTime" />
+        </mat-form-field>
+      </div>
     </div>
 
     <div mat-dialog-actions align="end">
@@ -66,6 +80,10 @@ export type AssignmentFormResult = {
   styles: [`
     .content { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
     .full { width: 100%; }
+    
+    /* Added styles for the side-by-side time inputs */
+    .time-row { display: flex; gap: 16px; width: 100%; }
+    .half { flex: 1; } 
   `],
 })
 export class AssignmentFormDialog {
@@ -75,6 +93,8 @@ export class AssignmentFormDialog {
   title = '';
   description = '';
   classIds: string[] = [];
+  startTime = ''; // Bound to the new start time input
+  endTime = '';   // Bound to the new end time input
 
   close() {
     this.ref.close(null);
@@ -85,6 +105,9 @@ export class AssignmentFormDialog {
       title: this.title.trim(),
       description: this.description.trim(),
       classIds: this.classIds,
+      // Pass the dates back. If the teacher leaves them blank, pass null.
+      startTime: this.startTime || null, 
+      endTime: this.endTime || null,     
     });
   }
 }

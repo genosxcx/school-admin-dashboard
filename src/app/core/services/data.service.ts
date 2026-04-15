@@ -39,16 +39,17 @@ export type Student = {
   id?: string;
   role?: 'student';
   schoolId: string;
+  
+  studentId?: string;
+  loginEmail?: string;
+
   fullName: string;
   email?: string;
   classId?: string;
-
-  // ✅ stats fields (optional)
   grade?: number;           // 0..100
   completion?: number;      // 0..1 or 0..100
   minutesRecorded?: number; // total minutes
 };
-
 export type SchoolClass = {
   id?: string;
   schoolId: string;
@@ -310,11 +311,11 @@ export class DataService {
         id: d.id,
         role: data.role,
         schoolId: data.schoolId,
+        studentId: (data.studentId ?? '').toString(), // ✅ Map studentId
         fullName: this.normalizeFullName(data),
         email: (data.email ?? '').toString(),
+        loginEmail: (data.loginEmail ?? '').toString(), // ✅ Pull dummy email if it exists
         classId: (data.classId ?? '').toString(),
-
-        // ✅ read stats fields
         grade: this.toNumber(data.grade, 0),
         completion: this.toNumber(data.completion, 0),
         minutesRecorded: this.toNumber(data.minutesRecorded, 0),
@@ -322,7 +323,7 @@ export class DataService {
     });
   }
 
-  async getStudentsByClass(schoolId: string, classId: string): Promise<Student[]> {
+async getStudentsByClass(schoolId: string, classId: string): Promise<Student[]> {
     const ref = collection(db, 'users');
     const qy = query(
       ref,
@@ -338,26 +339,29 @@ export class DataService {
         id: d.id,
         role: data.role,
         schoolId: data.schoolId,
+        studentId: (data.studentId ?? '').toString(), // ✅ Map studentId
         fullName: this.normalizeFullName(data),
         email: (data.email ?? '').toString(),
+        loginEmail: (data.loginEmail ?? '').toString(), 
         classId: (data.classId ?? '').toString(),
-
-        // ✅ read stats fields
         grade: this.toNumber(data.grade, 0),
         completion: this.toNumber(data.completion, 0),
         minutesRecorded: this.toNumber(data.minutesRecorded, 0),
       } as Student;
     });
   }
-
 async createStudent(
     schoolId: string,
-    payload: { fullName: string; email?: string; classId?: string; password?: string }
+    payload: { studentId: string; fullName: string; email?: string; classId?: string; password?: string }
   ) {
     let authUid = '';
+    
+    // ✅ Generate a dummy email if none is provided so Firebase Auth still works
+    const actualEmail = (payload.email ?? '').trim();
+    const authEmail = actualEmail || `${payload.studentId}@student.local`; 
 
-    // 1. Create the Auth account using a secondary Firebase app instance
-    if (payload.email && payload.password) {
+    // ✅ Trigger Auth creation based on PASSWORD existence, not email existence.
+    if (payload.password) {
       const secondaryAppName = 'SecondaryAppStudent_' + Date.now();
       const secondaryApp = initializeApp(environment.firebase, secondaryAppName);
       const secondaryAuth = getAuth(secondaryApp);
@@ -365,7 +369,7 @@ async createStudent(
       try {
         const userCredential = await createUserWithEmailAndPassword(
           secondaryAuth, 
-          payload.email.trim(), 
+          authEmail, 
           payload.password
         );
         authUid = userCredential.user.uid;
@@ -380,16 +384,17 @@ async createStudent(
     const studentData = {
       role: 'student',
       schoolId,
+      studentId: payload.studentId.trim(), // ✅ Save studentId
       fullName: payload.fullName.trim(),
-      email: (payload.email ?? '').trim(),
+      email: actualEmail, 
+      loginEmail: authEmail, // ✅ Save the actual email they need to type in the login box
       classId: (payload.classId ?? '').trim(),
-      status: 'APPROVED', // Automatically approve them
+      status: 'APPROVED', 
       grade: 0,
       completion: 0,
       minutesRecorded: 0,
     };
 
-    // 2. Save the data to Firestore
     if (authUid) {
       const docRef = doc(db, 'users', authUid);
       await setDoc(docRef, studentData);
@@ -403,14 +408,14 @@ async createStudent(
 
   async updateStudent(
     studentId: string,
-    patch: Partial<Pick<Student, 'fullName' | 'email' | 'classId' | 'grade' | 'completion' | 'minutesRecorded'>>
+    patch: Partial<Pick<Student, 'studentId' | 'fullName' | 'email' | 'classId' | 'grade' | 'completion' | 'minutesRecorded'>>
   ) {
     const ref = doc(db, 'users', studentId);
     await updateDoc(ref, {
+      ...(patch.studentId !== undefined ? { studentId: patch.studentId.trim() } : {}), // ✅ Handle studentId
       ...(patch.fullName !== undefined ? { fullName: patch.fullName.trim() } : {}),
       ...(patch.email !== undefined ? { email: (patch.email ?? '').trim() } : {}),
       ...(patch.classId !== undefined ? { classId: (patch.classId ?? '').trim() } : {}),
-
       ...(patch.grade !== undefined ? { grade: this.toNumber(patch.grade, 0) } : {}),
       ...(patch.completion !== undefined ? { completion: this.toNumber(patch.completion, 0) } : {}),
       ...(patch.minutesRecorded !== undefined

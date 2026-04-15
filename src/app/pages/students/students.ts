@@ -56,11 +56,11 @@ export class Students implements OnInit, OnDestroy {
   classes: SchoolClass[] = [];
   classNameById = new Map<string, string>();
 
-  // ✅ teacher filtering
   isTeacher = false;
   teacherClassId = '';
 
-  displayedColumns: string[] = ['name', 'email', 'classId', 'actions'];
+  // ✅ Added studentId to columns
+  displayedColumns: string[] = ['studentId', 'name', 'email', 'classId', 'actions'];
 
   get filtered(): Student[] {
     const s = this.q.trim().toLowerCase();
@@ -69,6 +69,7 @@ export class Students implements OnInit, OnDestroy {
     return this.students.filter((st) => {
       const className = this.classNameById.get(st.classId ?? '') ?? '';
       return (
+        (st.studentId ?? '').toLowerCase().includes(s) || // ✅ Search by ID
         (st.fullName ?? '').toLowerCase().includes(s) ||
         (st.email ?? '').toLowerCase().includes(s) ||
         (className ?? '').toLowerCase().includes(s)
@@ -115,19 +116,14 @@ export class Students implements OnInit, OnDestroy {
         
         const roleStr = (claims.role ?? '').toString().toLowerCase();
         this.isTeacher = roleStr === 'teacher';
-        
-        // ✅ Add a check for the parent
         const isParent = roleStr === 'parent'; 
 
-        // ✅ If it's a teacher OR a parent, we want to lock the class dropdown!
         this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
         
-        // If they are a parent, trick the UI into treating them like a locked-in Home Teacher
         if (isParent) {
             this.isTeacher = true; 
         }
 
-        // Only throw the unassigned error if they are a real teacher without a class
         if (this.isTeacher && !this.teacherClassId && !isParent) {
           this.zone.run(() => {
             this.error = 'Your account is not assigned to a class yet.';
@@ -156,8 +152,6 @@ export class Students implements OnInit, OnDestroy {
       this.zone.run(() => {
         const allClasses = classes ?? [];
 
-        // ✅ If this is a Parent and they don't have a teacherClassId yet, 
-        // grab the ID of their auto-generated "My Family" class so the dropdown locks correctly.
         if (this.isTeacher && !this.teacherClassId && allClasses.length > 0) {
             this.teacherClassId = allClasses[0].id!;
         }
@@ -238,7 +232,8 @@ export class Students implements OnInit, OnDestroy {
       data: {
         title: 'Edit student',
         classes: this.classOptions(),
-        initial: { fullName: st.fullName, email: st.email, classId: st.classId },
+        // ✅ Passed studentId to initial data
+        initial: { studentId: st.studentId, fullName: st.fullName, email: st.email, classId: st.classId },
         lockClass: this.isTeacher, 
       },
     });
