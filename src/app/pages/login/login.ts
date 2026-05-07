@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -31,7 +31,8 @@ export class Login {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef // ✅ Added ChangeDetectorRef to fix the infinite spinner
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -71,6 +72,7 @@ export class Login {
     this.form.get('email')?.markAsTouched();
     this.form.get('password')?.markAsTouched();
   }
+
   async submit() {
     this.error = '';
 
@@ -80,14 +82,21 @@ export class Login {
     }
 
     this.loading = true;
+    this.cdr.detectChanges(); // ✅ Force UI to show spinner
+
     try {
       const { email, password } = this.form.getRawValue();
       await this.auth.login(email!, password!);
+      
+      console.log('Login successful, navigating to /admin...');
       await this.router.navigateByUrl('/admin');
+      
     } catch (e: any) {
-      this.error = e?.message ?? 'Login failed';
+      console.error('Login Error:', e);
+      this.error = e?.message ?? 'Login failed. Please check your credentials.';
     } finally {
       this.loading = false;
+      this.cdr.detectChanges(); // ✅ Force UI to stop spinning and show error
     }
   }
 }

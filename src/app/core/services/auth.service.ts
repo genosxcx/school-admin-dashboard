@@ -15,13 +15,12 @@ export class AuthService {
   private _user$ = new BehaviorSubject<User | null>(null);
   user$ = this._user$.asObservable();
 
-  // ✅ ADDED: A flag to track if Firebase has finished its initial load
   private isInitialized = false;
 
   constructor() {
     console.log('[AuthService] Initializing...');
     onAuthStateChanged(auth, (user) => {
-      this.isInitialized = true; // ✅ Mark as initialized as soon as Firebase responds
+      this.isInitialized = true; 
       console.log('[AuthService] Auth state changed, user:', user?.uid ?? 'null');
       this._user$.next(user);
     });
@@ -31,10 +30,6 @@ export class AuthService {
     return this._user$.value;
   }
 
-  /**
-   * ✅ BULLETPROOF WAIT: Checks the flag. If Firebase is already loaded, 
-   * it returns immediately. If not, it waits.
-   */
   waitForAuth(): Promise<User | null> {
     if (this.isInitialized) {
       return Promise.resolve(this.currentUser);
@@ -58,20 +53,28 @@ export class AuthService {
     }
 
     const uid = cred.user.uid;
-    const snap = await getDoc(doc(db, 'users', uid));
 
-    if (!snap.exists()) {
-      await signOut(auth);
-      throw new Error('Your account is pending approval.');
+    // 1. Check if they are a student in the 'users' collection
+    const studentSnap = await getDoc(doc(db, 'users', uid));
+    if (studentSnap.exists()) {
+      const data = studentSnap.data() as any;
+      if (data?.approved !== true && data?.status !== 'APPROVED') {
+        await signOut(auth);
+        throw new Error('Your student account is pending approval.');
+      }
+      return cred; // Approved Student
     }
 
-    const data = snap.data() as any;
+    // 2. Check if they are a Teacher
+    const teacherSnap = await getDoc(doc(db, 'teachers', uid));
+    if (teacherSnap.exists()) return cred; // Allowed
 
-    if (data?.approved !== true && data?.status !== 'APPROVED') {
-      await signOut(auth);
-      throw new Error('Your account is pending approval.');
-    }
+    // 3. Check if they are a Subject Teacher
+    const subjectTeacherSnap = await getDoc(doc(db, 'subjectTeachers', uid));
+    if (subjectTeacherSnap.exists()) return cred; // Allowed
 
+    // If they have a valid Firebase Auth login but aren't in the above collections,
+    // we allow them through (e.g., Principals or Admins that might be stored elsewhere).
     return cred;
   }
 
