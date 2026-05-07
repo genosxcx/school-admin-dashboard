@@ -6,23 +6,18 @@ export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  console.log('[authGuard] Checking auth for route:', state.url);
-
   try {
-    // Wait for Firebase to initialize and check for stored session
     const user = await authService.waitForAuth();
 
     if (user) {
-      console.log('[authGuard] User is authenticated:', user.uid);
       return true;
     } else {
-      console.log('[authGuard] No user logged in');
-      router.navigateByUrl('/login');
+      // ✅ FIXED: Pointing to the correct login route path
+      router.navigateByUrl('/admin/login');
       return false;
     }
   } catch (e) {
-    console.error('[authGuard] Auth guard error:', e);
-    router.navigateByUrl('/login');
+    router.navigateByUrl('/admin/login');
     return false;
   }
 };

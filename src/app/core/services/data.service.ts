@@ -356,17 +356,21 @@ async createStudent(
   ) {
     let authUid = '';
     
-    // ✅ Generate a dummy email if none is provided so Firebase Auth still works
+    // The email they typed in the form (can be blank)
     const actualEmail = (payload.email ?? '').trim();
-    const authEmail = actualEmail || `${payload.studentId}@student.local`; 
+    
+    // ✅ GUARANTEED UNIQUE: Append Date.now() so it NEVER collides with an old deleted account
+    // Example: "john123_1713214567890@student.local"
+    const authEmail = `${payload.studentId.toLowerCase()}_${Date.now()}@student.local`; 
 
-    // ✅ Trigger Auth creation based on PASSWORD existence, not email existence.
     if (payload.password) {
+      // NOTE: Make sure 'environment' is imported at the top of this file!
       const secondaryAppName = 'SecondaryAppStudent_' + Date.now();
       const secondaryApp = initializeApp(environment.firebase, secondaryAppName);
       const secondaryAuth = getAuth(secondaryApp);
 
       try {
+        // ✅ We ONLY pass the guaranteed unique authEmail to Firebase
         const userCredential = await createUserWithEmailAndPassword(
           secondaryAuth, 
           authEmail, 
@@ -384,10 +388,10 @@ async createStudent(
     const studentData = {
       role: 'student',
       schoolId,
-      studentId: payload.studentId.trim(), // ✅ Save studentId
+      studentId: payload.studentId.trim(), 
       fullName: payload.fullName.trim(),
-      email: actualEmail, 
-      loginEmail: authEmail, // ✅ Save the actual email they need to type in the login box
+      email: actualEmail, // We save what they typed just for your records
+      loginEmail: authEmail, // The unique dummy email they will use to log in
       classId: (payload.classId ?? '').trim(),
       status: 'APPROVED', 
       grade: 0,
@@ -404,9 +408,7 @@ async createStudent(
       const docRef = await addDoc(ref, studentData);
       return docRef.id;
     }
-  }
-
-  async updateStudent(
+  }  async updateStudent(
     studentId: string,
     patch: Partial<Pick<Student, 'studentId' | 'fullName' | 'email' | 'classId' | 'grade' | 'completion' | 'minutesRecorded'>>
   ) {
