@@ -17,7 +17,7 @@ import { SuperadminRequests } from './pages/superadmin-requests/superadmin-reque
 import { SubjectTeachers } from './pages/subject-teachers/subject-teachers/subject-teachers';
 
 import { Assignments } from './pages/assignments/assignments';
-
+import{PortfolioComponent} from './iqraa/iqraa';
 import { ParentRegister } from './pages/parent-register/parent-register';
 
 export const routes: Routes = [
@@ -76,6 +76,6 @@ export const routes: Routes = [
       },
     ],
   },
-
+  { path: 'hya-naqraa', component: PortfolioComponent },
   { path: '**', redirectTo: 'admin/login' },
 ];
