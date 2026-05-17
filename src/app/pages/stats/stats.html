@@ -11,66 +11,7 @@
         <p>{{ error }}</p>
       </mat-card>
     } @else {
-
-      <!-- Page Header -->
-      <div class="page-header">
-        <div class="page-title">
-          <h1>Dashboard</h1>
-          <span class="page-subtitle">Overview of your institution's performance</span>
-        </div>
-      </div>
-
-      <!-- Summary Cards -->
-      <div class="summary-grid">
-        <mat-card class="summary-card card-teachers">
-          <div class="card-icon">
-            <mat-icon>school</mat-icon>
-          </div>
-          <div class="card-content">
-            <div class="card-value">{{ summary.teachers }}</div>
-            <div class="card-label">Teachers</div>
-          </div>
-          <div class="card-accent"></div>
-        </mat-card>
-
-        <mat-card class="summary-card card-students">
-          <div class="card-icon">
-            <mat-icon>groups</mat-icon>
-          </div>
-          <div class="card-content">
-            <div class="card-value">{{ summary.students }}</div>
-            <div class="card-label">Students</div>
-          </div>
-          <div class="card-accent"></div>
-        </mat-card>
-
-        <mat-card class="summary-card card-classes">
-          <div class="card-icon">
-            <mat-icon>menu_book</mat-icon>
-          </div>
-          <div class="card-content">
-            <div class="card-value">{{ summary.classes }}</div>
-            <div class="card-label">Classes</div>
-          </div>
-          <div class="card-accent"></div>
-        </mat-card>
-
-        <mat-card class="summary-card card-minutes">
-          <div class="card-icon">
-            <mat-icon>mic</mat-icon>
-          </div>
-          <div class="card-content">
-            <div class="card-value">{{ minutesText(summary.minutes) }}</div>
-            <div class="card-label">Minutes Recorded</div>
-          </div>
-          <div class="card-accent"></div>
-        </mat-card>
-      </div>
-
-      <!-- Main Content -->
-      <div class="content-grid">
-
-        <!-- Classes Sidebar (HIDE for teachers) -->
+      <div class="content-wrapper" [class.teacher-view]="isTeacher">
         @if (!isTeacher) {
           <div class="sidebar">
             <mat-card class="classes-card">
@@ -106,111 +47,90 @@
           </div>
         }
 
-        <!-- Main Panel -->
         <div class="main-panel">
           @if (selectedClassStats) {
+            <div class="slide-in-panel">
+              <!-- Compact Metrics Row -->
+              <div class="metrics-compact">
+                <mat-card class="metric-card">
+                  <div class="metric-icon icon-grade">
+                    <mat-icon>star_rate</mat-icon>
+                  </div>
+                  <div class="metric-body">
+                    <div class="metric-value">
+                      {{ minutesText(selectedClassStats.avgGrade) }}<span class="metric-unit">/100</span>
+                    </div>
+                    <div class="metric-label">Avg. Grade</div>
+                  </div>
+                </mat-card>
 
-            <!-- Class Header -->
-            <mat-card class="class-header-card">
-              <div class="class-header-inner">
-                <div class="class-avatar-lg">
-                  {{ (selectedClassStats.className || '?').charAt(0).toUpperCase() }}
+                <mat-card class="metric-card">
+                  <div class="metric-icon icon-completion">
+                    <mat-icon>show_chart</mat-icon>
+                  </div>
+                  <div class="metric-body">
+                    <div class="metric-value">
+                      {{ minutesText(selectedClassStats.avgCompletion) }}<span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-label">Avg. Completion</div>
+                  </div>
+                </mat-card>
+
+                <mat-card class="metric-card">
+                  <div class="metric-icon icon-time">
+                    <mat-icon>timer</mat-icon>
+                  </div>
+                  <div class="metric-body">
+                    <div class="metric-value">{{ minutesText(selectedClassStats.totalMinutes) }}</div>
+                    <div class="metric-label">Total Minutes</div>
+                  </div>
+                </mat-card>
+              </div>
+
+              <!-- Students Slide View -->
+              <div class="students-slide">
+                <div class="students-header">
+                  <span class="students-title">Student Performance</span>
+                  <span class="students-count">{{ classStudents.length }} students</span>
                 </div>
-                <div class="class-header-text">
-                  <h2>{{ selectedClassStats.className }}</h2>
-                  <span class="student-count">
-                    <mat-icon>people</mat-icon>
-                    {{ selectedClassStats.studentCount }} Students
-                  </span>
+
+                <div class="students-list">
+                  @for (s of classStudents; track s.id) {
+                    <div class="student-row">
+                      <div class="student-header-row">
+                        <div class="student-avatar">
+                          {{ ((s.fullName || '?').charAt(0)).toUpperCase() }}
+                        </div>
+                        <div class="student-name-section">
+                          <div class="student-name">{{ s.fullName }}</div>
+                        </div>
+                      </div>
+
+                      <div class="student-bars">
+                        <div class="bar-row">
+                          <span class="bar-label">Completion</span>
+                          <mat-progress-bar mode="determinate" [value]="completionPct(s)"></mat-progress-bar>
+                          <span class="bar-value">{{ minutesText(completionPct(s)) }}%</span>
+                        </div>
+
+                        <div class="bar-row">
+                          <span class="bar-label">Grade</span>
+                          <mat-progress-bar mode="determinate" [value]="gradePct(s)" class="grade-bar"></mat-progress-bar>
+                          <span class="bar-value">{{ minutesText(gradePct(s)) }}/100</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+
+                  @if (!classStudents.length) {
+                    <div class="empty-note">
+                      <mat-icon>person_off</mat-icon>
+                      <span>No students in this class</span>
+                    </div>
+                  }
                 </div>
               </div>
-            </mat-card>
-
-            <!-- Class Metrics -->
-            <div class="metrics-grid">
-              <mat-card class="metric-card">
-                <div class="metric-icon icon-grade">
-                  <mat-icon>star_rate</mat-icon>
-                </div>
-                <div class="metric-body">
-                  <div class="metric-value">
-                    {{ minutesText(selectedClassStats.avgGrade) }}<span class="metric-unit">/100</span>
-                  </div>
-                  <div class="metric-label">Avg. Grade</div>
-                </div>
-              </mat-card>
-
-              <mat-card class="metric-card">
-                <div class="metric-icon icon-completion">
-                  <mat-icon>show_chart</mat-icon>
-                </div>
-                <div class="metric-body">
-                  <div class="metric-value">
-                    {{ minutesText(selectedClassStats.avgCompletion) }}<span class="metric-unit">%</span>
-                  </div>
-                  <div class="metric-label">Avg. Completion</div>
-                </div>
-              </mat-card>
-
-              <mat-card class="metric-card">
-                <div class="metric-icon icon-time">
-                  <mat-icon>timer</mat-icon>
-                </div>
-                <div class="metric-body">
-                  <div class="metric-value">{{ minutesText(selectedClassStats.totalMinutes) }}</div>
-                  <div class="metric-label">Total Minutes</div>
-                </div>
-              </mat-card>
             </div>
-
-            <!-- Students Table -->
-            <mat-card class="students-card">
-              <div class="section-header">
-                <mat-icon>person</mat-icon>
-                <span class="section-title">Students</span>
-                <span class="badge">{{ classStudents.length }}</span>
-              </div>
-
-              <div class="students-list">
-                @for (s of classStudents; track s.id) {
-                  <div class="student-row">
-                    <div class="avatar">
-                      {{ ((s.fullName || '?').charAt(0)).toUpperCase() }}
-                    </div>
-
-                    <div class="student-info">
-                      <div class="student-name">{{ s.fullName }}</div>
-                      <div class="student-minutes">
-                        <mat-icon>timer</mat-icon>
-                        {{ minutesText(s.minutesRecorded ?? 0) }} min recorded
-                      </div>
-                    </div>
-
-                    <div class="student-bars">
-                      <div class="bar-row">
-                        <span class="bar-label">Completion</span>
-                        <mat-progress-bar mode="determinate" [value]="completionPct(s)"></mat-progress-bar>
-                        <span class="bar-value">{{ minutesText(completionPct(s)) }}%</span>
-                      </div>
-
-                      <div class="bar-row">
-                        <span class="bar-label">Grade</span>
-                        <mat-progress-bar mode="determinate" [value]="gradePct(s)" class="grade-bar"></mat-progress-bar>
-                        <span class="bar-value">{{ minutesText(gradePct(s)) }}/100</span>
-                      </div>
-                    </div>
-                  </div>
-                }
-
-                @if (!classStudents.length) {
-                  <div class="empty-note">
-                    <mat-icon>person_off</mat-icon>
-                    <span>No students in this class</span>
-                  </div>
-                }
-              </div>
-            </mat-card>
-
           } @else {
             <div class="empty-panel">
               <mat-icon>analytics</mat-icon>
@@ -220,7 +140,6 @@
           }
         </div>
       </div>
-
     }
   }
 </div>

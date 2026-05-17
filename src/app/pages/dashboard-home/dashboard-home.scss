@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────
-   Dashboard Home – matching stats page style
+   Dashboard Home – Clean Principal Dashboard
    ───────────────────────────────────────── */
 
 :host {
@@ -20,41 +20,22 @@
   --radius-md:    16px;
   --radius-lg:    20px;
   --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.07);
 }
 
 /* ── Page Layout ── */
 .dashboard-page {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
   padding: 24px;
   background: var(--bg);
-  min-height: 100%;
+  min-height: 100vh;
   font-family: 'Segoe UI', system-ui, sans-serif;
   color: var(--text);
 }
 
-/* ── Page Header ── */
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  h1 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-}
-
-.page-subtitle {
-  display: block;
-  margin-top: 2px;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-/* ── Loading ── */
+/* ── Loading State ── */
 .loading-state {
   display: grid;
   place-items: center;
@@ -72,9 +53,11 @@
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}
 
-/* ── Error ── */
+/* ── Error Card ── */
 .error-card {
   display: flex;
   align-items: center;
@@ -86,18 +69,101 @@
   border: 1px solid #fecaca;
   box-shadow: none;
 
-  mat-icon { opacity: 0.8; }
-  p { margin: 0; font-weight: 500; }
+  mat-icon { 
+    opacity: 0.8; 
+  }
+
+  p { 
+    margin: 0; 
+    font-weight: 500; 
+  }
 }
 
-/* ── KPI Grid ── */
-.kpi-grid {
+/* ── No Access Card ── */
+.no-access-card {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm) !important;
+  background: var(--surface);
+  padding: 28px;
+}
+
+.no-access-inner {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.no-access-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  background: var(--amber-soft);
+  color: var(--amber);
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.no-access-text {
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+
+  p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 70ch;
+  }
+}
+
+/* ── Page Header ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ── Summary Grid ── */
+.summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
-.kpi-card {
+.summary-card {
   position: relative;
   display: flex;
   align-items: center;
@@ -108,253 +174,152 @@
   border: 1px solid var(--border);
   background: var(--surface);
   overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.15s;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
 }
 
-.kpi-accent {
+.card-accent {
   position: absolute;
-  top: 0; right: 0;
+  top: 0;
+  right: 0;
   width: 80px;
   height: 80px;
   border-radius: 0 var(--radius-lg) 0 100%;
   opacity: 0.12;
+  pointer-events: none;
 }
 
-.kpi-teachers .kpi-accent { background: var(--primary); }
-.kpi-students .kpi-accent { background: var(--green); }
-.kpi-minutes  .kpi-accent { background: var(--blue); }
+.kpi-teachers .card-accent { background: var(--primary); }
+.kpi-students .card-accent { background: var(--green); }
+.kpi-minutes .card-accent { background: var(--blue); }
 
-.kpi-icon {
+.card-icon {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-sm);
   display: grid;
   place-items: center;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 
-  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+  mat-icon { 
+    font-size: 22px; 
+    width: 22px; 
+    height: 22px; 
+  }
 }
 
-.kpi-teachers .kpi-icon { background: var(--primary-soft); color: var(--primary); }
-.kpi-students .kpi-icon { background: var(--green-soft);   color: var(--green); }
-.kpi-minutes  .kpi-icon { background: var(--blue-soft);    color: var(--blue); }
+.kpi-teachers .card-icon { 
+  background: var(--primary-soft); 
+  color: var(--primary); 
+}
 
-.kpi-value {
+.kpi-students .card-icon { 
+  background: var(--green-soft); 
+  color: var(--green); 
+}
+
+.kpi-minutes .card-icon { 
+  background: var(--blue-soft); 
+  color: var(--blue); 
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.card-value {
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.5px;
   line-height: 1;
 }
 
-.kpi-label {
-  margin-top: 4px;
+.card-label {
   font-size: 13px;
   color: var(--muted);
   font-weight: 500;
 }
 
-/* ── Section ── */
-.section {
-  display: grid;
-  gap: 16px;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    color: var(--muted);
-  }
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 700;
-  flex: 1;
-}
-
-.badge {
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 9px;
-  border-radius: 99px;
-}
-
-/* ── Teachers Grid ── */
-.teachers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
-}
-
-.teacher-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 18px;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-sm) !important;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  transition: box-shadow 0.15s, transform 0.15s;
-
-  &:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,0.09) !important;
-    transform: translateY(-1px);
-  }
-}
-
-.teacher-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--primary-soft);
-  color: var(--primary);
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.teacher-info {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
-
-.teacher-name {
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.teacher-email,
-.teacher-class {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  color: var(--muted);
-
-  mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-    opacity: 0.6;
-  }
-}
-
-.class-badge {
-  background: var(--amber-soft);
-  color: #92400e;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
-}
-
-.no-class {
-  font-style: italic;
-  opacity: 0.6;
-}
-
-/* ── Empty State ── */
-.empty-note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 20px;
-  color: var(--muted);
-  font-size: 14px;
-  background: var(--surface);
-  border: 1px dashed #cbd5e1;
-  border-radius: var(--radius-lg);
-
-  mat-icon { font-size: 18px; width: 18px; height: 18px; opacity: 0.5; }
-}
-
 /* ── Responsive ── */
-@media (max-width: 768px) {
-  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .teachers-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 480px) {
-  .dashboard-page { padding: 16px; }
-  .kpi-grid { grid-template-columns: 1fr; }
-}
-/* ── Teacher Restricted State ── */
-.no-access-card {
-  border-radius: var(--radius-lg) !important;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm) !important;
-  background: var(--surface);
-  padding: 22px;
-}
-
-.no-access-inner {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 16px;
-  align-items: start;
-}
-
-.no-access-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  background: var(--amber-soft);
-  color: #92400e;
-
-  mat-icon {
-    font-size: 26px;
-    width: 26px;
-    height: 26px;
+@media (max-width: 1024px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.no-access-text {
-  h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    color: var(--text);
+@media (max-width: 640px) {
+  .dashboard-page {
+    padding: 16px;
+    gap: 16px;
   }
 
-  p {
-    margin: 6px 0 0;
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.5;
-    max-width: 70ch;
+  .page-header h1 {
+    font-size: 24px;
   }
-}
 
-.no-access-actions {
-  margin-top: 14px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
 
-@media (max-width: 600px) {
+  .summary-card {
+    padding: 18px;
+    gap: 14px;
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .card-value {
+    font-size: 24px;
+  }
+
   .no-access-inner {
     grid-template-columns: 1fr;
   }
+
   .no-access-icon {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page {
+    padding: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+
+  .summary-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .card-value {
+    font-size: 22px;
+  }
+
+  .card-label {
+    font-size: 12px;
   }
 }

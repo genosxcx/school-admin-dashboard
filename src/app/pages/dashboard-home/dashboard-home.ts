@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { filter, take } from 'rxjs/operators';
 import { RoleService } from '../../core/services/role.service';
 import { DataService } from '../../core/services/data.service';
-import { map } from 'rxjs/operators';
+
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
@@ -17,57 +17,68 @@ import { map } from 'rxjs/operators';
 export class DashboardHome implements OnInit {
   private roleSvc = inject(RoleService);
   private dataSvc = inject(DataService);
-  private cdr    = inject(ChangeDetectorRef);
+  private cdr = inject(ChangeDetectorRef);
 
   loading = true;
-  error   = '';
+  error = '';
 
-  teachers:      any[] = [];
-  totalTeachers  = 0;
-  totalStudents  = 0;
-  totalMinutes   = 0;
+  totalTeachers = 0;
+  totalStudents = 0;
+  totalMinutes = 0;
 
   ngOnInit(): void {
     this.loading = true;
-    this.error   = '';
+    this.error = '';
 
     this.roleSvc.claims$
       .pipe(
         filter((c): c is any => !!c),
         take(1)
       )
-      .subscribe(async (claims) => {
-        try {
-          if (claims.role !== 'principal') {
-            this.error = 'You are not allowed to view this page.';
-            return;
-          }
-
-          const schoolId = claims.schoolId;
-          if (!schoolId) {
-            this.error = 'schoolId is missing in claims.';
-            return;
-          }
-
-          const [teachers, totalTeachers, totalStudents, totalMinutes] =
-            await Promise.all([
-              this.dataSvc.getTeachers(schoolId),
-              this.dataSvc.countTeachers(schoolId),
-              this.dataSvc.countStudents(schoolId),
-              this.dataSvc.totalMinutes(schoolId),
-            ]);
-
-          this.teachers      = teachers      ?? [];
-          this.totalTeachers = totalTeachers ?? 0;
-          this.totalStudents = totalStudents ?? 0;
-          this.totalMinutes  = totalMinutes  ?? 0;
-        } catch (e: any) {
-          console.error('[DashboardHome] failed loading stats:', e);
-          this.error = e?.message ?? String(e);
-        } finally {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
+      .subscribe((claims) => {
+        this.loadDashboardData(claims);
       });
+  }
+
+  private async loadDashboardData(claims: any) {
+    try {
+      // Normalize role to lowercase
+      const roleStr = (claims.role ?? '').toString().toLowerCase();
+
+      // Check authorization
+      if (roleStr !== 'principal' && roleStr !== 'admin') {
+        this.error = 'You are not allowed to view this page.';
+        this.loading = false;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      const schoolId = claims.schoolId;
+      if (!schoolId) {
+        this.error = 'School ID is missing from your account.';
+        this.loading = false;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      // Load all dashboard metrics in parallel
+      const [totalTeachers, totalStudents, totalMinutes] = await Promise.all([
+        this.dataSvc.countTeachers(schoolId),
+        this.dataSvc.countStudents(schoolId),
+        this.dataSvc.totalMinutesRecorded(schoolId),
+      ]);
+
+      this.totalTeachers = totalTeachers ?? 0;
+      this.totalStudents = totalStudents ?? 0;
+      this.totalMinutes = totalMinutes ?? 0;
+
+      this.loading = false;
+    } catch (error: any) {
+      console.error('[DashboardHome] Error loading dashboard:', error);
+      this.error = error?.message ?? 'Failed to load dashboard data.';
+      this.loading = false;
+    } finally {
+      this.cdr.detectChanges();
+    }
   }
 }
