@@ -258,4 +258,38 @@ export class SubjectTeachers implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  exportToCSV() {
+    if (this.subjectTeachers.length === 0) return;
+
+    // Define headers
+    const headers = ['Full Name', 'Email', 'Subject', 'Assigned Classes'];
+    
+    // Map rows - note we use your existing classesLabel helper
+    const rows = this.subjectTeachers.map(t => [
+      `"${t.fullName || 'Unnamed'}"`,
+      `"${t.email || ''}"`,
+      `"${t.subject || ''}"`,
+      `"${this.classesLabel(t).replace(/"/g, '""')}"` // Handle potential commas/quotes in class list
+    ]);
+
+    // Create CSV content with BOM for Excel UTF-8 support
+    const csvContent = [headers, ...rows]
+      .map(row => row.join(','))
+      .join('\n');
+
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `subject_teachers_export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }

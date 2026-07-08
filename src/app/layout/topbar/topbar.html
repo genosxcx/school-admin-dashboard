@@ -1,15 +1,16 @@
 <mat-toolbar class="topbar">
   <div class="left">
     <span class="title">Hya Naqra'a</span>
-    <span class="subtitle">Dashboard</span>
+    <span class="badge-tag">Admin Portal</span>
   </div>
 
-  <span class="spacer"></span>
-
   <div class="right">
-    <span class="user">{{ displayName }}</span>
+    <div class="user-profile">
+      <div class="avatar">{{ (displayName || 'U').charAt(0).toUpperCase() }}</div>
+      <span class="user-name">{{ displayName || 'User Admin' }}</span>
+    </div>
 
-    <button mat-stroked-button color="primary" (click)="logout()">
+    <button mat-stroked-button class="logout-btn" (click)="logout()">
       <mat-icon>logout</mat-icon>
       Logout
     </button>

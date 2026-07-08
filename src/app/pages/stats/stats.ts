@@ -23,6 +23,8 @@ type Summary = {
   students: number;
   classes: number;
   minutes: number;
+  avgGrade: number;      // ✅ Added overall avg grade
+  avgCompletion: number; // ✅ Added overall avg completion
 };
 
 type ClassStats = {
@@ -58,16 +60,14 @@ export class Stats implements OnInit, OnDestroy {
   error = '';
   schoolId = '';
 
-  // ✅ Role checking
   isPrincipal = false;
   isTeacher = false;
   isSubjectTeacher = false;
 
-  // ✅ Class filters
   teacherClassId = '';
   subjectTeacherClassIds: string[] = [];
 
-  summary: Summary = { teachers: 0, students: 0, classes: 0, minutes: 0 };
+  summary: Summary = { teachers: 0, students: 0, classes: 0, minutes: 0, avgGrade: 0, avgCompletion: 0 };
 
   classes: SchoolClass[] = [];
   selectedClassId = '';
@@ -131,6 +131,21 @@ export class Stats implements OnInit, OnDestroy {
       });
   }
 
+  // ✅ Helper to safely fetch all accessible students across visible classes
+  private async getAllAccessibleStudents(visibleClasses: SchoolClass[]): Promise<Student[]> {
+    if (this.isTeacher && this.teacherClassId) {
+      return await this.data.getStudentsByClass(this.schoolId, this.teacherClassId) ?? [];
+    } else if (this.isSubjectTeacher && this.subjectTeacherClassIds.length > 0) {
+      return await this.data.getStudentsForSubjectTeacher(this.schoolId, this.subjectTeacherClassIds) ?? [];
+    } else if (visibleClasses.length > 0) {
+      const arrays = await Promise.all(
+        visibleClasses.map(c => this.data.getStudentsByClass(this.schoolId, c.id!))
+      );
+      return arrays.flat();
+    }
+    return [];
+  }
+
   private async loadOverview() {
     try {
       this.zone.run(() => (this.loading = true));
@@ -138,7 +153,6 @@ export class Stats implements OnInit, OnDestroy {
 
       const classList = await this.data.getClasses(this.schoolId);
 
-      // ✅ Filter classes based on role
       let visibleClasses = classList ?? [];
       if (this.isTeacher) {
         visibleClasses = visibleClasses.filter((c) => c.id === this.teacherClassId);
@@ -146,46 +160,32 @@ export class Stats implements OnInit, OnDestroy {
         visibleClasses = visibleClasses.filter((c) => c.id && this.subjectTeacherClassIds.includes(c.id));
       }
 
-      // Summary Logic
-      if (this.isPrincipal) {
-        const [teachers, students, classes, minutes] = await Promise.all([
-          this.data.countTeachers(this.schoolId),
-          this.data.countStudents(this.schoolId),
-          this.data.countClasses(this.schoolId),
-          this.data.totalMinutesRecorded(this.schoolId),
-        ]);
+      // ✅ 1. Fetch all accessible students to calculate Overall Average
+      const allStudents = await this.getAllAccessibleStudents(visibleClasses);
+      this.calculateSummaryFromStudents(allStudents, visibleClasses.length);
 
-        this.zone.run(() => {
-          this.summary = {
-            teachers: teachers ?? 0,
-            students: students ?? 0,
-            classes: classes ?? 0,
-            minutes: Number(minutes ?? 0),
-          };
-        });
-      } else if (this.isTeacher) {
-        // Home teacher class-level summary
-        const classStudents = await this.data.getStudentsByClass(this.schoolId, this.teacherClassId);
-        this.calculateSummaryFromStudents(classStudents, 1);
-      } else if (this.isSubjectTeacher) {
-        // Subject teacher multi-class summary
-        const allStudents = await this.data.getStudentsForSubjectTeacher(this.schoolId, this.subjectTeacherClassIds);
-        this.calculateSummaryFromStudents(allStudents, visibleClasses.length);
-      }
+      // ✅ 2. If user has access to multiple classes, prepend an "All Classes (Overview)" option
+      let displayClasses = visibleClasses
+        .slice()
+        .sort((a: SchoolClass, b: SchoolClass) => (a.name ?? '').localeCompare(b.name ?? ''));
+
+      if (!this.isTeacher && displayClasses.length > 1) {
+  displayClasses = [
+    { 
+      id: 'ALL', 
+      name: 'All Classes (Overview)', 
+      schoolId: this.schoolId // ✅ Add schoolId to satisfy the SchoolClass interface
+    } as SchoolClass, // ✅ Adding 'as SchoolClass' prevents errors if you have other required fields like createdAt
+    ...displayClasses
+  ];
+}
 
       this.zone.run(() => {
-        this.classes = visibleClasses
-          .slice()
-          .sort((a: SchoolClass, b: SchoolClass) => (a.name ?? '').localeCompare(b.name ?? ''));
-
+        this.classes = displayClasses;
         this.loading = false;
 
-        // ✅ Auto-select logic
-        if (this.isTeacher) {
-          this.selectedClassId = this.teacherClassId;
-          this.selectClass(this.teacherClassId);
-        } else if (this.classes.length > 0) {
-          // Both Principal and Subject Teacher auto-select the first visible class
+        // Auto-select the first item (either their single class or 'ALL')
+        if (this.classes.length > 0) {
           this.selectClass(this.classes[0].id!);
         }
       });
@@ -201,7 +201,6 @@ export class Stats implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ Extracted summary calculation so both teacher types can use it
   private calculateSummaryFromStudents(students: Student[], classCount: number) {
     const safe = (students ?? []).map((s: Student) => ({
       ...s,
@@ -210,25 +209,37 @@ export class Stats implements OnInit, OnDestroy {
       minutesRecorded: Number(s.minutesRecorded ?? 0),
     }));
 
-    const totalMinutes = safe.reduce(
-      (sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0),
-      0
-    );
+    const studentCount = safe.length;
+    const totalMinutes = safe.reduce((sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0), 0);
+
+    const completionValues: number[] = safe.map((s: Student) => {
+      const v = Number(s.completion ?? 0);
+      return v <= 1 ? v * 100 : v;
+    });
+
+    const avgCompletion = studentCount
+      ? completionValues.reduce((a: number, b: number) => a + b, 0) / studentCount
+      : 0;
+
+    const avgGrade = studentCount
+      ? safe.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) / studentCount
+      : 0;
 
     this.zone.run(() => {
       this.summary = {
-        teachers: 1, // teacher view: not meaningful school-wide
-        students: safe.length,
+        teachers: 1,
+        students: studentCount,
         classes: classCount,
         minutes: totalMinutes,
+        avgGrade,
+        avgCompletion,
       };
     });
   }
 
   async selectClass(classId: string) {
-    // ✅ Security: Ensure teachers can only select authorized classes
     if (this.isTeacher && classId !== this.teacherClassId) return;
-    if (this.isSubjectTeacher && !this.subjectTeacherClassIds.includes(classId)) return;
+    if (this.isSubjectTeacher && classId !== 'ALL' && !this.subjectTeacherClassIds.includes(classId)) return;
 
     this.selectedClassId = classId;
 
@@ -243,7 +254,15 @@ export class Stats implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      const students = await this.data.getStudentsByClass(this.schoolId, classId);
+      let students: Student[] = [];
+
+      // ✅ Check if they selected "All Classes (Overview)" vs a single class
+      if (classId === 'ALL') {
+        const actualClasses = this.classes.filter(c => c.id !== 'ALL');
+        students = await this.getAllAccessibleStudents(actualClasses);
+      } else {
+        students = await this.data.getStudentsByClass(this.schoolId, classId);
+      }
 
       const safeStudents: Student[] = (students ?? []).map((s: Student) => ({
         ...s,
@@ -253,11 +272,7 @@ export class Stats implements OnInit, OnDestroy {
       }));
 
       const studentCount = safeStudents.length;
-
-      const totalMinutes = safeStudents.reduce(
-        (sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0),
-        0
-      );
+      const totalMinutes = safeStudents.reduce((sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0), 0);
 
       const completionValues: number[] = safeStudents.map((s: Student) => {
         const v = Number(s.completion ?? 0);

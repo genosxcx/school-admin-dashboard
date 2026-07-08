@@ -1,101 +1,151 @@
 :host {
   display: block;
   height: 100%;
+  user-select: none;
 }
 
 .sidebar {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #ffffff;
+  color: #0f172a;
 }
 
-/* Brand */
+/* ── Brand Header ── */
 .brand {
-  padding: 18px 16px;
-  border-bottom: 1px solid #eef0f4;
+  padding: 24px 20px 20px;
 }
 
 .logo-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .logo-mark {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   display: grid;
   place-items: center;
+  font-size: 15px;
   font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #ffffff;
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
 }
 
 .brand-text {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
-  color: #111827;
+  color: #0f172a;
+  letter-spacing: -0.3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .sub {
-  margin-top: 2px;
   font-size: 11px;
-  font-weight: 700;
-  color: #6b7280;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
 }
 
-/* Nav */
+/* ── Navigation Links ── */
 .nav {
   flex: 1;
-  padding: 10px;
-  overflow: auto;
+  padding: 8px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-/* Material list items */
+/* Deep Material Overrides for clean SaaS aesthetics */
 :host ::ng-deep .nav a.mat-mdc-list-item {
-  border-radius: 12px;
-  margin: 6px 0;
-  transition: background-color 160ms ease, transform 160ms ease;
+  border-radius: 10px !important;
+  margin: 4px 0 !important;
+  height: 44px !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  transition: all 0.15s ease !important;
+  position: relative;
+  overflow: hidden;
 }
 
 :host ::ng-deep .nav a.mat-mdc-list-item:hover {
-  background: rgba(59, 130, 246, 0.08);
-  transform: translateX(2px);
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  transform: translateX(3px);
 }
 
 :host ::ng-deep .nav a.mat-mdc-list-item.active {
-  background: rgba(59, 130, 246, 0.12);
+  background: #eef2ff !important;
+  color: #4f46e5 !important;
+  font-weight: 700 !important;
 }
 
-:host ::ng-deep .nav a.mat-mdc-list-item.active .mat-icon {
-  color: #2563eb;
+/* Active indicator accent bar */
+:host ::ng-deep .nav a.mat-mdc-list-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  background: #4f46e5;
+  border-radius: 0 4px 4px 0;
 }
 
 :host ::ng-deep .nav .mat-icon {
-  color: #6b7280;
+  color: #64748b !important;
+  margin-right: 14px !important;
+  transition: color 0.15s ease;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
-/* Footer */
+:host ::ng-deep .nav a.mat-mdc-list-item:hover .mat-icon {
+  color: #0f172a !important;
+}
+
+:host ::ng-deep .nav a.mat-mdc-list-item.active .mat-icon {
+  color: #4f46e5 !important;
+}
+
+/* ── Footer ── */
 .sidebar-footer {
-  border-top: 1px solid #eef0f4;
-  padding: 12px 14px;
+  padding: 16px 20px;
+  margin: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
 }
 
 .hint {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 12px;
-  color: #6b7280;
+  font-weight: 500;
+  color: #64748b;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #94a3b8;
+  }
 }

@@ -190,4 +190,34 @@ export class Classes implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  exportToCSV() {
+    if (this.filtered.length === 0) return;
+
+    // Define headers
+    const headers = ['Class Name'];
+    
+    // Map rows
+    const rows = this.filtered.map(c => [
+      `"${c.name || 'Unnamed Class'}"`
+    ]);
+
+    // Create CSV content with BOM for Excel UTF-8 support
+    const csvContent = [headers, ...rows]
+      .map(row => row.join(','))
+      .join('\n');
+
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `classes_export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }

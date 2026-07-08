@@ -1,18 +1,51 @@
-.page-header {
-  margin-bottom: 24px;
-  h2 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 500;
-  }
+/* ─────────────────────────────────────────
+   Settings Page – Hya Naqra'a Design System
+   ───────────────────────────────────────── */
+
+:host {
+  --primary:      #4f46e5;
+  --surface:      #ffffff;
+  --border:       rgba(15, 23, 42, 0.06);
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --radius-lg:    18px;
+  --shadow-sm:    0 2px 4px rgba(15, 23, 42, 0.03);
 }
 
+.settings-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.page-subtitle { color: var(--muted); font-size: 14px; font-weight: 500; }
+
 .settings-card {
-  max-width: 500px;
-  
-  mat-card-content {
-    padding-top: 16px;
-  }
+  background: var(--surface) !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  padding: 24px !important;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .form-layout {
@@ -21,17 +54,48 @@
   gap: 16px;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
+.footer-section {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.error-msg {
-  background: #ffebee;
-  color: #c62828;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-  font-size: 14px;
+/* Material Field Override */
+.mat-mdc-form-field { width: 100%; }
+
+.settings-page {
+  padding: 20px;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.settings-card {
+  padding: 24px;
+  margin: 0 auto 24px auto;
+  max-width: 500px;
+  h3 { color: #3f51b5; margin-top: 0; }
+}
+
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.upload-section {
+  button { width: 100%; padding: 20px 0; }
+}
+
+.footer-section {
+  text-align: center;
+  margin-top: 60px;
+  color: #777;
+  .powered-by { font-size: 0.9em; margin-top: 4px; color: #3f51b5; }
 }

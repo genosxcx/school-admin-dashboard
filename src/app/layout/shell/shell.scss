@@ -1,34 +1,60 @@
 :host {
   display: block;
   height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .shell {
   height: 100vh;
-  background: #f6f7fb;
+  background: #f8fafc;
 }
 
 .shell-sidenav {
-  width: 280px;
-  border-right: 1px solid #e5e7eb;
+  width: 260px;
+  border-right: 1px solid rgba(15, 23, 42, 0.06) !important;
   background: #ffffff;
+  box-shadow: 1px 0 10px rgba(0, 0, 0, 0.02);
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .shell-content {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
 }
 
 .page {
   flex: 1;
-  padding: 24px;
-  overflow: auto;
+  padding: 32px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-@media (max-width: 900px) {
+/* Smooth custom scrollbar for the main content area */
+.page::-webkit-scrollbar {
+  width: 8px;
+}
+.page::-webkit-scrollbar-track {
+  background: transparent;
+}
+.page::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+}
+.page::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+@media (max-width: 1024px) {
+  .page {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
   .shell-sidenav {
-    width: 84px; // compact rail look
+    width: 76px; /* Sleek mini-rail on tablets/mobile */
   }
   .page {
     padding: 16px;

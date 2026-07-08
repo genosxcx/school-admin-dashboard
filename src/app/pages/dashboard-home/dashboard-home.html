@@ -3,7 +3,7 @@
   @if (loading) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Loading dashboard...</p>
+      <p>Loading school data...</p>
     </div>
   }
 
@@ -33,47 +33,54 @@
   }
 
   @else {
-    <!-- Page Header -->
+    <!-- Page Header (Read-Only) -->
     <div class="page-header">
+      <!-- Logo Display -->
+      @if (schoolLogo) {
+        <div class="school-logo">
+          <img [src]="schoolLogo" alt="School Logo" />
+        </div>
+      }
+
       <div class="header-content">
-        <h1>Principal Dashboard</h1>
-        <span class="page-subtitle">Overview of school metrics and staff</span>
+        <h1>{{ schoolName }}</h1>
+        <span class="page-subtitle">Key school metrics and staff performance</span>
       </div>
     </div>
 
     <!-- Summary KPIs -->
     <div class="summary-grid">
       
+      <!-- Interactive Faculty KPI -->
       <mat-card class="summary-card kpi-teachers">
-        <div class="card-accent"></div>
         <div class="card-icon">
           <mat-icon>school</mat-icon>
         </div>
         <div class="card-content">
           <div class="card-value">{{ totalTeachers }}</div>
-          <div class="card-label">Total Teachers</div>
+          <div class="card-label">Total Faculty</div>
         </div>
       </mat-card>
 
+      <!-- Students KPI -->
       <mat-card class="summary-card kpi-students">
-        <div class="card-accent"></div>
         <div class="card-icon">
           <mat-icon>groups</mat-icon>
         </div>
         <div class="card-content">
           <div class="card-value">{{ totalStudents }}</div>
-          <div class="card-label">Total Students</div>
+          <div class="card-label">Active Students</div>
         </div>
       </mat-card>
 
+      <!-- Minutes KPI -->
       <mat-card class="summary-card kpi-minutes">
-        <div class="card-accent"></div>
         <div class="card-icon">
           <mat-icon>timer</mat-icon>
         </div>
         <div class="card-content">
           <div class="card-value">{{ totalMinutes | number:'1.0-1' }}</div>
-          <div class="card-label">Minutes Recorded</div>
+          <div class="card-label">Learning Minutes</div>
         </div>
       </mat-card>
 

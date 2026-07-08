@@ -4,7 +4,7 @@
       <div class="logo-mark">HN</div>
       <div class="brand-text">
         <div class="logo">Hya Naqra'a</div>
-        <div class="sub">Admin Dashboard</div>
+        <div class="sub">Collaborative Learning</div>
       </div>
     </div>
   </div>
@@ -12,7 +12,7 @@
   <mat-nav-list class="nav">
     <a mat-list-item routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <mat-icon matListItemIcon>dashboard</mat-icon>
-      <span matListItemTitle>Home</span>
+      <span matListItemTitle>Overview</span>
     </a>
 
     @if (isPrincipal$ | async) {
@@ -55,7 +55,7 @@
 
     <a mat-list-item routerLink="/admin/stats" routerLinkActive="active">
       <mat-icon matListItemIcon>bar_chart</mat-icon>
-      <span matListItemTitle>Stats</span>
+      <span matListItemTitle>Statistics</span>
     </a>
 
     <a mat-list-item routerLink="/admin/settings" routerLinkActive="active">
@@ -66,8 +66,8 @@
 
   <div class="sidebar-footer">
     <div class="hint">
-      <mat-icon>info</mat-icon>
-      <span>Use the menu to navigate</span>
+      <mat-icon>help_outline</mat-icon>
+      <span>Need assistance?</span>
     </div>
   </div>
 </aside>

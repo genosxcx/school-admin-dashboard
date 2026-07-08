@@ -266,4 +266,35 @@ export class Teachers implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  // Add this method to your Teachers class
+  exportToCSV() {
+    if (this.teachers.length === 0) return;
+
+    const headers = ['Full Name', 'Email', 'Assigned Class'];
+    const rows = this.teachers.map(t => [
+      `"${t.fullName || 'Unnamed'}"`,
+      `"${t.email || ''}"`,
+      `"${this.classLabel(t)}"`
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.join(','))
+      .join('\n');
+
+    // ✅ ADD THIS: Add the Byte Order Mark (BOM) for UTF-8 support in Excel
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `teachers_export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }

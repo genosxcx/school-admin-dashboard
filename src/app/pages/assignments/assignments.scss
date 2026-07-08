@@ -1,0 +1,94 @@
+/* ─────────────────────────────────────────
+   Assignments Page – Hya Naqra'a Design System
+   ───────────────────────────────────────── */
+
+:host {
+  --primary:      #4f46e5;
+  --primary-soft: #eef2ff;
+  --primary-dark: #3730a3;
+  --blue:         #3b82f6;
+  --blue-soft:    #dbeafe;
+  --red:          #ef4444;
+  --red-soft:     #fef2f2;
+  --surface:      #ffffff;
+  --border:       rgba(15, 23, 42, 0.06);
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --radius-md:    12px;
+  --radius-lg:    18px;
+  --shadow-sm:    0 2px 4px rgba(15, 23, 42, 0.03);
+}
+
+.assignments-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* ── Header Section ── */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.header-title h1 { margin: 0 0 6px; font-size: 28px; font-weight: 800; letter-spacing: -0.6px; color: var(--text); }
+.subtitle { margin: 0; font-size: 14px; color: var(--muted); font-weight: 500; }
+
+.header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+.search-field {
+  width: 280px;
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper { background: var(--surface) !important; border-radius: var(--radius-md) !important; }
+    .mat-mdc-form-field-infix { padding: 12px 0 10px 0 !important; min-height: 44px !important; }
+  }
+}
+
+.add-btn {
+  height: 44px !important;
+  padding: 0 20px !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+}
+
+/* ── Table Card ── */
+.table-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  padding: 0 !important;
+}
+
+.full-width-table {
+  width: 100%;
+  .mat-mdc-header-row { background: #f8fafc; height: 52px; }
+  .mat-mdc-header-cell { padding: 0 24px; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; border: none; }
+  .mat-mdc-row { height: 68px; border-bottom: 1px solid var(--border); transition: 0.15s; }
+  .mat-mdc-row:hover { background: #f8fafc; }
+  .mat-mdc-cell { padding: 0 24px; color: var(--text); font-size: 14px; border: none; }
+}
+
+/* Cell styles */
+.title-text { font-weight: 700; color: var(--text); font-size: 15px; }
+.desc-text { color: var(--muted); font-size: 13px; max-width: 300px; }
+.date-pill { background: #f1f5f9; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.classes-pill { background: var(--primary-soft); color: var(--primary); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+
+.action-buttons { display: flex; justify-content: flex-end; }
+.delete-btn:hover { color: var(--red) !important; background: var(--red-soft) !important; }
+
+/* Overlays */
+.loading-overlay { padding: 40px; text-align: center; color: var(--muted); font-weight: 600; }
+.error-msg { background: #fef2f2; color: #b91c1c; padding: 16px; border-radius: var(--radius-md); margin-bottom: 16px; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }

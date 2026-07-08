@@ -5,6 +5,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  getDoc,
   query,
   updateDoc,
   where,
@@ -15,7 +16,8 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc } from 'firebase/firestore'; // Make sure setDoc is imported
 import { environment } from '../../../environments/environment';
 import { db } from '../../firebase';
-
+// Add these to your existing imports
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // ---------------- TYPES ----------------
 
 export type Teacher = {
@@ -82,24 +84,16 @@ export class DataService {
 
   async getTeachers(schoolId: string): Promise<Teacher[]> {
     const ref = collection(db, 'users');
-    const qy = query(
-      ref,
-      where('role', '==', 'teacher'),
-      where('schoolId', '==', schoolId)
-    );
+    const qy = query(ref, where('role', '==', 'teacher'), where('schoolId', '==', schoolId));
     const snap = await getDocs(qy);
-
-    return snap.docs.map((d) => {
-      const data = d.data() as any;
-      return {
+    return snap.docs.map((d) => ({
         id: d.id,
-        role: data.role,
-        schoolId: data.schoolId,
-        fullName: this.normalizeFullName(data),
-        email: (data.email ?? '').toString(),
-        classId: (data.classId ?? '').toString(),
-      } as Teacher;
-    });
+        role: d.data()['role'],
+        schoolId: d.data()['schoolId'],
+        fullName: this.normalizeFullName(d.data()),
+        email: (d.data()['email'] ?? '').toString(),
+        classId: (d.data()['classId'] ?? '').toString(),
+    } as Teacher));
   }
 
   async createTeacher(
@@ -590,4 +584,37 @@ async getStudentsForSubjectTeacher(schoolId: string, classIds: string[]): Promis
     const ref = doc(db, 'assignments', assignmentId);
     await deleteDoc(ref);
   }
+  // ---------------- SCHOOL BRANDING ----------------
+  
+  /**
+   * Fetches the school name and logo URL.
+   */
+  async getSchoolDetails(schoolId: string) {
+    const docRef = doc(db, 'schools', schoolId);
+    const snap = await getDoc(docRef);
+    return snap.exists() ? snap.data() : null;
+  }
+
+  /**
+   * Updates the school name and logo URL.
+   */
+  async updateSchoolDetails(schoolId: string, data: { name: string, logoUrl: string }) {
+    const docRef = doc(db, 'schools', schoolId);
+    // Use setDoc with merge: true to create the doc if it doesn't exist
+    await setDoc(docRef, data, { merge: true });
+  }
+  /**
+ * Uploads a logo file to Firebase Storage and returns the download URL.
+ */
+async uploadLogo(schoolId: string, file: File): Promise<string> {
+  const storage = getStorage();
+  // We use the schoolId as part of the path to keep files organized
+  const storageRef = ref(storage, `schools/${schoolId}/logo`);
+  
+  // Upload the file
+  const snapshot = await uploadBytes(storageRef, file);
+  
+  // Get the public download URL
+  return await getDownloadURL(snapshot.ref);
+}
 }

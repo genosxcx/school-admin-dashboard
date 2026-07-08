@@ -1,42 +1,97 @@
-<div class="page-header">
-  <h2>Settings</h2>
-</div>
+<div class="settings-page">
+  <div class="page-header">
+    <h1>Settings</h1>
+    <p class="page-subtitle">Manage your account preferences and security</p>
+  </div>
 
-<mat-card class="settings-card">
-  <mat-card-header>
-    <mat-card-title>Change Password</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <div class="error-msg" *ngIf="error">{{ error }}</div>
+  <!-- Central Navigation -->
+  <div class="settings-actions">
+    <button mat-raised-button color="primary" (click)="activeSection = 'org'">
+      <mat-icon>business</mat-icon> Organization
+    </button>
+    <button mat-raised-button color="primary" (click)="activeSection = 'password'">
+      <mat-icon>lock</mat-icon> Password
+    </button>
+    <button mat-raised-button color="accent" (click)="activeSection = 'terms'">
+      <mat-icon>description</mat-icon> Terms & Conditions
+    </button>
+  </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="form-layout">
+  <!-- 1. Organization Section -->
+  @if (activeSection === 'org') {
+    <mat-card class="settings-card">
       
-      <mat-form-field appearance="outline">
-        <mat-label>New Password</mat-label>
-        <input matInput type="password" formControlName="newPassword" />
-        <mat-error *ngIf="form.get('newPassword')?.hasError('minlength')">
-          Password must be at least 6 characters.
-        </mat-error>
-        <mat-error *ngIf="form.get('newPassword')?.hasError('required')">
-          New password is required.
-        </mat-error>
-      </mat-form-field>
+      <!-- Debugging Section: Remove this once you confirm your role -->
+      <!-- <div style="background: #fdf2f2; padding: 10px; margin-bottom: 20px; border: 1px solid #e0e0e0; font-size: 12px;">
+        <strong>DEBUG INFO:</strong><br>
+        @if ((roleSvc.claims$ | async); as claims) {
+          Role: "{{ claims.role }}" <br>
+          School ID: "{{ claims.schoolId }}"
+        } @else {
+          Loading claims...
+        }
+      </div> -->
 
-      <mat-form-field appearance="outline">
-        <mat-label>Confirm New Password</mat-label>
-        <input matInput type="password" formControlName="confirmPassword" />
-        <mat-error *ngIf="form.hasError('mismatch') && form.get('confirmPassword')?.touched">
-          Passwords do not match.
-        </mat-error>
-      </mat-form-field>
+      @if ((roleSvc.claims$ | async); as claims) {
+        @if (['principal', 'admin'].includes((claims.role ?? '').toLowerCase())) {
+          <h3>Edit Organization</h3>
+          <form [formGroup]="orgForm" (ngSubmit)="updateOrganization()" class="form-layout">
+            <mat-form-field appearance="outline">
+              <mat-label>School Name</mat-label>
+              <input matInput formControlName="name" />
+            </mat-form-field>
 
-      <div class="form-actions">
-        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
+            <div class="upload-section">
+              <button mat-stroked-button type="button" (click)="fileInput.click()">
+                <mat-icon>upload</mat-icon> {{ logoFile ? logoFile.name : 'Choose Logo Image' }}
+              </button>
+              <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" hidden />
+            </div>
+
+            <!-- REMOVED [disabled] FOR DEBUGGING -->
+<button mat-flat-button color="primary" type="submit">
+  Save Organization
+</button>>
+          </form>
+        } @else {
+          <p style="color: red;">Access Denied: You do not have the required role to edit organization settings.</p>
+        }
+      }
+    </mat-card>
+  }
+
+  <!-- 2. Password Section -->
+  @if (activeSection === 'password') {
+    <mat-card class="settings-card">
+      <h3>Change Password</h3>
+      @if (error) { <div class="error-msg">{{ error }}</div> }
+      <form [formGroup]="form" (ngSubmit)="submitPassword()" class="form-layout">
+        <mat-form-field appearance="outline">
+          <mat-label>New Password</mat-label>
+          <input matInput type="password" formControlName="newPassword" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm New Password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" />
+        </mat-form-field>
+        <button mat-flat-button color="primary" [disabled]="form.invalid || loading">
           {{ loading ? 'Updating...' : 'Update Password' }}
         </button>
-      </div>
+      </form>
+    </mat-card>
+  }
 
-    </form>
-  </mat-card-content>
-</mat-card>
+  <!-- 3. Terms & Conditions Section -->
+  @if (activeSection === 'terms') {
+    <mat-card class="settings-card">
+      <h3>Terms and Conditions</h3>
+      <p>Hey, how are you? This is the placeholder for the full terms and conditions document.</p>
+    </mat-card>
+  }
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <p>Hya Naqra'a Admin Portal © 2026</p>
+    <p class="powered-by">Powered by <strong>NadaSoft</strong></p>
+  </div>
+</div>

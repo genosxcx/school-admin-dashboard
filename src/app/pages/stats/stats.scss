@@ -518,3 +518,55 @@ mat-progress-bar.grade-bar {
     font-size: 14px;
   }
 }
+/* 1. Lock the main panel height so it doesn't expand past the screen */
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 100px); /* Adjust 100px to match your top navbar/header height */
+  overflow: hidden;
+}
+
+/* 2. Ensure the slide-in container fills the panel vertically */
+.slide-in-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 3. Prevent the top metrics cards from shrinking or scrolling away */
+.metrics-compact {
+  flex-shrink: 0;
+}
+
+/* 4. Set up the student section as a flexible column */
+.students-slide {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Crucial: prevents flexbox scroll clipping in Chrome/Firefox */
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+/* 5. Keep the "Student Performance" header fixed right above the list */
+.students-header {
+  flex-shrink: 0;
+  padding-bottom: 8px;
+}
+
+/* 6. Enable scrolling ONLY on the list of students */
+.students-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px; /* Prevents scrollbar from overlapping text */
+
+  /* Optional: smooth scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+}

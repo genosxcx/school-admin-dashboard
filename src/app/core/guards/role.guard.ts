@@ -1,12 +1,25 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CanActivateFn, Router } from '@angular/router';
 import { RoleService } from '../services/role.service';
+import { AuthService } from '../services/auth.service'; // ✅ Import AuthService
 
 export const roleGuard: CanActivateFn = async (route) => {
   const roleSvc = inject(RoleService);
+  const authSvc = inject(AuthService); // ✅ Inject AuthService
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
+
+  // 1. Bypass check if running on the server (SSR) to prevent false logouts
+  if (!isPlatformBrowser(platformId)) {
+    return true; 
+  }
 
   try {
+    // 🚀 THE FIX: Force the roleGuard to wait for Firebase to fully restore the session 
+    // BEFORE it attempts to read the user's claims.
+    await authSvc.waitForAuth();
+
     const claims = await roleSvc.getClaims();
 
     // If no schoolId, treat as not allowed and send to login
