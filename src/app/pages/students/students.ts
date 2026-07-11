@@ -18,6 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 import { DataService, Student, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
@@ -35,6 +36,7 @@ import { StudentFormDialog, ClassOption } from './student-form-dialog/student-fo
     MatTableModule,
     MatIconModule,
     MatButtonModule,
+    TranslatePipe
   ],
   templateUrl: './students.html',
   styleUrls: ['./students.scss'],
@@ -45,6 +47,7 @@ export class Students implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService);
   private destroy$ = new Subject<void>();
 
   loading = true;
@@ -59,7 +62,6 @@ export class Students implements OnInit, OnDestroy {
   isTeacher = false;
   teacherClassId = '';
 
-  // ✅ Added studentId to columns
   displayedColumns: string[] = ['studentId', 'name', 'email', 'classId', 'actions'];
 
   get filtered(): Student[] {
@@ -69,7 +71,7 @@ export class Students implements OnInit, OnDestroy {
     return this.students.filter((st) => {
       const className = this.classNameById.get(st.classId ?? '') ?? '';
       return (
-        (st.studentId ?? '').toLowerCase().includes(s) || // ✅ Search by ID
+        (st.studentId ?? '').toLowerCase().includes(s) ||
         (st.fullName ?? '').toLowerCase().includes(s) ||
         (st.email ?? '').toLowerCase().includes(s) ||
         (className ?? '').toLowerCase().includes(s)
@@ -101,7 +103,7 @@ export class Students implements OnInit, OnDestroy {
         catchError((err) => {
           console.error('[Students] claims$ failed:', err);
           this.zone.run(() => {
-            this.error = 'Could not load your school info (claims).';
+            this.error = this.translate.instant('STUDENTS.MESSAGES.ERROR_CLAIMS');
             this.loading = false;
           });
           this.cdr.detectChanges();
@@ -113,26 +115,22 @@ export class Students implements OnInit, OnDestroy {
       )
       .subscribe((claims) => {
         this.schoolId = claims.schoolId;
-        
         const roleStr = (claims.role ?? '').toString().toLowerCase();
         this.isTeacher = roleStr === 'teacher';
         const isParent = roleStr === 'parent'; 
 
         this.teacherClassId = (claims.classId ?? claims.classIds?.[0] ?? '').toString();
         
-        if (isParent) {
-            this.isTeacher = true; 
-        }
+        if (isParent) this.isTeacher = true; 
 
         if (this.isTeacher && !this.teacherClassId && !isParent) {
           this.zone.run(() => {
-            this.error = 'Your account is not assigned to a class yet.';
+            this.error = this.translate.instant('STUDENTS.MESSAGES.ERROR_ACCOUNT');
             this.loading = false;
           });
           this.cdr.detectChanges();
           return;
         }
-
         this.loadAll();
       });
   }
@@ -151,27 +149,18 @@ export class Students implements OnInit, OnDestroy {
 
       this.zone.run(() => {
         const allClasses = classes ?? [];
-
         if (this.isTeacher && !this.teacherClassId && allClasses.length > 0) {
             this.teacherClassId = allClasses[0].id!;
         }
-
-        this.classes = this.isTeacher
-          ? allClasses.filter((c) => c.id === this.teacherClassId)
-          : allClasses;
-
-        this.classNameById = new Map(
-          (this.classes ?? []).filter((c) => !!c.id).map((c) => [c.id!, c.name])
-        );
-
+        this.classes = this.isTeacher ? allClasses.filter((c) => c.id === this.teacherClassId) : allClasses;
+        this.classNameById = new Map((this.classes ?? []).filter((c) => !!c.id).map((c) => [c.id!, c.name]));
         this.students = students ?? [];
         this.loading = false;
       });
       this.cdr.detectChanges();
     } catch (e) {
-      console.error('[Students] loadAll failed:', e);
       this.zone.run(() => {
-        this.error = 'Failed to load students.';
+        this.error = this.translate.instant('STUDENTS.MESSAGES.ERROR_LOAD');
         this.loading = false;
       });
       this.cdr.detectChanges();
@@ -179,18 +168,15 @@ export class Students implements OnInit, OnDestroy {
   }
 
   private classOptions(): ClassOption[] {
-    return (this.classes ?? [])
-      .filter((c) => !!c.id)
-      .map((c) => ({ id: c.id!, name: c.name }));
+    return (this.classes ?? []).filter((c) => !!c.id).map((c) => ({ id: c.id!, name: c.name }));
   }
 
- async addStudent() {
+  async addStudent() {
     if (!this.schoolId) return;
-
     const ref = this.dialog.open(StudentFormDialog, {
       width: '520px',
       data: {
-        title: 'Add student',
+        title: this.translate.instant('STUDENT_DIALOG.TITLE_ADD'),
         classes: this.classOptions(),
         initial: this.isTeacher ? { classId: this.teacherClassId } : undefined,
         lockClass: this.isTeacher, 
@@ -200,19 +186,13 @@ export class Students implements OnInit, OnDestroy {
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
-    const payload = this.isTeacher
-      ? { ...result, classId: this.teacherClassId }
-      : result;
-
+    const payload = this.isTeacher ? { ...result, classId: this.teacherClassId } : result;
     this.zone.run(() => (this.loading = true));
-    this.cdr.detectChanges();
-
     try {
       await this.data.createStudent(this.schoolId, payload);
       await this.loadAll();
     } catch (e) {
-      console.error(e);
-      this.zone.run(() => (this.error = 'Failed to create student.'));
+      this.zone.run(() => (this.error = this.translate.instant('STUDENTS.MESSAGES.ERROR_CREATE')));
     } finally {
       this.zone.run(() => (this.loading = false));
       this.cdr.detectChanges();
@@ -221,18 +201,16 @@ export class Students implements OnInit, OnDestroy {
 
   async editStudent(st: Student) {
     if (!st.id) return;
-
     if (this.isTeacher && st.classId !== this.teacherClassId) {
-      alert('You can only edit students in your class.');
+      alert(this.translate.instant('STUDENTS.MESSAGES.RESTRICT_EDIT'));
       return;
     }
 
     const ref = this.dialog.open(StudentFormDialog, {
       width: '520px',
       data: {
-        title: 'Edit student',
+        title: this.translate.instant('STUDENT_DIALOG.TITLE_EDIT'),
         classes: this.classOptions(),
-        // ✅ Passed studentId to initial data
         initial: { studentId: st.studentId, fullName: st.fullName, email: st.email, classId: st.classId },
         lockClass: this.isTeacher, 
       },
@@ -241,19 +219,13 @@ export class Students implements OnInit, OnDestroy {
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
-    const payload = this.isTeacher
-      ? { ...result, classId: this.teacherClassId }
-      : result;
-
+    const payload = this.isTeacher ? { ...result, classId: this.teacherClassId } : result;
     this.zone.run(() => (this.loading = true));
-    this.cdr.detectChanges();
-
     try {
       await this.data.updateStudent(st.id, payload);
       await this.loadAll();
     } catch (e) {
-      console.error(e);
-      this.zone.run(() => (this.error = 'Failed to update student.'));
+      this.zone.run(() => (this.error = this.translate.instant('STUDENTS.MESSAGES.ERROR_UPDATE')));
     } finally {
       this.zone.run(() => (this.loading = false));
       this.cdr.detectChanges();
@@ -262,65 +234,50 @@ export class Students implements OnInit, OnDestroy {
   
   async deleteStudent(st: Student) {
     if (!st.id) return;
-
     if (this.isTeacher && st.classId !== this.teacherClassId) {
-      alert('You can only delete students in your class.');
+      alert(this.translate.instant('STUDENTS.MESSAGES.RESTRICT_DELETE'));
       return;
     }
 
-    const ok = confirm(`Delete student "${st.fullName}"?`);
+    const msg = this.translate.instant('STUDENTS.MESSAGES.DELETE_CONFIRM');
+    const ok = confirm(`${msg} "${st.fullName}"?`);
     if (!ok) return;
 
     this.zone.run(() => (this.loading = true));
-    this.cdr.detectChanges();
-
     try {
       await this.data.deleteStudent(st.id);
       await this.loadAll();
     } catch (e) {
-      console.error(e);
-      this.zone.run(() => (this.error = 'Failed to delete student.'));
+      this.zone.run(() => (this.error = this.translate.instant('STUDENTS.MESSAGES.ERROR_DELETE')));
     } finally {
       this.zone.run(() => (this.loading = false));
       this.cdr.detectChanges();
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
   exportToCSV() {
     if (this.filtered.length === 0) return;
-
-    // Define headers
     const headers = ['Student ID', 'Full Name', 'Email', 'Assigned Class'];
-    
-    // Map rows using your existing classLabel helper
     const rows = this.filtered.map(s => [
       `"${s.studentId || ''}"`,
       `"${s.fullName || 'Unnamed'}"`,
       `"${s.email || s.loginEmail || ''}"`,
       `"${this.classLabel(s).replace(/"/g, '""')}"`
     ]);
-
-    // Create CSV content with BOM for Excel UTF-8 support
-    const csvContent = [headers, ...rows]
-      .map(row => row.join(','))
-      .join('\n');
-
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
     const BOM = '\uFEFF';
     const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    
     link.setAttribute('href', url);
     link.setAttribute('download', `students_export_${new Date().toISOString().slice(0,10)}.csv`);
-    link.style.visibility = 'hidden';
-    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

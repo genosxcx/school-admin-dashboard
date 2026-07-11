@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon'; 
+import { TranslatePipe } from '@ngx-translate/core';
 
 export type ClassOption = { id: string; name: string };
 
@@ -36,38 +37,39 @@ export type StudentFormResult = {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    TranslatePipe
   ],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
 
     <div mat-dialog-content class="content">
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Student ID</mat-label>
+        <mat-label>{{ 'STUDENT_DIALOG.ID' | translate }}</mat-label>
         <input matInput [(ngModel)]="studentId" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Full name</mat-label>
+        <mat-label>{{ 'STUDENT_DIALOG.NAME' | translate }}</mat-label>
         <input matInput [(ngModel)]="fullName" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Email (Optional)</mat-label>
+        <mat-label>{{ 'STUDENT_DIALOG.EMAIL' | translate }}</mat-label>
         <input matInput [(ngModel)]="email" type="email" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full" *ngIf="password">
-        <mat-label>Generated Password (Copy this!)</mat-label>
+        <mat-label>{{ 'STUDENT_DIALOG.PASSWORD' | translate }}</mat-label>
         <input matInput [value]="password" readonly />
         <mat-icon matSuffix style="cursor: pointer;" (click)="copyPassword()">content_copy</mat-icon>
-        <mat-hint>Give this to the student so they can log in.</mat-hint>
+        <mat-hint>{{ 'STUDENT_DIALOG.HINT' | translate }}</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full" *ngIf="!data.lockClass">
-        <mat-label>Class</mat-label>
+        <mat-label>{{ 'STUDENT_DIALOG.CLASS' | translate }}</mat-label>
         <mat-select [(ngModel)]="classId">
-          <mat-option [value]="''">Unassigned</mat-option>
+          <mat-option [value]="''">{{ 'STUDENT_DIALOG.UNASSIGNED' | translate }}</mat-option>
           <mat-option *ngFor="let c of data.classes" [value]="c.id">
             {{ c.name }}
           </mat-option>
@@ -76,9 +78,9 @@ export type StudentFormResult = {
     </div>
 
     <div mat-dialog-actions align="end">
-      <button mat-button (click)="close()">Cancel</button>
+      <button mat-button (click)="close()">{{ 'STUDENT_DIALOG.CANCEL' | translate }}</button>
       <button mat-flat-button color="primary" (click)="save()" [disabled]="!studentId.trim() || !fullName.trim()">
-        Save
+        {{ 'STUDENT_DIALOG.SAVE' | translate }}
       </button>
     </div>
   `,
@@ -91,15 +93,11 @@ export class StudentFormDialog {
   data = inject(MAT_DIALOG_DATA) as StudentFormData;
   private ref = inject(MatDialogRef<StudentFormDialog, StudentFormResult | null>);
 
-  // ✅ 1. Determine if this is an Edit by checking if a studentId already exists
   isEdit = !!this.data.initial?.studentId;
-
   studentId = this.data.initial?.studentId ?? '';
   fullName = this.data.initial?.fullName ?? '';
   email = this.data.initial?.email ?? '';
   classId = this.data.initial?.classId ?? '';
-
-  // ✅ 2. Generate password ONLY if it is a brand-new student
   password = this.isEdit ? '' : this.generateRandomPassword(6);
 
   private generateRandomPassword(length: number): string {
@@ -112,14 +110,10 @@ export class StudentFormDialog {
   }
 
   copyPassword() {
-    if (this.password) {
-      navigator.clipboard.writeText(this.password);
-    }
+    if (this.password) navigator.clipboard.writeText(this.password);
   }
 
-  close() {
-    this.ref.close(null);
-  }
+  close() { this.ref.close(null); }
 
   save() {
     this.ref.close({

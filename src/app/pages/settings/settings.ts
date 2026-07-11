@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,35 +10,45 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { take } from 'rxjs/operators';
 
+// Services
 import { AuthService } from '../../core/services/auth.service';
 import { RoleService } from '../../core/services/role.service';
 import { DataService } from '../../core/services/data.service';
+
+// ✅ Translate Service AND Pipe
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatButtonModule, MatSnackBarModule, MatSelectModule, MatIconModule
+    MatInputModule, MatButtonModule, MatSnackBarModule, MatSelectModule, MatIconModule,
+    TranslatePipe // ✅ Added here so the HTML pipe works!
   ],
   templateUrl: './settings.html',
   styleUrls: ['./settings.scss']
 })
 export class Settings implements OnInit {
+  // Dependencies
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   public roleSvc = inject(RoleService);
   private dataSvc = inject(DataService);
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService);
+  private platformId = inject(PLATFORM_ID);
 
   // UI State
-  activeSection: 'org' | 'password' | 'terms' | null = null;
+  activeSection: 'org' | 'password' | 'terms' | 'language' | null = null;
   loading = false;
   error = '';
   schoolId = '';
   logoFile: File | null = null;
+  currentLang = 'en';
 
+  // Forms
   form = this.fb.group({
     newPassword: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', Validators.required]
@@ -50,6 +60,14 @@ export class Settings implements OnInit {
   });
 
   ngOnInit() {
+    // Load saved language safely for SSR
+    if (isPlatformBrowser(this.platformId)) {
+      const savedLang = localStorage.getItem('appLang');
+      if (savedLang) {
+        this.currentLang = savedLang;
+      }
+    }
+
     this.roleSvc.claims$.pipe(take(1)).subscribe(async (claims) => {
       if (!claims || !claims.schoolId) return;
       
@@ -70,6 +88,26 @@ export class Settings implements OnInit {
     });
   }
 
+  changeLanguage(lang: string) {
+    this.currentLang = lang;
+    this.translate.use(lang);
+    
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('appLang', lang);
+    }
+
+    // Handle RTL
+    const dir = (lang === 'ar' || lang === 'he') ? 'rtl' : 'ltr';
+    document.documentElement.dir = dir;
+    document.documentElement.lang = lang;
+
+    this.snackBar.open(
+      this.translate.instant('SETTINGS.MESSAGES.LANG_UPDATED'), 
+      this.translate.instant('SETTINGS.MESSAGES.CLOSE'), 
+      { duration: 3000 }
+    );
+  }
+
   passwordMatchValidator(g: any) {
     return g.get('newPassword')?.value === g.get('confirmPassword')?.value ? null : { mismatch: true };
   }
@@ -86,57 +124,61 @@ export class Settings implements OnInit {
     this.loading = true;
     try {
       await this.auth.changePassword(this.form.value.newPassword!);
-      this.snackBar.open('Password updated!', 'Close', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('SETTINGS.MESSAGES.PASS_UPDATED'), 
+        this.translate.instant('SETTINGS.MESSAGES.CLOSE'), 
+        { duration: 3000 }
+      );
       this.form.reset();
     } catch (e: any) {
-      this.error = e.message || 'Failed to update password.';
+      this.error = this.translate.instant('SETTINGS.MESSAGES.PASS_FAILED');
     } finally {
       this.loading = false;
     }
   }
 
   async updateOrganization() {
-  const currentClaims = this.roleSvc.claims;
-  // Ensure we have a valid schoolId before proceeding
-  const schoolId = currentClaims?.schoolId; 
-  const isCurrentlyPrincipal = ['principal', 'admin'].includes((currentClaims?.role ?? '').toLowerCase());
+    const currentClaims = this.roleSvc.claims;
+    const schoolId = currentClaims?.schoolId; 
+    const isCurrentlyPrincipal = ['principal', 'admin'].includes((currentClaims?.role ?? '').toLowerCase());
 
-  // Add this guard to catch the empty ID before it hits Firebase
-  if (!schoolId || schoolId.trim() === '') {
-    console.error('Save failed: schoolId is missing or empty.');
-    this.snackBar.open('Error: School ID is missing. Please refresh.', 'Close');
-    return;
-  }
-
-  if (!isCurrentlyPrincipal || this.orgForm.invalid) {
-    this.snackBar.open('Unauthorized or invalid form.', 'Close');
-    return;
-  }
-  
-  this.loading = true;
-  try {
-    let logoUrl = this.orgForm.value.logoUrl;
-
-    if (this.logoFile) {
-      logoUrl = await this.dataSvc.uploadLogo(schoolId, this.logoFile);
+    if (!schoolId || schoolId.trim() === '') {
+      this.snackBar.open(this.translate.instant('SETTINGS.MESSAGES.SCHOOL_ID_MISSING'), 'Close');
+      return;
     }
 
-    // Now it is safe to call, because we verified schoolId exists
-    await this.dataSvc.updateSchoolDetails(schoolId, {
-      name: this.orgForm.value.name!,
-      logoUrl: logoUrl!
-    });
+    if (!isCurrentlyPrincipal || this.orgForm.invalid) {
+      this.snackBar.open(this.translate.instant('SETTINGS.MESSAGES.UNAUTHORIZED'), 'Close');
+      return;
+    }
     
-    this.snackBar.open('Organization details saved!', 'Close', { duration: 3000 });
-    this.logoFile = null; 
-    this.cdr.detectChanges(); 
-  } catch (e) {
-    console.error(e);
-    this.snackBar.open('Failed to save branding.', 'Close', { duration: 3000 });
-  } finally {
-    this.loading = false;
+    this.loading = true;
+    try {
+      let logoUrl = this.orgForm.value.logoUrl;
+
+      if (this.logoFile) {
+        logoUrl = await this.dataSvc.uploadLogo(schoolId, this.logoFile);
+      }
+
+      await this.dataSvc.updateSchoolDetails(schoolId, {
+        name: this.orgForm.value.name!,
+        logoUrl: logoUrl!
+      });
+      
+      this.snackBar.open(
+        this.translate.instant('SETTINGS.MESSAGES.ORG_SAVED'), 
+        this.translate.instant('SETTINGS.MESSAGES.CLOSE'), 
+        { duration: 3000 }
+      );
+      this.logoFile = null; 
+      this.cdr.detectChanges(); 
+    } catch (e) {
+      console.error(e);
+      this.snackBar.open(this.translate.instant('SETTINGS.MESSAGES.ORG_FAILED'), 'Close', { duration: 3000 });
+    } finally {
+      this.loading = false;
+    }
   }
-}
 
   viewTerms() { 
     this.activeSection = 'terms';

@@ -1,97 +1,99 @@
 <div class="settings-page">
   <div class="page-header">
-    <h1>Settings</h1>
-    <p class="page-subtitle">Manage your account preferences and security</p>
+    <h1>{{ 'SETTINGS.TITLE' | translate }}</h1>
+    <p class="page-subtitle">{{ 'SETTINGS.SUBTITLE' | translate }}</p>
   </div>
 
-  <!-- Central Navigation -->
   <div class="settings-actions">
     <button mat-raised-button color="primary" (click)="activeSection = 'org'">
-      <mat-icon>business</mat-icon> Organization
+      <mat-icon>business</mat-icon> {{ 'SETTINGS.ACTIONS.ORG' | translate }}
     </button>
     <button mat-raised-button color="primary" (click)="activeSection = 'password'">
-      <mat-icon>lock</mat-icon> Password
+      <mat-icon>lock</mat-icon> {{ 'SETTINGS.ACTIONS.PASSWORD' | translate }}
+    </button>
+    <button mat-raised-button color="primary" (click)="activeSection = 'language'">
+      <mat-icon>language</mat-icon> {{ 'SETTINGS.ACTIONS.LANGUAGE' | translate }}
     </button>
     <button mat-raised-button color="accent" (click)="activeSection = 'terms'">
-      <mat-icon>description</mat-icon> Terms & Conditions
+      <mat-icon>description</mat-icon> {{ 'SETTINGS.ACTIONS.TERMS' | translate }}
     </button>
   </div>
 
-  <!-- 1. Organization Section -->
   @if (activeSection === 'org') {
     <mat-card class="settings-card">
-      
-      <!-- Debugging Section: Remove this once you confirm your role -->
-      <!-- <div style="background: #fdf2f2; padding: 10px; margin-bottom: 20px; border: 1px solid #e0e0e0; font-size: 12px;">
-        <strong>DEBUG INFO:</strong><br>
-        @if ((roleSvc.claims$ | async); as claims) {
-          Role: "{{ claims.role }}" <br>
-          School ID: "{{ claims.schoolId }}"
-        } @else {
-          Loading claims...
-        }
-      </div> -->
-
       @if ((roleSvc.claims$ | async); as claims) {
         @if (['principal', 'admin'].includes((claims.role ?? '').toLowerCase())) {
-          <h3>Edit Organization</h3>
+          <h3>{{ 'SETTINGS.ORG.TITLE' | translate }}</h3>
           <form [formGroup]="orgForm" (ngSubmit)="updateOrganization()" class="form-layout">
             <mat-form-field appearance="outline">
-              <mat-label>School Name</mat-label>
+              <mat-label>{{ 'SETTINGS.ORG.SCHOOL_NAME' | translate }}</mat-label>
               <input matInput formControlName="name" />
             </mat-form-field>
 
             <div class="upload-section">
               <button mat-stroked-button type="button" (click)="fileInput.click()">
-                <mat-icon>upload</mat-icon> {{ logoFile ? logoFile.name : 'Choose Logo Image' }}
+                <mat-icon>upload</mat-icon> {{ logoFile ? logoFile.name : ('SETTINGS.ORG.CHOOSE_LOGO' | translate) }}
               </button>
               <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" hidden />
             </div>
 
-            <!-- REMOVED [disabled] FOR DEBUGGING -->
-<button mat-flat-button color="primary" type="submit">
-  Save Organization
-</button>>
+            <button mat-flat-button color="primary" type="submit">
+              {{ 'SETTINGS.ORG.SAVE' | translate }}
+            </button>
           </form>
         } @else {
-          <p style="color: red;">Access Denied: You do not have the required role to edit organization settings.</p>
+          <p style="color: red;">{{ 'SETTINGS.ORG.ACCESS_DENIED' | translate }}</p>
         }
       }
     </mat-card>
   }
 
-  <!-- 2. Password Section -->
   @if (activeSection === 'password') {
     <mat-card class="settings-card">
-      <h3>Change Password</h3>
+      <h3>{{ 'SETTINGS.PASSWORD.TITLE' | translate }}</h3>
       @if (error) { <div class="error-msg">{{ error }}</div> }
       <form [formGroup]="form" (ngSubmit)="submitPassword()" class="form-layout">
         <mat-form-field appearance="outline">
-          <mat-label>New Password</mat-label>
+          <mat-label>{{ 'SETTINGS.PASSWORD.NEW' | translate }}</mat-label>
           <input matInput type="password" formControlName="newPassword" />
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Confirm New Password</mat-label>
+          <mat-label>{{ 'SETTINGS.PASSWORD.CONFIRM' | translate }}</mat-label>
           <input matInput type="password" formControlName="confirmPassword" />
         </mat-form-field>
         <button mat-flat-button color="primary" [disabled]="form.invalid || loading">
-          {{ loading ? 'Updating...' : 'Update Password' }}
+          {{ loading ? ('SETTINGS.PASSWORD.UPDATING' | translate) : ('SETTINGS.PASSWORD.UPDATE' | translate) }}
         </button>
       </form>
     </mat-card>
   }
 
-  <!-- 3. Terms & Conditions Section -->
-  @if (activeSection === 'terms') {
+  @if (activeSection === 'language') {
     <mat-card class="settings-card">
-      <h3>Terms and Conditions</h3>
-      <p>Hey, how are you? This is the placeholder for the full terms and conditions document.</p>
+      <h3>{{ 'SETTINGS.LANGUAGE.TITLE' | translate }}</h3>
+      <p>{{ 'SETTINGS.LANGUAGE.DESC' | translate }}</p>
+      <div class="form-layout" style="margin-top: 15px;">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'SETTINGS.LANGUAGE.LABEL' | translate }}</mat-label>
+          <mat-select [value]="currentLang" (selectionChange)="changeLanguage($event.value)">
+            <mat-option value="en">English</mat-option>
+            <mat-option value="ar">العربية (Arabic)</mat-option>
+            <mat-option value="he">עברית (Hebrew)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </mat-card>
   }
 
-  <!-- Footer -->
+  @if (activeSection === 'terms') {
+    <mat-card class="settings-card">
+      <h3>{{ 'SETTINGS.TERMS.TITLE' | translate }}</h3>
+      <p>{{ 'SETTINGS.TERMS.CONTENT' | translate }}</p>
+    </mat-card>
+  }
+
   <div class="footer-section">
-    <p>Hya Naqra'a Admin Portal © 2026</p>
-    <p class="powered-by">Powered by <strong>NadaSoft</strong></p>
+    <p>{{ 'FOOTER.COPYRIGHT' | translate }}</p>
+    <p class="powered-by" [innerHTML]="'FOOTER.POWERED_BY' | translate"></p>
   </div>
 </div>

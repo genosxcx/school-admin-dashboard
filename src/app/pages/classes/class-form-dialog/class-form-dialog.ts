@@ -6,6 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
+// ✅ Import TranslatePipe
+import { TranslatePipe } from '@ngx-translate/core';
+
 export type ClassFormData = {
   title: string;
   initialName?: string;
@@ -25,21 +28,22 @@ export type ClassFormResult = {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    TranslatePipe // ✅ Added
   ],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
 
     <div mat-dialog-content class="content">
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Class name</mat-label>
-        <input matInput [(ngModel)]="name" placeholder="e.g. A1" />
+        <mat-label>{{ 'CLASS_DIALOG.LABEL' | translate }}</mat-label>
+        <input matInput [(ngModel)]="name" [placeholder]="'CLASS_DIALOG.PLACEHOLDER' | translate" />
       </mat-form-field>
     </div>
 
     <div mat-dialog-actions align="end">
-      <button mat-button (click)="close()">Cancel</button>
+      <button mat-button (click)="close()">{{ 'CLASS_DIALOG.CANCEL' | translate }}</button>
       <button mat-flat-button color="primary" (click)="save()" [disabled]="!name.trim()">
-        Save
+        {{ 'CLASS_DIALOG.SAVE' | translate }}
       </button>
     </div>
   `,

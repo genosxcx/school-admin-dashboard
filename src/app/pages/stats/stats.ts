@@ -1,19 +1,14 @@
-import {
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-  NgZone,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, of } from 'rxjs';
 import { catchError, filter, take, takeUntil, timeout } from 'rxjs/operators';
-
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+
+// ✅ Translate
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 import { DataService, SchoolClass, Student } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
@@ -23,8 +18,8 @@ type Summary = {
   students: number;
   classes: number;
   minutes: number;
-  avgGrade: number;      // ✅ Added overall avg grade
-  avgCompletion: number; // ✅ Added overall avg completion
+  avgGrade: number;
+  avgCompletion: number;
 };
 
 type ClassStats = {
@@ -40,11 +35,8 @@ type ClassStats = {
   selector: 'app-stats',
   standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatProgressBarModule,
+    CommonModule, MatCardModule, MatIconModule, MatButtonModule,
+    MatProgressBarModule, TranslatePipe // ✅ Pipe Added
   ],
   templateUrl: './stats.html',
   styleUrls: ['./stats.scss'],
@@ -54,6 +46,7 @@ export class Stats implements OnInit, OnDestroy {
   private role = inject(RoleService);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService); // ✅ Injected
   private destroy$ = new Subject<void>();
 
   loading = true;
@@ -75,19 +68,15 @@ export class Stats implements OnInit, OnDestroy {
   classStudents: Student[] = [];
 
   ngOnInit(): void {
-    this.zone.run(() => {
-      this.loading = true;
-      this.error = '';
-    });
+    this.zone.run(() => { this.loading = true; this.error = ''; });
     this.cdr.detectChanges();
 
     this.role.claims$
       .pipe(
         timeout(8000),
         catchError((err) => {
-          console.error('[Stats] claims$ failed:', err);
           this.zone.run(() => {
-            this.error = 'Could not load your school info (claims).';
+            this.error = this.translate.instant('STATS.MESSAGES.ERROR_CLAIMS');
             this.loading = false;
           });
           this.cdr.detectChanges();
@@ -99,9 +88,7 @@ export class Stats implements OnInit, OnDestroy {
       )
       .subscribe((claims) => {
         this.schoolId = claims.schoolId;
-        
         const roleStr = (claims.role ?? '').toString().toLowerCase();
-      
         this.isPrincipal = roleStr === 'principal' || roleStr === 'admin' || roleStr === 'parent';
         this.isTeacher = roleStr === 'teacher';
         this.isSubjectTeacher = roleStr === 'subject_teacher';
@@ -110,19 +97,13 @@ export class Stats implements OnInit, OnDestroy {
         this.subjectTeacherClassIds = Array.isArray(claims.classIds) ? claims.classIds : [];
 
         if (this.isTeacher && !this.teacherClassId) {
-          this.zone.run(() => {
-            this.error = 'Your account is not assigned to a class yet.';
-            this.loading = false;
-          });
+          this.zone.run(() => { this.error = this.translate.instant('STATS.MESSAGES.ERROR_ACCOUNT'); this.loading = false; });
           this.cdr.detectChanges();
           return;
         }
 
         if (this.isSubjectTeacher && this.subjectTeacherClassIds.length === 0) {
-          this.zone.run(() => {
-            this.error = 'Your account is not assigned to any classes yet.';
-            this.loading = false;
-          });
+          this.zone.run(() => { this.error = this.translate.instant('STATS.MESSAGES.ERROR_SUB_TEACHER'); this.loading = false; });
           this.cdr.detectChanges();
           return;
         }
@@ -131,16 +112,13 @@ export class Stats implements OnInit, OnDestroy {
       });
   }
 
-  // ✅ Helper to safely fetch all accessible students across visible classes
   private async getAllAccessibleStudents(visibleClasses: SchoolClass[]): Promise<Student[]> {
     if (this.isTeacher && this.teacherClassId) {
       return await this.data.getStudentsByClass(this.schoolId, this.teacherClassId) ?? [];
     } else if (this.isSubjectTeacher && this.subjectTeacherClassIds.length > 0) {
       return await this.data.getStudentsForSubjectTeacher(this.schoolId, this.subjectTeacherClassIds) ?? [];
     } else if (visibleClasses.length > 0) {
-      const arrays = await Promise.all(
-        visibleClasses.map(c => this.data.getStudentsByClass(this.schoolId, c.id!))
-      );
+      const arrays = await Promise.all(visibleClasses.map(c => this.data.getStudentsByClass(this.schoolId, c.id!)));
       return arrays.flat();
     }
     return [];
@@ -152,88 +130,48 @@ export class Stats implements OnInit, OnDestroy {
       this.cdr.detectChanges();
 
       const classList = await this.data.getClasses(this.schoolId);
-
       let visibleClasses = classList ?? [];
+      
       if (this.isTeacher) {
         visibleClasses = visibleClasses.filter((c) => c.id === this.teacherClassId);
       } else if (this.isSubjectTeacher) {
         visibleClasses = visibleClasses.filter((c) => c.id && this.subjectTeacherClassIds.includes(c.id));
       }
 
-      // ✅ 1. Fetch all accessible students to calculate Overall Average
       const allStudents = await this.getAllAccessibleStudents(visibleClasses);
       this.calculateSummaryFromStudents(allStudents, visibleClasses.length);
 
-      // ✅ 2. If user has access to multiple classes, prepend an "All Classes (Overview)" option
-      let displayClasses = visibleClasses
-        .slice()
-        .sort((a: SchoolClass, b: SchoolClass) => (a.name ?? '').localeCompare(b.name ?? ''));
+      let displayClasses = visibleClasses.slice().sort((a: SchoolClass, b: SchoolClass) => (a.name ?? '').localeCompare(b.name ?? ''));
 
       if (!this.isTeacher && displayClasses.length > 1) {
-  displayClasses = [
-    { 
-      id: 'ALL', 
-      name: 'All Classes (Overview)', 
-      schoolId: this.schoolId // ✅ Add schoolId to satisfy the SchoolClass interface
-    } as SchoolClass, // ✅ Adding 'as SchoolClass' prevents errors if you have other required fields like createdAt
-    ...displayClasses
-  ];
-}
+        displayClasses = [
+          { id: 'ALL', name: this.translate.instant('STATS.ALL_CLASSES'), schoolId: this.schoolId } as SchoolClass, 
+          ...displayClasses
+        ];
+      }
 
       this.zone.run(() => {
         this.classes = displayClasses;
         this.loading = false;
-
-        // Auto-select the first item (either their single class or 'ALL')
-        if (this.classes.length > 0) {
-          this.selectClass(this.classes[0].id!);
-        }
+        if (this.classes.length > 0) this.selectClass(this.classes[0].id!);
       });
-
       this.cdr.detectChanges();
     } catch (e) {
-      console.error('[Stats] loadOverview failed:', e);
-      this.zone.run(() => {
-        this.error = 'Failed to load stats.';
-        this.loading = false;
-      });
+      this.zone.run(() => { this.error = this.translate.instant('STATS.MESSAGES.ERROR_LOAD'); this.loading = false; });
       this.cdr.detectChanges();
     }
   }
 
   private calculateSummaryFromStudents(students: Student[], classCount: number) {
-    const safe = (students ?? []).map((s: Student) => ({
-      ...s,
-      grade: Number(s.grade ?? 0),
-      completion: Number(s.completion ?? 0),
-      minutesRecorded: Number(s.minutesRecorded ?? 0),
-    }));
-
+    const safe = (students ?? []).map((s: Student) => ({ ...s, grade: Number(s.grade ?? 0), completion: Number(s.completion ?? 0), minutesRecorded: Number(s.minutesRecorded ?? 0), }));
     const studentCount = safe.length;
     const totalMinutes = safe.reduce((sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0), 0);
-
-    const completionValues: number[] = safe.map((s: Student) => {
-      const v = Number(s.completion ?? 0);
-      return v <= 1 ? v * 100 : v;
-    });
-
-    const avgCompletion = studentCount
-      ? completionValues.reduce((a: number, b: number) => a + b, 0) / studentCount
-      : 0;
-
-    const avgGrade = studentCount
-      ? safe.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) / studentCount
-      : 0;
+    const completionValues: number[] = safe.map((s: Student) => { const v = Number(s.completion ?? 0); return v <= 1 ? v * 100 : v; });
+    const avgCompletion = studentCount ? completionValues.reduce((a: number, b: number) => a + b, 0) / studentCount : 0;
+    const avgGrade = studentCount ? safe.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) / studentCount : 0;
 
     this.zone.run(() => {
-      this.summary = {
-        teachers: 1,
-        students: studentCount,
-        classes: classCount,
-        minutes: totalMinutes,
-        avgGrade,
-        avgCompletion,
-      };
+      this.summary = { teachers: 1, students: studentCount, classes: classCount, minutes: totalMinutes, avgGrade, avgCompletion, };
     });
   }
 
@@ -242,21 +180,14 @@ export class Stats implements OnInit, OnDestroy {
     if (this.isSubjectTeacher && classId !== 'ALL' && !this.subjectTeacherClassIds.includes(classId)) return;
 
     this.selectedClassId = classId;
-
     const cls = this.classes.find((c) => c.id === classId);
     const className = cls?.name ?? 'Class';
 
-    this.zone.run(() => {
-      this.selectedClassStats = null;
-      this.classStudents = [];
-      this.error = '';
-    });
+    this.zone.run(() => { this.selectedClassStats = null; this.classStudents = []; this.error = ''; });
     this.cdr.detectChanges();
 
     try {
       let students: Student[] = [];
-
-      // ✅ Check if they selected "All Classes (Overview)" vs a single class
       if (classId === 'ALL') {
         const actualClasses = this.classes.filter(c => c.id !== 'ALL');
         students = await this.getAllAccessibleStudents(actualClasses);
@@ -264,68 +195,27 @@ export class Stats implements OnInit, OnDestroy {
         students = await this.data.getStudentsByClass(this.schoolId, classId);
       }
 
-      const safeStudents: Student[] = (students ?? []).map((s: Student) => ({
-        ...s,
-        grade: Number(s.grade ?? 0),
-        completion: Number(s.completion ?? 0),
-        minutesRecorded: Number(s.minutesRecorded ?? 0),
-      }));
-
+      const safeStudents: Student[] = (students ?? []).map((s: Student) => ({ ...s, grade: Number(s.grade ?? 0), completion: Number(s.completion ?? 0), minutesRecorded: Number(s.minutesRecorded ?? 0), }));
       const studentCount = safeStudents.length;
       const totalMinutes = safeStudents.reduce((sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0), 0);
-
-      const completionValues: number[] = safeStudents.map((s: Student) => {
-        const v = Number(s.completion ?? 0);
-        return v <= 1 ? v * 100 : v;
-      });
-
-      const avgCompletion = studentCount
-        ? completionValues.reduce((a: number, b: number) => a + b, 0) / studentCount
-        : 0;
-
-      const avgGrade = studentCount
-        ? safeStudents.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) / studentCount
-        : 0;
+      const completionValues: number[] = safeStudents.map((s: Student) => { const v = Number(s.completion ?? 0); return v <= 1 ? v * 100 : v; });
+      const avgCompletion = studentCount ? completionValues.reduce((a: number, b: number) => a + b, 0) / studentCount : 0;
+      const avgGrade = studentCount ? safeStudents.reduce((a: number, b: Student) => a + Number(b.grade ?? 0), 0) / studentCount : 0;
 
       this.zone.run(() => {
         this.classStudents = safeStudents;
-        this.selectedClassStats = {
-          classId,
-          className,
-          studentCount,
-          totalMinutes,
-          avgGrade,
-          avgCompletion,
-        };
+        this.selectedClassStats = { classId, className, studentCount, totalMinutes, avgGrade, avgCompletion, };
       });
-
       this.cdr.detectChanges();
     } catch (e) {
-      console.error('[Stats] selectClass failed:', e);
-      this.zone.run(() => {
-        this.error = 'Failed to load class stats.';
-      });
+      this.zone.run(() => { this.error = this.translate.instant('STATS.MESSAGES.ERROR_SELECT'); });
       this.cdr.detectChanges();
     }
   }
 
-  completionPct(s: Student): number {
-    const v = Number(s.completion ?? 0);
-    const pct = v <= 1 ? v * 100 : v;
-    return Math.max(0, Math.min(100, pct));
-  }
+  completionPct(s: Student): number { const v = Number(s.completion ?? 0); const pct = v <= 1 ? v * 100 : v; return Math.max(0, Math.min(100, pct)); }
+  gradePct(s: Student): number { const v = Number(s.grade ?? 0); return Math.max(0, Math.min(100, v)); }
+  minutesText(n: number): string { return (Math.round(n * 10) / 10).toString(); }
 
-  gradePct(s: Student): number {
-    const v = Number(s.grade ?? 0);
-    return Math.max(0, Math.min(100, v));
-  }
-
-  minutesText(n: number): string {
-    return (Math.round(n * 10) / 10).toString();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 }

@@ -1,0 +1,245 @@
+{
+  "BRAND": {
+    "LOGO_MARK": "HN",
+    "TITLE": "Hya Naqra'a",
+    "SUBTITLE": "למידה שיתופית"
+  },
+  "NAV": {
+    "OVERVIEW": "סקירה כללית",
+    "HOME_TEACHERS": "מורים מחנכים",
+    "SUBJECT_TEACHERS": "מורים מקצועיים",
+    "CLASSES": "כיתות",
+    "STUDENTS": "תלמידים",
+    "MY_KIDS": "הילדים שלי",
+    "ASSIGNMENTS": "מטלות",
+    "STATISTICS": "סטטיסטיקות",
+    "SETTINGS": "הגדרות"
+  },
+  "SETTINGS": {
+    "TITLE": "הגדרות",
+    "SUBTITLE": "נהל את העדפות החשבון והאבטחה שלך",
+    "ACTIONS": {
+      "ORG": "ארגון",
+      "PASSWORD": "סיסמה",
+      "LANGUAGE": "שפה",
+      "TERMS": "תנאים והגבלות"
+    },
+    "ORG": {
+      "TITLE": "עריכת פרטי הארגון",
+      "SCHOOL_NAME": "שם בית הספר",
+      "CHOOSE_LOGO": "בחר לוגו",
+      "SAVE": "שמור פרטי ארגון",
+      "ACCESS_DENIED": "גישה נדחתה: אין לך את ההרשאות הנדרשות לעריכת הגדרות ארגון."
+    },
+    "PASSWORD": {
+      "TITLE": "שינוי סיסמה",
+      "NEW": "סיסמה חדשה",
+      "CONFIRM": "אשר סיסמה חדשה",
+      "UPDATE": "עדכן סיסמה",
+      "UPDATING": "מעדכן..."
+    },
+    "LANGUAGE": {
+      "TITLE": "שפת ממשק",
+      "DESC": "בחר את השפה המועדפת עליך עבור לוח הבקרה.",
+      "LABEL": "שפה"
+    },
+    "TERMS": {
+      "TITLE": "תנאים והגבלות",
+      "CONTENT": "היי, מה נשמע? זהו מקום המיועד למסמך תנאים והגבלות המלא."
+    }
+  },
+  "FOOTER": {
+    "COPYRIGHT": "פורטל הניהול Hya Naqra'a © 2026",
+    "POWERED_BY": "מופעל על ידי <strong>NadaSoft</strong>",
+    "NEED_ASSISTANCE": "זקוק לעזרה?"
+  },
+  "TOPBAR": {
+    "ADMIN_PORTAL": "פורטל ניהול",
+    "USER_ADMIN": "ניהול משתמשים",
+    "LOGOUT": "התנתק"
+  },
+  "ASSIGNMENTS": {
+  "TITLE": "מטלות",
+  "SUBTITLE": "נהל ועקוב אחר משימות תלמידים",
+  "SEARCH": "חיפוש מטלות...",
+  "CREATE_BTN": "צור מטלה",
+  "TABLE": {
+    "TITLE": "כותרת",
+    "DESCRIPTION": "תיאור",
+    "ASSIGNED_TO": "משויך ל",
+    "CREATED_ON": "נוצר בתאריך"
+  },
+  "MESSAGES": {
+    "TIMEOUT": "פסק זמן בטעינת פרטי משתמש.",
+    "INVALID_ID": "מזהה בית ספר או משתמש לא תקין.",
+    "CREATE_FAILED": "נכשל ביצירת המטלה: ",
+    "DELETE_CONFIRM": "האם אתה בטוח שברצונך למחוק מטלה זו?",
+    "DELETE_FAILED": "מחיקת המטלה נכשלה.",
+    "LOADING": "טוען מטלות...",
+    "NO_DATA": "לא נמצאו מטלות. צור אחת כדי להתחיל!"
+  },
+  "UNASSIGNED": "לא משויך"
+},
+"ASSIGNMENT_DIALOG": {
+  "TITLE_FIELD": "כותרת המטלה",
+  "TITLE_PLACEHOLDER": "למשל: קרא פרק 4",
+  "DESC_FIELD": "תיאור / הוראות",
+  "DESC_PLACEHOLDER": "הזן פרטים כאן...",
+  "CLASSES_FIELD": "שיוך לכיתות",
+  "START_TIME": "זמן התחלה (מוצג לתלמידים)",
+  "END_TIME": "זמן סיום (תאריך הגשה)",
+  "CANCEL": "ביטול",
+  "SAVE": "שמור מטלה"
+},
+"CLASSES": {
+  "TITLE": "כיתות",
+  "SUBTITLE": "ניהול חלוקת כיתות וקבוצות לימוד",
+  "SEARCH": "חיפוש כיתות...",
+  "EXPORT": "ייצוא ל-CSV",
+  "ADD": "הוסף כיתה",
+  "UNNAMED": "כיתה ללא שם",
+  "TABLE": {
+    "NAME": "שם הכיתה",
+    "ACTIONS": "פעולות"
+  },
+  "MESSAGES": {
+    "LOADING": "טוען כיתות...",
+    "ERROR_CLAIMS": "לא ניתן היה לטעון את פרטי בית הספר שלך (הרשאות).",
+    "ERROR_LOAD": "טעינת הכיתות נכשלה.",
+    "ERROR_CREATE": "יצירת הכיתה נכשלה.",
+    "ERROR_UPDATE": "עדכון הכיתה נכשל.",
+    "ERROR_DELETE": "מחיקת הכיתה נכשלה.",
+    "DELETE_CONFIRM": "מחק כיתה",
+    "NO_DATA_TITLE": "לא נמצאו כיתות",
+    "NO_DATA_SUB": "הוסף את הכיתה הראשונה שלך כדי להתחיל לשייך תלמידים ואנשי סגל."
+  }
+},
+"CLASS_DIALOG": {
+  "LABEL": "שם הכיתה",
+  "PLACEHOLDER": "למשל: א1",
+  "CANCEL": "ביטול",
+  "SAVE": "שמור"
+},
+"STATS": {
+  "LOADING": "טוען סטטיסטיקות...",
+  "CLASSES": "כיתות",
+  "ALL_CLASSES": "כל הכיתות (סקירה כללית)",
+  "OVERALL_AVG": "ממוצע כללי (כל התלמידים):",
+  "GRADE": "ציון",
+  "COMPLETION": "השלמה",
+  "TOTAL_MINUTES": "סך דקות",
+  "STUDENT_PERFORMANCE": "ביצועי תלמידים",
+  "ALL_STUDENTS_PERF": "ביצועי כלל התלמידים",
+  "NO_CLASSES": "אין עדיין כיתות",
+  "NO_STUDENTS": "לא נמצאו תלמידים",
+  "SELECT_CLASS_TITLE": "בחר כיתה",
+  "SELECT_CLASS_SUB": "בחר כיתה מהלוח בצד כדי להציג סטטיסטיקות מפורטות",
+  "MESSAGES": {
+    "ERROR_CLAIMS": "לא ניתן היה לטעון את פרטי בית הספר שלך.",
+    "ERROR_ACCOUNT": "החשבון שלך אינו משויך לכיתה עדיין.",
+    "ERROR_SUB_TEACHER": "החשבון שלך אינו משויך לאף כיתה עדיין.",
+    "ERROR_LOAD": "טעינת הסטטיסטיקות נכשלה.",
+    "ERROR_SELECT": "טעינת נתוני הכיתה נכשלה."
+  }
+},
+"STUDENTS": {
+  "TITLE": "תלמידים",
+  "SUBTITLE": "ניהול רישום ושיוך כיתות",
+  "SEARCH": "חיפוש תלמידים...",
+  "EXPORT": "ייצוא ל-CSV",
+  "ADD": "הוסף תלמיד",
+  "TABLE": { "ID": "ת.ז. תלמיד", "NAME": "שם מלא", "EMAIL": "דוא\"ל להתחברות", "CLASS": "כיתה", "ACTIONS": "פעולות" },
+  "MESSAGES": {
+    "LOADING": "טוען רשומות תלמידים...",
+    "ERROR_CLAIMS": "לא ניתן היה לטעון את פרטי בית הספר.",
+    "ERROR_ACCOUNT": "החשבון שלך אינו משויך לכיתה עדיין.",
+    "ERROR_LOAD": "טעינת התלמידים נכשלה.",
+    "ERROR_CREATE": "יצירת התלמיד נכשלה.",
+    "ERROR_UPDATE": "עדכון התלמיד נכשל.",
+    "ERROR_DELETE": "מחיקת התלמיד נכשלה.",
+    "DELETE_CONFIRM": "מחק תלמיד",
+    "RESTRICT_EDIT": "באפשרותך לערוך רק תלמידים בכיתה שלך.",
+    "RESTRICT_DELETE": "באפשרותך למחוק רק תלמידים בכיתה שלך.",
+    "NO_DATA_TITLE": "לא נמצאו תלמידים",
+    "NO_DATA_SUB": "נסה לחפש תלמיד אחר או להוסיף רשומה חדשה.",
+    "UNNAMED": "תלמיד ללא שם"
+  }
+},
+"STUDENT_DIALOG": {
+  "ID": "ת.ז. תלמיד", "NAME": "שם מלא", "EMAIL": "דוא\"ל (אופציונלי)",
+  "PASSWORD": "סיסמה שנוצרה (העתק!)", "HINT": "תן את הסיסמה לתלמיד כדי שיוכל להתחבר.",
+  "CLASS": "כיתה", "UNASSIGNED": "ללא שיוך", "CANCEL": "ביטול", "SAVE": "שמור",
+  "TITLE_ADD": "הוסף תלמיד", "TITLE_EDIT": "ערוך תלמיד"
+},
+"SUBJECT_TEACHERS": {
+  "TITLE": "מורי מקצוע",
+  "SUBTITLE": "ניהול מורים מומחים ושיוך כיתות",
+  "SEARCH_LABEL": "חיפוש מורי מקצוע...",
+  "SEARCH_PLACEHOLDER": "שם, דוא\"ל, מקצוע...",
+  "EXPORT": "ייצוא ל-CSV",
+  "ADD_BUTTON": "הוסף מורה",
+  "LOADING": "טוען מורי מקצוע...",
+  "UNNAMED": "מורה ללא שם",
+  "UNASSIGNED": "לא משויך",
+  "TABLE": {
+    "NAME": "שם מלא",
+    "EMAIL": "כתובת דוא\"ל",
+    "SUBJECT": "מקצוע",
+    "CLASSES": "כיתות",
+    "ACTIONS": "פעולות"
+  },
+  "MESSAGES": {
+    "LOADING": "טוען מורי מקצוע...",
+    "ERROR_TIMEOUT": "זמן טעינת פרטי בית הספר עבר. אנא רענן.",
+    "ERROR_SCHOOL": "מזהה בית הספר שלך לא מוגדר.",
+    "ERROR_LOAD": "טעינת המורים נכשלה.",
+    "ERROR_CREATE": "יצירת המורה נכשלה.",
+    "ERROR_UPDATE": "עדכון המורה נכשל.",
+    "ERROR_DELETE": "מחיקת המורה נכשלה.",
+    "DELETE_CONFIRM": "מחק מורה מקצוע",
+    "NO_DATA": "לא נמצאו מורי מקצוע",
+    "NO_DATA_SUB": "נסה לשנות את סינון החיפוש או להוסיף מורה חדש.",
+    "UNASSIGNED": "לא משויך",
+    "UNNAMED": "מורה ללא שם"
+  }
+},
+"SUBJECT_TEACHER_DIALOG": {
+  "TITLE_ADD": "הוסף מורה מקצוע", "TITLE_EDIT": "ערוך מורה מקצוע",
+  "NAME": "שם מלא", "EMAIL": "כתובת דוא\"ל",
+  "PASSWORD": "סיסמה שנוצרה (העתק!)", "HINT": "תן את הסיסמה למורה כדי שיוכל להתחבר.",
+  "SUBJECT": "מקצוע", "CLASSES": "שיוך כיתות", "CANCEL": "ביטול", "SAVE": "שמור"
+},
+"TEACHERS": {
+  "TITLE": "מורים",
+  "SUBTITLE": "ניהול סגל והשמת כיתות",
+  "SEARCH_LABEL": "חיפוש מורים...",
+  "SEARCH_PLACEHOLDER": "שם, אימייל, כיתה...",
+  "EXPORT": "ייצוא ל-CSV",
+  "ADD_BTN": "הוסף מורה",
+  "LOADING": "טוען מורים...",
+  "UNNAMED": "מורה ללא שם",
+  "UNASSIGNED": "לא משויך",
+  "TABLE": { "NAME": "שם מלא", "EMAIL": "כתובת אימייל", "CLASS": "כיתה משויכת", "ACTIONS": "פעולות" },
+  "EDIT": "ערוך מורה",
+  "DELETE": "מחק מורה",
+  "NO_DATA": "לא נמצאו מורים",
+  "NO_DATA_SUB": "נסה לשנות את החיפוש או להוסיף מורה חדש."
+},
+"DIALOG": {
+  "NAME": "שם מלא",
+  "EMAIL": "דוא\"ל (חובה לכניסה)",
+  "PASSWORD": "סיסמה שנוצרה",
+  "COPY_HINT": "מסור סיסמה זו למורה כדי שיוכל להתחבר.",
+  "CANCEL": "ביטול",
+  "SAVE": "שמור"
+},
+"DASHBOARD": {
+  "LOADING": "טוען נתוני בית ספר...",
+  "RESTRICTED_ACCESS": "גישה מוגבלת",
+  "ACCESS_DENIED_MSG": "לוח בקרה זה זמין למנהלים בלבד.",
+  "SUBTITLE": "מדדי בית ספר וביצועי סגל",
+  "TOTAL_FACULTY": "סך הכל סגל",
+  "ACTIVE_STUDENTS": "תלמידים פעילים",
+  "LEARNING_MINUTES": "דקות למידה"
+}
+}

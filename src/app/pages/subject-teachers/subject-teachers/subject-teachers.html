@@ -1,126 +1,69 @@
 <div class="teachers-container">
-
-  <!-- Header Section -->
   <div class="header-section">
     <div class="header-title">
-      <h1>Subject Teachers</h1>
-      <p class="subtitle">Manage specialist instructors and multi-class assignments</p>
+      <h1>{{ 'SUBJECT_TEACHERS.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'SUBJECT_TEACHERS.SUBTITLE' | translate }}</p>
     </div>
 
-    <!-- Action Bar: Search + Add Button aligned neatly -->
-    <!-- Inside the .header-actions div -->
-<div class="header-actions">
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>Search subject teachers...</mat-label>
-    <mat-icon matPrefix style="margin-right: 8px;">search</mat-icon>
-    <input matInput [(ngModel)]="q" placeholder="Name, email, subject..." />
-    <button *ngIf="q" matSuffix mat-icon-button (click)="q = ''" matTooltip="Clear search">
-      <mat-icon>close</mat-icon>
-    </button>
-  </mat-form-field>
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>{{ 'SUBJECT_TEACHERS.SEARCH_LABEL' | translate }}</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [(ngModel)]="q" [placeholder]="'SUBJECT_TEACHERS.SEARCH_PLACEHOLDER' | translate" />
+      </mat-form-field>
 
-  <!-- Export Button Added Here -->
-  <button mat-stroked-button class="export-btn" (click)="exportToCSV()" [disabled]="loading || subjectTeachers.length === 0">
-    <mat-icon>download</mat-icon>
-    <span>Export CSV</span>
-  </button>
+      <button mat-stroked-button (click)="exportToCSV()" [disabled]="loading || subjectTeachers.length === 0">
+        <mat-icon>download</mat-icon> {{ 'SUBJECT_TEACHERS.EXPORT' | translate }}
+      </button>
 
-  <button mat-flat-button class="add-btn" (click)="addSubjectTeacher()" [disabled]="loading || !schoolId">
-    <mat-icon>add</mat-icon>
-    <span>Add Subject Teacher</span>
-  </button>
-</div>
+<button mat-flat-button class="add-btn" (click)="addSubjectTeacher()">
+  <mat-icon>add</mat-icon>
+  <span>{{ 'SUBJECT_TEACHERS.ADD_BUTTON' | translate }}</span>
+</button>    </div>
   </div>
-
-  <!-- Error Banner -->
   <div class="error-msg" *ngIf="error">
-    <mat-icon>error_outline</mat-icon>
-    <span>{{ error }}</span>
+    <mat-icon>error_outline</mat-icon> {{ error }}
   </div>
 
-  <!-- Table Card -->
   <mat-card class="table-card">
     <mat-card-content>
-      
-      <!-- Glassmorphic Loading Overlay -->
       <div class="loading-overlay" *ngIf="loading">
         <div class="spinner"></div>
-        <p>Loading subject teachers...</p>
+        <p>{{ 'SUBJECT_TEACHERS.LOADING' | translate }}</p>
       </div>
 
-      <div class="table-wrapper">
-        <table mat-table [dataSource]="filtered" class="full-width-table">
-          
-          <!-- Full Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Full Name</th>
-            <td mat-cell *matCellDef="let t">
-              <div class="name-cell">
-                <div class="avatar">{{ ((t.fullName || '?').charAt(0)).toUpperCase() }}</div>
-                <span class="name-text">{{ t.fullName || 'Unnamed Instructor' }}</span>
-              </div>
-            </td>
-          </ng-container>
+      <table mat-table [dataSource]="filtered" class="full-width-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT_TEACHERS.TABLE.NAME' | translate }}</th>
+          <td mat-cell *matCellDef="let t">{{ t.fullName || ('SUBJECT_TEACHERS.UNNAMED' | translate) }}</td>
+        </ng-container>
 
-          <!-- Email Column -->
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef>Email Address</th>
-            <td mat-cell *matCellDef="let t">
-              <span class="email-text">{{ t.email || '—' }}</span>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT_TEACHERS.TABLE.EMAIL' | translate }}</th>
+          <td mat-cell *matCellDef="let t">{{ t.email }}</td>
+        </ng-container>
 
-          <!-- Subject Column -->
-          <ng-container matColumnDef="subject">
-            <th mat-header-cell *matHeaderCellDef>Specialty Subject</th>
-            <td mat-cell *matCellDef="let t">
-              <span class="subject-badge" *ngIf="t.subject">{{ t.subject }}</span>
-              <span class="email-text" *ngIf="!t.subject">—</span>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="subject">
+          <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT_TEACHERS.TABLE.SUBJECT' | translate }}</th>
+          <td mat-cell *matCellDef="let t">{{ t.subject || '—' }}</td>
+        </ng-container>
 
-          <!-- Assigned Classes Column -->
-          <ng-container matColumnDef="classes">
-            <th mat-header-cell *matHeaderCellDef>Assigned Classes</th>
-            <td mat-cell *matCellDef="let t">
-              <span class="classes-text" *ngIf="classesLabel(t) !== '-' && classesLabel(t) !== ''">
-                {{ classesLabel(t) }}
-              </span>
-              <span class="email-text" *ngIf="classesLabel(t) === '-' || !classesLabel(t)">Unassigned</span>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="classes">
+          <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT_TEACHERS.TABLE.CLASSES' | translate }}</th>
+          <td mat-cell *matCellDef="let t">{{ classesLabel(t) }}</td>
+        </ng-container>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef style="width: 100px; text-align: right;">Actions</th>
-            <td mat-cell *matCellDef="let t" class="action-cell">
-              <div class="action-buttons">
-                <button mat-icon-button class="edit-btn" (click)="editSubjectTeacher(t)" matTooltip="Edit Instructor">
-                  <mat-icon>edit_outlined</mat-icon>
-                </button>
-                <button mat-icon-button class="delete-btn" (click)="deleteSubjectTeacher(t)" matTooltip="Delete Instructor">
-                  <mat-icon>delete_outline</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef style="text-align: right;">{{ 'SUBJECT_TEACHERS.TABLE.ACTIONS' | translate }}</th>
+          <td mat-cell *matCellDef="let t" style="text-align: right;">
+            <button mat-icon-button (click)="editSubjectTeacher(t)"><mat-icon>edit_outlined</mat-icon></button>
+            <button mat-icon-button (click)="deleteSubjectTeacher(t)"><mat-icon>delete_outline</mat-icon></button>
+          </td>
+        </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          
-          <!-- Empty State Row -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="border: none;">
-              <div class="empty-state">
-                <div class="empty-icon">📚</div>
-                <h3>No subject teachers found</h3>
-                <p>Try adjusting your search filter or assign a new subject teacher to your school.</p>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
     </mat-card-content>
   </mat-card>
 </div>

@@ -1,11 +1,4 @@
-import {
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-  NgZone,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, of, firstValueFrom } from 'rxjs';
@@ -19,6 +12,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 
+// ✅ Translate
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+
 import { DataService, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 import { ClassFormDialog } from './class-form-dialog/class-form-dialog';
@@ -27,14 +23,9 @@ import { ClassFormDialog } from './class-form-dialog/class-form-dialog';
   selector: 'app-classes',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatIconModule,
-    MatButtonModule,
+    CommonModule, FormsModule, MatCardModule, MatFormFieldModule,
+    MatInputModule, MatTableModule, MatIconModule, MatButtonModule,
+    TranslatePipe // ✅ Added Pipe
   ],
   templateUrl: './classes.html',
   styleUrls: ['./classes.scss'],
@@ -45,6 +36,7 @@ export class Classes implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService); // ✅ Injected
   private destroy$ = new Subject<void>();
 
   loading = true;
@@ -75,7 +67,7 @@ export class Classes implements OnInit, OnDestroy {
         catchError((err) => {
           console.error('[Classes] claims$ failed:', err);
           this.zone.run(() => {
-            this.error = 'Could not load your school info (claims).';
+            this.error = this.translate.instant('CLASSES.MESSAGES.ERROR_CLAIMS');
             this.loading = false;
           });
           this.cdr.detectChanges();
@@ -106,7 +98,7 @@ export class Classes implements OnInit, OnDestroy {
     } catch (e) {
       console.error('[Classes] loadClasses failed:', e);
       this.zone.run(() => {
-        this.error = 'Failed to load classes.';
+        this.error = this.translate.instant('CLASSES.MESSAGES.ERROR_LOAD');
         this.loading = false;
       });
       this.cdr.detectChanges();
@@ -118,9 +110,8 @@ export class Classes implements OnInit, OnDestroy {
 
     const ref = this.dialog.open(ClassFormDialog, {
       width: '420px',
-      data: { title: 'Add class' },
+      data: { title: this.translate.instant('CLASSES.ADD') }, // ✅ Translate here
     });
-
     const result = await firstValueFrom(ref.afterClosed());
     if (!result) return;
 
@@ -132,7 +123,7 @@ export class Classes implements OnInit, OnDestroy {
       await this.loadClasses();
     } catch (e) {
       console.error(e);
-      this.zone.run(() => (this.error = 'Failed to create class.'));
+      this.zone.run(() => (this.error = this.translate.instant('CLASSES.MESSAGES.ERROR_CREATE')));
     } finally {
       this.zone.run(() => (this.loading = false));
       this.cdr.detectChanges();
@@ -144,7 +135,10 @@ export class Classes implements OnInit, OnDestroy {
 
     const ref = this.dialog.open(ClassFormDialog, {
       width: '420px',
-      data: { title: 'Edit class', initialName: c.name },
+      data: { 
+        title: this.translate.instant('CLASSES.TABLE.ACTIONS'), // Or a custom translation key
+        initialName: c.name 
+      },
     });
 
     const result = await firstValueFrom(ref.afterClosed());
@@ -158,7 +152,7 @@ export class Classes implements OnInit, OnDestroy {
       await this.loadClasses();
     } catch (e) {
       console.error(e);
-      this.zone.run(() => (this.error = 'Failed to update class.'));
+      this.zone.run(() => (this.error = this.translate.instant('CLASSES.MESSAGES.ERROR_UPDATE')));
     } finally {
       this.zone.run(() => (this.loading = false));
       this.cdr.detectChanges();
@@ -168,7 +162,8 @@ export class Classes implements OnInit, OnDestroy {
   async deleteClass(c: SchoolClass) {
     if (!c.id) return;
 
-    const ok = confirm(`Delete class "${c.name}"?`);
+    const msg = this.translate.instant('CLASSES.MESSAGES.DELETE_CONFIRM');
+    const ok = confirm(`${msg} "${c.name}"?`);
     if (!ok) return;
 
     this.zone.run(() => (this.loading = true));
@@ -179,7 +174,7 @@ export class Classes implements OnInit, OnDestroy {
       await this.loadClasses();
     } catch (e) {
       console.error(e);
-      this.zone.run(() => (this.error = 'Failed to delete class.'));
+      this.zone.run(() => (this.error = this.translate.instant('CLASSES.MESSAGES.ERROR_DELETE')));
     } finally {
       this.zone.run(() => (this.loading = false));
       this.cdr.detectChanges();
@@ -190,6 +185,8 @@ export class Classes implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  
+
   exportToCSV() {
     if (this.filtered.length === 0) return;
 

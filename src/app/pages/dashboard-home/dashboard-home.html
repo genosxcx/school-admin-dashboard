@@ -3,7 +3,7 @@
   @if (loading) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Loading school data...</p>
+      <p>{{ 'DASHBOARD.LOADING' | translate }}</p>
     </div>
   }
 
@@ -11,20 +11,14 @@
     @if (error.toLowerCase().includes('not allowed')) {
       <mat-card class="no-access-card">
         <div class="no-access-inner">
-          <div class="no-access-icon">
-            <mat-icon>lock</mat-icon>
-          </div>
+          <div class="no-access-icon"><mat-icon>lock</mat-icon></div>
           <div class="no-access-text">
-            <h2>Restricted Access</h2>
-            <p>
-              This dashboard is only available to principals and administrators.
-              If you believe this is an error, please contact your school administrator.
-            </p>
+            <h2>{{ 'DASHBOARD.RESTRICTED_ACCESS' | translate }}</h2>
+            <p>{{ 'DASHBOARD.ACCESS_DENIED_MSG' | translate }}</p>
           </div>
         </div>
       </mat-card>
-    }
-    @else {
+    } @else {
       <mat-card class="error-card">
         <mat-icon>error_outline</mat-icon>
         <p>{{ error }}</p>
@@ -33,57 +27,30 @@
   }
 
   @else {
-    <!-- Page Header (Read-Only) -->
-    <div class="page-header">
-      <!-- Logo Display -->
-      @if (schoolLogo) {
-        <div class="school-logo">
-          <img [src]="schoolLogo" alt="School Logo" />
-        </div>
-      }
-
-      <div class="header-content">
-        <h1>{{ schoolName }}</h1>
-        <span class="page-subtitle">Key school metrics and staff performance</span>
-      </div>
-    </div>
-
-    <!-- Summary KPIs -->
     <div class="summary-grid">
-      
-      <!-- Interactive Faculty KPI -->
       <mat-card class="summary-card kpi-teachers">
-        <div class="card-icon">
-          <mat-icon>school</mat-icon>
-        </div>
+        <div class="card-icon"><mat-icon>school</mat-icon></div>
         <div class="card-content">
           <div class="card-value">{{ totalTeachers }}</div>
-          <div class="card-label">Total Faculty</div>
+          <div class="card-label">{{ 'DASHBOARD.TOTAL_FACULTY' | translate }}</div>
         </div>
       </mat-card>
 
-      <!-- Students KPI -->
       <mat-card class="summary-card kpi-students">
-        <div class="card-icon">
-          <mat-icon>groups</mat-icon>
-        </div>
+        <div class="card-icon"><mat-icon>groups</mat-icon></div>
         <div class="card-content">
           <div class="card-value">{{ totalStudents }}</div>
-          <div class="card-label">Active Students</div>
+          <div class="card-label">{{ 'DASHBOARD.ACTIVE_STUDENTS' | translate }}</div>
         </div>
       </mat-card>
 
-      <!-- Minutes KPI -->
       <mat-card class="summary-card kpi-minutes">
-        <div class="card-icon">
-          <mat-icon>timer</mat-icon>
-        </div>
+        <div class="card-icon"><mat-icon>timer</mat-icon></div>
         <div class="card-content">
           <div class="card-value">{{ totalMinutes | number:'1.0-1' }}</div>
-          <div class="card-label">Learning Minutes</div>
+          <div class="card-label">{{ 'DASHBOARD.LEARNING_MINUTES' | translate }}</div>
         </div>
       </mat-card>
-
     </div>
   }
 </div>

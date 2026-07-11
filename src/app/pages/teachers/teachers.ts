@@ -1,16 +1,9 @@
-import {
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-  NgZone,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, of, firstValueFrom } from 'rxjs';
 import { catchError, filter, take, takeUntil, timeout } from 'rxjs/operators';
-
+import { TranslatePipe } from '@ngx-translate/core'; // Added
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataService, Teacher, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 import { TeacherFormDialog, ClassOption } from './teacher-form-dialog/teacher-form-dialog';
@@ -26,16 +19,7 @@ import { TeacherFormDialog, ClassOption } from './teacher-form-dialog/teacher-fo
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
+  imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule, MatIconModule, MatButtonModule, MatTooltipModule, TranslatePipe],
   templateUrl: './teachers.html',
   styleUrls: ['./teachers.scss'],
 })
@@ -47,17 +31,9 @@ export class Teachers implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
-  loading = true;
-  error = '';
-  schoolId = '';
-  q = '';
-
-  teachers: Teacher[] = [];
-  classes: SchoolClass[] = [];
-  classNameById = new Map<string, string>();
-
+  loading = true; error = ''; schoolId = ''; q = '';
+  teachers: Teacher[] = []; classes: SchoolClass[] = []; classNameById = new Map<string, string>();
   displayedColumns = ['name', 'email', 'classId', 'actions'];
-
   get filtered(): Teacher[] {
     const s = this.q.trim().toLowerCase();
     if (!s) return this.teachers;

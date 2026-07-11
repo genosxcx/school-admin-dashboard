@@ -149,3 +149,17 @@
     color: #94a3b8;
   }
 }
+
+.sidebar-logo {
+  width: 42px;
+  height: 42px;
+  min-width: 42px; /* Prevents the layout from shrinking or expanding it */
+  object-fit: cover; /* Ensures the photo fills the square without stretching */
+  border-radius: 8px; /* Make this 50% if you want a perfect circle */
+  
+  /* Using margin-inline-end is better for Hebrew/RTL layouts so the spacing applies to the correct side */
+  margin-inline-end: 12px; 
+  
+  /* Optional: Adds a subtle shadow to make it pop */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}

@@ -1,0 +1,276 @@
+{
+  "BRAND": {
+    "LOGO_MARK": "HN",
+    "TITLE": "Hya Naqra'a",
+    "SUBTITLE": "Collaborative Learning"
+  },
+  "NAV": {
+    "OVERVIEW": "Overview",
+    "HOME_TEACHERS": "Home Teachers",
+    "SUBJECT_TEACHERS": "Subject Teachers",
+    "CLASSES": "Classes",
+    "STUDENTS": "Students",
+    "MY_KIDS": "My Kids",
+    "ASSIGNMENTS": "Assignments",
+    "STATISTICS": "Statistics",
+    "SETTINGS": "Settings"
+  },
+  "SETTINGS": {
+    "TITLE": "Settings",
+    "SUBTITLE": "Manage your account preferences and security",
+    "ACTIONS": {
+      "ORG": "Organization",
+      "PASSWORD": "Password",
+      "LANGUAGE": "Language",
+      "TERMS": "Terms & Conditions"
+    },
+    "ORG": {
+      "TITLE": "Edit Organization",
+      "SCHOOL_NAME": "School Name",
+      "CHOOSE_LOGO": "Choose Logo Image",
+      "SAVE": "Save Organization",
+      "ACCESS_DENIED": "Access Denied: You do not have the required role to edit organization settings."
+    },
+    "PASSWORD": {
+      "TITLE": "Change Password",
+      "NEW": "New Password",
+      "CONFIRM": "Confirm New Password",
+      "UPDATE": "Update Password",
+      "UPDATING": "Updating..."
+    },
+    "LANGUAGE": {
+      "TITLE": "Display Language",
+      "DESC": "Select your preferred language for the dashboard interface.",
+      "LABEL": "Language"
+    },
+    "TERMS": {
+      "TITLE": "Terms and Conditions",
+      "CONTENT": "Hey, how are you? This is the placeholder for the full terms and conditions document."
+    }
+  },
+  "FOOTER": {
+    "COPYRIGHT": "Hya Naqra'a Admin Portal © 2026",
+    "POWERED_BY": "Powered by <strong>NadaSoft</strong>",
+    "NEED_ASSISTANCE": "Need assistance?"
+  },
+  "TOPBAR": {
+    "ADMIN_PORTAL": "Admin Portal",
+    "USER_ADMIN": "User Admin",
+    "LOGOUT": "Logout"
+  },
+  "MESSAGES": {
+  "LANG_UPDATED": "Language updated successfully!",
+  "PASS_UPDATED": "Password updated!",
+  "PASS_FAILED": "Failed to update password.",
+  "SCHOOL_ID_MISSING": "Error: School ID is missing. Please refresh.",
+  "UNAUTHORIZED": "Unauthorized or invalid form.",
+  "ORG_SAVED": "Organization details saved!",
+  "ORG_FAILED": "Failed to save branding.",
+  "CLOSE": "Close"
+},
+"ASSIGNMENTS": {
+  "TITLE": "Assignments",
+  "SUBTITLE": "Manage and track student tasks",
+  "SEARCH": "Search assignments...",
+  "CREATE_BTN": "Create Assignment",
+  "TABLE": {
+    "TITLE": "Title",
+    "DESCRIPTION": "Description",
+    "ASSIGNED_TO": "Assigned To",
+    "CREATED_ON": "Created On"
+  },
+  "MESSAGES": {
+    "TIMEOUT": "Timeout loading user info.",
+    "INVALID_ID": "Invalid school or user ID.",
+    "CREATE_FAILED": "Failed to create assignment: ",
+    "DELETE_CONFIRM": "Are you sure you want to delete this assignment?",
+    "DELETE_FAILED": "Failed to delete assignment.",
+    "LOADING": "Loading assignments...",
+    "NO_DATA": "No assignments found. Create one to get started!"
+  },
+  "UNASSIGNED": "Unassigned"
+},
+"ASSIGNMENT_DIALOG": {
+  "TITLE_FIELD": "Assignment Title",
+  "TITLE_PLACEHOLDER": "e.g. Read Chapter 4",
+  "DESC_FIELD": "Description / Instructions",
+  "DESC_PLACEHOLDER": "Enter details here...",
+  "CLASSES_FIELD": "Assign to Classes",
+  "START_TIME": "Start Time (Shows to students)",
+  "END_TIME": "End Time (Due Date)",
+  "CANCEL": "Cancel",
+  "SAVE": "Save Assignment"
+},
+"CLASSES": {
+  "TITLE": "Classes",
+  "SUBTITLE": "Manage classroom divisions and grade groups",
+  "SEARCH": "Search classes...",
+  "EXPORT": "Export CSV",
+  "ADD": "Add Class",
+  "UNNAMED": "Unnamed Class",
+  "TABLE": {
+    "NAME": "Class Name",
+    "ACTIONS": "Actions"
+  },
+  "MESSAGES": {
+    "LOADING": "Loading classes...",
+    "ERROR_CLAIMS": "Could not load your school info (claims).",
+    "ERROR_LOAD": "Failed to load classes.",
+    "ERROR_CREATE": "Failed to create class.",
+    "ERROR_UPDATE": "Failed to update class.",
+    "ERROR_DELETE": "Failed to delete class.",
+    "DELETE_CONFIRM": "Delete class",
+    "NO_DATA_TITLE": "No classes found",
+    "NO_DATA_SUB": "Add your first class to start assigning students and faculty."
+  }
+},
+"CLASS_DIALOG": {
+  "LABEL": "Class name",
+  "PLACEHOLDER": "e.g. A1",
+  "CANCEL": "Cancel",
+  "SAVE": "Save"
+},
+"STATS": {
+  "LOADING": "Loading statistics...",
+  "CLASSES": "Classes",
+  "ALL_CLASSES": "All Classes (Overview)",
+  "OVERALL_AVG": "Overall (All Students) Avg:",
+  "GRADE": "Grade",
+  "COMPLETION": "Completion",
+  "TOTAL_MINUTES": "Total Minutes",
+  "STUDENT_PERFORMANCE": "Student Performance",
+  "ALL_STUDENTS_PERF": "All Students Performance",
+  "NO_CLASSES": "No classes yet",
+  "NO_STUDENTS": "No students found",
+  "SELECT_CLASS_TITLE": "Select a Class",
+  "SELECT_CLASS_SUB": "Choose a class from the left panel to view detailed statistics",
+  "MESSAGES": {
+    "ERROR_CLAIMS": "Could not load your school info (claims).",
+    "ERROR_ACCOUNT": "Your account is not assigned to a class yet.",
+    "ERROR_SUB_TEACHER": "Your account is not assigned to any classes yet.",
+    "ERROR_LOAD": "Failed to load stats.",
+    "ERROR_SELECT": "Failed to load class stats."
+  }
+},
+"STUDENTS": {
+  "TITLE": "Students",
+  "SUBTITLE": "Manage school enrollment and class assignments",
+  "SEARCH": "Search students...",
+  "EXPORT": "Export CSV",
+  "ADD": "Add Student",
+  "TABLE": {
+    "ID": "Student ID",
+    "NAME": "Full Name",
+    "EMAIL": "Login Email",
+    "CLASS": "Class",
+    "ACTIONS": "Actions"
+  },
+  "MESSAGES": {
+    "LOADING": "Loading student records...",
+    "ERROR_CLAIMS": "Could not load your school info (claims).",
+    "ERROR_ACCOUNT": "Your account is not assigned to a class yet.",
+    "ERROR_LOAD": "Failed to load students.",
+    "ERROR_CREATE": "Failed to create student.",
+    "ERROR_UPDATE": "Failed to update student.",
+    "ERROR_DELETE": "Failed to delete student.",
+    "DELETE_CONFIRM": "Delete student",
+    "RESTRICT_EDIT": "You can only edit students in your class.",
+    "RESTRICT_DELETE": "You can only delete students in your class.",
+    "NO_DATA_TITLE": "No students found",
+    "NO_DATA_SUB": "Try searching for a different student or add a new record.",
+    "UNNAMED": "Unnamed Student"
+  }
+},
+"STUDENT_DIALOG": {
+  "ID": "Student ID",
+  "NAME": "Full name",
+  "EMAIL": "Email (Optional)",
+  "PASSWORD": "Generated Password (Copy this!)",
+  "HINT": "Give this to the student so they can log in.",
+  "CLASS": "Class",
+  "UNASSIGNED": "Unassigned",
+  "CANCEL": "Cancel",
+  "SAVE": "Save",
+  "TITLE_ADD": "Add student",
+  "TITLE_EDIT": "Edit student"
+},
+"SUBJECT_TEACHERS": {
+  "TITLE": "Subject Teachers",
+  "SUBTITLE": "Manage specialist instructors and multi-class assignments",
+  "SEARCH": "Search subject teachers...",
+  "EXPORT": "Export CSV",
+  "ADD": "Add Subject Teacher",
+  "TABLE": {
+    "NAME": "Full Name",
+    "EMAIL": "Email Address",
+    "SUBJECT": "Specialty Subject",
+    "CLASSES": "Assigned Classes",
+    "ACTIONS": "Actions",
+  "ADD_BUTTON": "Add Subject Teacher",
+  "EXPORT": "Export CSV",
+  "SEARCH_LABEL": "Search subject teachers...",
+  "SEARCH_PLACEHOLDER": "Name, email, subject..."
+
+  },
+  "MESSAGES": {
+    "LOADING": "Loading subject teachers...",
+    "ERROR_TIMEOUT": "Timeout loading school info. Please refresh.",
+    "ERROR_SCHOOL": "Your school ID is not configured.",
+    "ERROR_LOAD": "Failed to load teachers.",
+    "ERROR_CREATE": "Failed to create teacher.",
+    "ERROR_UPDATE": "Failed to update teacher.",
+    "ERROR_DELETE": "Failed to delete teacher.",
+    "DELETE_CONFIRM": "Delete subject teacher",
+    "NO_DATA": "No subject teachers found",
+    "NO_DATA_SUB": "Try adjusting your search filter or assign a new subject teacher.",
+    "UNASSIGNED": "Unassigned",
+    "UNNAMED": "Unnamed Instructor"
+  }
+},
+"SUBJECT_TEACHER_DIALOG": {
+  "TITLE_ADD": "Add subject teacher",
+  "TITLE_EDIT": "Edit subject teacher",
+  "NAME": "Full Name",
+  "EMAIL": "Email Address",
+  "PASSWORD":"Generated Password (Copy this!)", 
+  "HINT": "Give this to the teacher so they can log in.",
+  "SUBJECT": "Subject",
+  "CLASSES": "Assign Classes",
+  "CANCEL": "Cancel",
+  "SAVE": "Save"
+  
+},
+"TEACHERS": {
+  "TITLE": "Teachers",
+  "SUBTITLE": "Manage faculty and classroom assignments",
+  "SEARCH_LABEL": "Search teachers...",
+  "SEARCH_PLACEHOLDER": "Name, email, class...",
+  "EXPORT": "Export CSV",
+  "ADD_BTN": "Add Teacher",
+  "LOADING": "Loading teachers...",
+  "UNNAMED": "Unnamed Faculty",
+  "UNASSIGNED": "Unassigned",
+  "TABLE": { "NAME": "Full Name", "EMAIL": "Email Address", "CLASS": "Assigned Class", "ACTIONS": "Actions" },
+  "EDIT": "Edit Teacher",
+  "DELETE": "Delete Teacher",
+  "NO_DATA": "No teachers found",
+  "NO_DATA_SUB": "Try adjusting your search query or add a new teacher."
+},
+"DIALOG": {
+  "NAME": "Full name",
+  "EMAIL": "Email (Required for login)",
+  "PASSWORD": "Generated Password",
+  "COPY_HINT": "Give this to the home teacher so they can log in.",
+  "CANCEL": "Cancel",
+  "SAVE": "Save"
+},
+"DASHBOARD": {
+  "LOADING": "Loading school data...",
+  "RESTRICTED_ACCESS": "Restricted Access",
+  "ACCESS_DENIED_MSG": "This dashboard is only available to principals and administrators.",
+  "SUBTITLE": "Key school metrics and staff performance",
+  "TOTAL_FACULTY": "Total Faculty",
+  "ACTIVE_STUDENTS": "Active Students",
+  "LEARNING_MINUTES": "Learning Minutes"
+}
+}

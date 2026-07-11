@@ -79,16 +79,53 @@
 }
 
 /* Cell styles */
+/* Cell styles */
 .title-text { font-weight: 700; color: var(--text); font-size: 15px; }
-.desc-text { color: var(--muted); font-size: 13px; max-width: 300px; }
+
+.desc-text {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 300px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  white-space: normal; /* make sure it can wrap onto 2 lines instead of staying on 1 */
+}
+
 .date-pill { background: #f1f5f9; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
 .classes-pill { background: var(--primary-soft); color: var(--primary); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
-
 .action-buttons { display: flex; justify-content: flex-end; }
 .delete-btn:hover { color: var(--red) !important; background: var(--red-soft) !important; }
 
-/* Overlays */
-.loading-overlay { padding: 40px; text-align: center; color: var(--muted); font-weight: 600; }
-.error-msg { background: #fef2f2; color: #b91c1c; padding: 16px; border-radius: var(--radius-md); margin-bottom: 16px; }
+.full-width-table {
+  width: 100%;
+  border-spacing: 0 12px !important;
+  border-collapse: separate !important;
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .mat-mdc-header-row { background: #f8fafc; height: 52px; }
+  .mat-mdc-header-cell { padding: 0 24px; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; border: none; }
+
+  .mat-mdc-row {
+    height: 68px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: 0.15s;
+  }
+  .mat-mdc-row:hover {
+    background: #f8fafc;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+  }
+  .mat-mdc-cell {
+    padding: 0 24px;
+    color: var(--text);
+    font-size: 14px;
+    border: none;
+  }
+  .mat-mdc-cell:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+  .mat-mdc-cell:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+}

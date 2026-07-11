@@ -76,6 +76,11 @@ export const routes: Routes = [
       },
     ],
   },
+  { 
+    path: '', 
+    redirectTo: 'hya-naqraa', 
+    pathMatch: 'full' 
+  },
   { path: 'hya-naqraa', component: PortfolioComponent },
   { path: '**', redirectTo: 'admin/login' },
 ];

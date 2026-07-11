@@ -2,7 +2,7 @@
   @if (loading) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Loading statistics...</p>
+      <p>{{ 'STATS.LOADING' | translate }}</p>
     </div>
   } @else {
     @if (error) {
@@ -17,17 +17,13 @@
             <mat-card class="classes-card">
               <div class="section-header">
                 <mat-icon>class</mat-icon>
-                <span class="section-title">Classes</span>
+                <span class="section-title">{{ 'STATS.CLASSES' | translate }}</span>
                 <span class="badge">{{ classes.length }}</span>
               </div>
 
               <div class="class-list">
                 @for (c of classes; track c.id) {
-                  <button
-                    class="class-item"
-                    [class.active]="c.id === selectedClassId"
-                    (click)="selectClass(c.id!)"
-                  >
+                  <button class="class-item" [class.active]="c.id === selectedClassId" (click)="selectClass(c.id!)">
                     <div class="class-avatar">
                       {{ c.id === 'ALL' ? '⭐' : (c.name || '?').charAt(0).toUpperCase() }}
                     </div>
@@ -39,7 +35,7 @@
                 @if (!classes.length) {
                   <div class="empty-note">
                     <mat-icon>inbox</mat-icon>
-                    <span>No classes yet</span>
+                    <span>{{ 'STATS.NO_CLASSES' | translate }}</span>
                   </div>
                 }
               </div>
@@ -51,89 +47,67 @@
           @if (selectedClassStats) {
             <div class="slide-in-panel">
               
-              <!-- ✅ Overall Comparison Banner: Shows All-Students Avg when viewing a single class -->
               @if (selectedClassId !== 'ALL' && summary.students > 0 && !isTeacher) {
                 <div class="overall-banner" style="background: rgba(0,0,0,0.04); padding: 8px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
-                  <span><strong>Overall (All Students) Avg:</strong></span>
+                  <span><strong>{{ 'STATS.OVERALL_AVG' | translate }}</strong></span>
                   <div>
-                    <span style="margin-right: 16px;">⭐ Grade: <strong>{{ minutesText(summary.avgGrade) }}/100</strong></span>
-                    <span>📈 Completion: <strong>{{ minutesText(summary.avgCompletion) }}%</strong></span>
+                    <span style="margin-right: 16px;">⭐ {{ 'STATS.GRADE' | translate }}: <strong>{{ minutesText(summary.avgGrade) }}/100</strong></span>
+                    <span>📈 {{ 'STATS.COMPLETION' | translate }}: <strong>{{ minutesText(summary.avgCompletion) }}%</strong></span>
                   </div>
                 </div>
               }
 
-              <!-- Compact Metrics Row -->
               <div class="metrics-compact">
-                <mat-card class="metric-card">
-                  <div class="metric-icon icon-grade">
-                    <mat-icon>star_rate</mat-icon>
-                  </div>
-                  <div class="metric-body">
-                    <div class="metric-value">
-                      {{ minutesText(selectedClassStats.avgGrade) }}<span class="metric-unit">/100</span>
-                    </div>
-                    <div class="metric-label">
-                      {{ selectedClassId === 'ALL' ? 'Overall Avg. Grade' : 'Class Avg. Grade' }}
-                    </div>
-                  </div>
-                </mat-card>
+                <div class="metric-container">
+                  <mat-card class="metric-card">
+                    <div class="metric-icon icon-grade"><mat-icon>star_rate</mat-icon></div>
+                    <div class="metric-value">{{ minutesText(selectedClassStats.avgGrade) }}<span class="metric-unit">/100</span></div>
+                  </mat-card>
+                  <div class="metric-tooltip">{{ 'STATS.GRADE' | translate }}</div>
+                </div>
 
-                <mat-card class="metric-card">
-                  <div class="metric-icon icon-completion">
-                    <mat-icon>show_chart</mat-icon>
-                  </div>
-                  <div class="metric-body">
-                    <div class="metric-value">
-                      {{ minutesText(selectedClassStats.avgCompletion) }}<span class="metric-unit">%</span>
-                    </div>
-                    <div class="metric-label">
-                      {{ selectedClassId === 'ALL' ? 'Overall Avg. Completion' : 'Class Avg. Completion' }}
-                    </div>
-                  </div>
-                </mat-card>
+                <div class="metric-container">
+                  <mat-card class="metric-card">
+                    <div class="metric-icon icon-completion"><mat-icon>show_chart</mat-icon></div>
+                    <div class="metric-value">{{ minutesText(selectedClassStats.avgCompletion) }}<span class="metric-unit">%</span></div>
+                  </mat-card>
+                  <div class="metric-tooltip">{{ 'STATS.COMPLETION' | translate }}</div>
+                </div>
 
-                <mat-card class="metric-card">
-                  <div class="metric-icon icon-time">
-                    <mat-icon>timer</mat-icon>
-                  </div>
-                  <div class="metric-body">
+                <div class="metric-container">
+                  <mat-card class="metric-card">
+                    <div class="metric-icon icon-time"><mat-icon>timer</mat-icon></div>
                     <div class="metric-value">{{ minutesText(selectedClassStats.totalMinutes) }}</div>
-                    <div class="metric-label">Total Minutes</div>
-                  </div>
-                </mat-card>
+                  </mat-card>
+                  <div class="metric-tooltip">{{ 'STATS.TOTAL_MINUTES' | translate }}</div>
+                </div>
               </div>
 
-              <!-- Students Slide View -->
               <div class="students-slide">
                 <div class="students-header">
                   <span class="students-title">
-                    {{ selectedClassId === 'ALL' ? 'All Students Performance' : 'Student Performance' }}
+                    {{ (selectedClassId === 'ALL' ? 'STATS.ALL_STUDENTS_PERF' : 'STATS.STUDENT_PERFORMANCE') | translate }}
                   </span>
                   <span class="students-count">{{ classStudents.length }} students</span>
                 </div>
 
-                <!-- ✅ This list container scrolls independently thanks to SCSS flex: 1 + overflow-y: auto -->
                 <div class="students-list">
                   @for (s of classStudents; track s.id) {
                     <div class="student-row">
                       <div class="student-header-row">
-                        <div class="student-avatar">
-                          {{ ((s.fullName || '?').charAt(0)).toUpperCase() }}
-                        </div>
-                        <div class="student-name-section">
-                          <div class="student-name">{{ s.fullName }}</div>
-                        </div>
+                        <div class="student-avatar">{{ ((s.fullName || '?').charAt(0)).toUpperCase() }}</div>
+                        <div class="student-name-section"><div class="student-name">{{ s.fullName }}</div></div>
                       </div>
 
                       <div class="student-bars">
                         <div class="bar-row">
-                          <span class="bar-label">Completion</span>
+                          <span class="bar-label">{{ 'STATS.COMPLETION' | translate }}</span>
                           <mat-progress-bar mode="determinate" [value]="completionPct(s)"></mat-progress-bar>
                           <span class="bar-value">{{ minutesText(completionPct(s)) }}%</span>
                         </div>
 
                         <div class="bar-row">
-                          <span class="bar-label">Grade</span>
+                          <span class="bar-label">{{ 'STATS.GRADE' | translate }}</span>
                           <mat-progress-bar mode="determinate" [value]="gradePct(s)" class="grade-bar"></mat-progress-bar>
                           <span class="bar-value">{{ minutesText(gradePct(s)) }}/100</span>
                         </div>
@@ -144,7 +118,7 @@
                   @if (!classStudents.length) {
                     <div class="empty-note">
                       <mat-icon>person_off</mat-icon>
-                      <span>No students found</span>
+                      <span>{{ 'STATS.NO_STUDENTS' | translate }}</span>
                     </div>
                   }
                 </div>
@@ -153,8 +127,8 @@
           } @else {
             <div class="empty-panel">
               <mat-icon>analytics</mat-icon>
-              <h3>Select a Class</h3>
-              <p>Choose a class from the left panel to view detailed statistics</p>
+              <h3>{{ 'STATS.SELECT_CLASS_TITLE' | translate }}</h3>
+              <p>{{ 'STATS.SELECT_CLASS_SUB' | translate }}</p>
             </div>
           }
         </div>

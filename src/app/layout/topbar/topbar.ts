@@ -10,10 +10,19 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
+// ✅ Import TranslatePipe directly instead of the module
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [AsyncPipe, MatToolbarModule, MatButtonModule, MatIconModule],
+  imports: [
+    AsyncPipe, 
+    MatToolbarModule, 
+    MatButtonModule, 
+    MatIconModule,
+    TranslatePipe // ✅ Added here
+  ],
   templateUrl: './topbar.html',
   styleUrls: ['./topbar.scss'],
 })

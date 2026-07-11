@@ -12,6 +12,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 
+// ✅ Added Translate Service and Pipe
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+
 import { DataService, Assignment, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 import { AssignmentFormDialog, ClassOption } from './assignment-form-dialog/assignment-form-dialog';
@@ -20,15 +23,9 @@ import { AssignmentFormDialog, ClassOption } from './assignment-form-dialog/assi
   selector: 'app-assignments',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatIconModule,
-    MatButtonModule,
-    DatePipe
+    CommonModule, FormsModule, MatCardModule, MatFormFieldModule,
+    MatInputModule, MatTableModule, MatIconModule, MatButtonModule,
+    DatePipe, TranslatePipe // ✅ Added Pipe
   ],
   templateUrl: './assignments.html',
   styleUrls: ['./assignments.scss'],
@@ -39,12 +36,13 @@ export class Assignments implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService); // ✅ Injected
   private destroy$ = new Subject<void>();
 
   loading = true;
   error = '';
   schoolId = '';
-  teacherId = ''; // The UID of the logged-in user
+  teacherId = '';
   q = '';
 
   assignments: Assignment[] = [];
@@ -67,8 +65,9 @@ export class Assignments implements OnInit, OnDestroy {
     });
   }
 
+  // ✅ Updated to use translation
   classesLabel(a: Assignment): string {
-    if (!a.classIds || a.classIds.length === 0) return 'Unassigned';
+    if (!a.classIds || a.classIds.length === 0) return this.translate.instant('ASSIGNMENTS.UNASSIGNED');
     return a.classIds
       .map(id => this.classNameById.get(id))
       .filter(name => !!name)
@@ -86,7 +85,7 @@ export class Assignments implements OnInit, OnDestroy {
         timeout(12000),
         catchError((err) => {
           this.zone.run(() => {
-            this.error = 'Timeout loading user info.';
+            this.error = this.translate.instant('ASSIGNMENTS.MESSAGES.TIMEOUT');
             this.loading = false;
           });
           this.cdr.detectChanges();
@@ -104,7 +103,7 @@ export class Assignments implements OnInit, OnDestroy {
             this.loadAll();
           } else {
             this.zone.run(() => {
-              this.error = 'Invalid school or user ID.';
+              this.error = this.translate.instant('ASSIGNMENTS.MESSAGES.INVALID_ID');
               this.loading = false;
             });
             this.cdr.detectChanges();
@@ -118,7 +117,6 @@ export class Assignments implements OnInit, OnDestroy {
       this.zone.run(() => (this.loading = true));
       this.cdr.detectChanges();
 
-      // Fetch all school classes and only the assignments created by this specific teacher
       const [classes, assignments] = await Promise.all([
         this.data.getClasses(this.schoolId),
         this.data.getAssignmentsForTeacher(this.schoolId, this.teacherId),
@@ -130,7 +128,6 @@ export class Assignments implements OnInit, OnDestroy {
           this.classes.filter((c) => c && c.id).map((c) => [c.id!, c.name])
         );
 
-        // Sort assignments by date (newest first)
         this.assignments = (assignments ?? []).sort((a, b) => b.createdAt - a.createdAt);
         this.loading = false;
         this.error = '';
@@ -153,7 +150,11 @@ export class Assignments implements OnInit, OnDestroy {
   async addAssignment() {
     const ref = this.dialog.open(AssignmentFormDialog, {
       width: '520px',
-      data: { title: 'Create New Assignment', classes: this.classOptions() },
+      data: { 
+        // ✅ Translate the title before passing it
+        title: this.translate.instant('ASSIGNMENTS.CREATE_BTN'), 
+        classes: this.classOptions() 
+      },
     });
 
     try {
@@ -168,7 +169,7 @@ export class Assignments implements OnInit, OnDestroy {
     } catch (e) {
       console.error('[Assignments] add error:', e);
       this.zone.run(() => {
-        this.error = `Failed to create assignment: ${e instanceof Error ? e.message : String(e)}`;
+        this.error = this.translate.instant('ASSIGNMENTS.MESSAGES.CREATE_FAILED') + (e instanceof Error ? e.message : String(e));
         this.loading = false;
       });
       this.cdr.detectChanges();
@@ -177,7 +178,8 @@ export class Assignments implements OnInit, OnDestroy {
 
   async deleteAssignment(a: Assignment) {
     if (!a.id) return;
-    const ok = confirm(`Are you sure you want to delete "${a.title}"?`);
+    // ✅ Use translation for native confirm
+    const ok = confirm(this.translate.instant('ASSIGNMENTS.MESSAGES.DELETE_CONFIRM'));
     if (!ok) return;
 
     try {
@@ -189,7 +191,7 @@ export class Assignments implements OnInit, OnDestroy {
     } catch (e) {
       console.error('[Assignments] delete error:', e);
       this.zone.run(() => {
-        this.error = `Failed to delete assignment.`;
+        this.error = this.translate.instant('ASSIGNMENTS.MESSAGES.DELETE_FAILED');
         this.loading = false;
       });
       this.cdr.detectChanges();

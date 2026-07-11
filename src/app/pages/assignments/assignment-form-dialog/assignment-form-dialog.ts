@@ -7,49 +7,42 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
+// ✅ Import TranslatePipe
+import { TranslatePipe } from '@ngx-translate/core';
+
 export type ClassOption = { id: string; name: string };
-
-export type AssignmentFormData = {
-  title: string;
-  classes: ClassOption[];
-};
-
+export type AssignmentFormData = { title: string; classes: ClassOption[] };
 export type AssignmentFormResult = {
   title: string;
   description: string;
   classIds: string[];
-  startTime: string | null; // Added
-  endTime: string | null;   // Added
+  startTime: string | null;
+  endTime: string | null;
 };
 
 @Component({
   selector: 'app-assignment-form-dialog',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
+    CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
+    MatInputModule, MatSelectModule, MatButtonModule, TranslatePipe // ✅ Added Pipe
   ],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
 
     <div mat-dialog-content class="content">
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Assignment Title</mat-label>
-        <input matInput [(ngModel)]="title" placeholder="e.g. Read Chapter 4" required />
+        <mat-label>{{ 'ASSIGNMENT_DIALOG.TITLE_FIELD' | translate }}</mat-label>
+        <input matInput [(ngModel)]="title" [placeholder]="'ASSIGNMENT_DIALOG.TITLE_PLACEHOLDER' | translate" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Description / Instructions</mat-label>
-        <textarea matInput [(ngModel)]="description" rows="4" placeholder="Enter details here..."></textarea>
+        <mat-label>{{ 'ASSIGNMENT_DIALOG.DESC_FIELD' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="description" rows="4" [placeholder]="'ASSIGNMENT_DIALOG.DESC_PLACEHOLDER' | translate"></textarea>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Assign to Classes</mat-label>
+        <mat-label>{{ 'ASSIGNMENT_DIALOG.CLASSES_FIELD' | translate }}</mat-label>
         <mat-select [(ngModel)]="classIds" multiple required>
           <mat-option *ngFor="let c of data.classes" [value]="c.id">
             {{ c.name }}
@@ -59,29 +52,27 @@ export type AssignmentFormResult = {
 
       <div class="time-row">
         <mat-form-field appearance="outline" class="half">
-          <mat-label>Start Time (Shows to students)</mat-label>
+          <mat-label>{{ 'ASSIGNMENT_DIALOG.START_TIME' | translate }}</mat-label>
           <input matInput type="datetime-local" [(ngModel)]="startTime" />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="half">
-          <mat-label>End Time (Due Date)</mat-label>
+          <mat-label>{{ 'ASSIGNMENT_DIALOG.END_TIME' | translate }}</mat-label>
           <input matInput type="datetime-local" [(ngModel)]="endTime" />
         </mat-form-field>
       </div>
     </div>
 
     <div mat-dialog-actions align="end">
-      <button mat-button (click)="close()">Cancel</button>
+      <button mat-button (click)="close()">{{ 'ASSIGNMENT_DIALOG.CANCEL' | translate }}</button>
       <button mat-flat-button color="primary" (click)="save()" [disabled]="!title.trim() || classIds.length === 0">
-        Save Assignment
+        {{ 'ASSIGNMENT_DIALOG.SAVE' | translate }}
       </button>
     </div>
   `,
   styles: [`
     .content { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
     .full { width: 100%; }
-    
-    /* Added styles for the side-by-side time inputs */
     .time-row { display: flex; gap: 16px; width: 100%; }
     .half { flex: 1; } 
   `],
@@ -93,19 +84,16 @@ export class AssignmentFormDialog {
   title = '';
   description = '';
   classIds: string[] = [];
-  startTime = ''; // Bound to the new start time input
-  endTime = '';   // Bound to the new end time input
+  startTime = '';
+  endTime = '';
 
-  close() {
-    this.ref.close(null);
-  }
+  close() { this.ref.close(null); }
 
   save() {
     this.ref.close({
       title: this.title.trim(),
       description: this.description.trim(),
       classIds: this.classIds,
-      // Pass the dates back. If the teacher leaves them blank, pass null.
       startTime: this.startTime || null, 
       endTime: this.endTime || null,     
     });

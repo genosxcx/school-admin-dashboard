@@ -2,13 +2,13 @@
   
   <div class="header-section">
     <div class="header-title">
-      <h1>Assignments</h1>
-      <p class="subtitle">Manage and track student tasks</p>
+      <h1>{{ 'ASSIGNMENTS.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'ASSIGNMENTS.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="header-actions">
       <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Search assignments...</mat-label>
+        <mat-label>{{ 'ASSIGNMENTS.SEARCH' | translate }}</mat-label>
         <mat-icon matPrefix>search</mat-icon>
         <input matInput [(ngModel)]="q" />
         <button *ngIf="q" matSuffix mat-icon-button (click)="q = ''"><mat-icon>close</mat-icon></button>
@@ -16,7 +16,7 @@
 
       <button mat-flat-button class="add-btn" (click)="addAssignment()" [disabled]="loading || !schoolId">
         <mat-icon>add</mat-icon>
-        <span>Create Assignment</span>
+        <span>{{ 'ASSIGNMENTS.CREATE_BTN' | translate }}</span>
       </button>
     </div>
   </div>
@@ -25,27 +25,27 @@
 
   <mat-card class="table-card">
     <mat-card-content>
-      <div class="loading-overlay" *ngIf="loading">Loading assignments...</div>
+      <div class="loading-overlay" *ngIf="loading">{{ 'ASSIGNMENTS.MESSAGES.LOADING' | translate }}</div>
 
       <table mat-table [dataSource]="filtered" class="full-width-table">
         
         <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef> Title </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'ASSIGNMENTS.TABLE.TITLE' | translate }} </th>
           <td mat-cell *matCellDef="let a"> <span class="title-text">{{ a.title }}</span> </td>
         </ng-container>
 
         <ng-container matColumnDef="description">
-          <th mat-header-cell *matHeaderCellDef> Description </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'ASSIGNMENTS.TABLE.DESCRIPTION' | translate }} </th>
           <td mat-cell *matCellDef="let a" class="desc-text"> {{ a.description || '-' }} </td>
         </ng-container>
 
         <ng-container matColumnDef="classes">
-          <th mat-header-cell *matHeaderCellDef> Assigned To </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'ASSIGNMENTS.TABLE.ASSIGNED_TO' | translate }} </th>
           <td mat-cell *matCellDef="let a"> <span class="classes-pill">{{ classesLabel(a) }}</span> </td>
         </ng-container>
 
         <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef> Created On </th>
+          <th mat-header-cell *matHeaderCellDef> {{ 'ASSIGNMENTS.TABLE.CREATED_ON' | translate }} </th>
           <td mat-cell *matCellDef="let a"> <span class="date-pill">{{ a.createdAt | date:'mediumDate' }}</span> </td>
         </ng-container>
 
@@ -64,7 +64,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         
         <tr *matNoDataRow>
-          <td colspan="5" class="loading-overlay">No assignments found. Create one to get started!</td>
+          <td colspan="5" class="loading-overlay">{{ 'ASSIGNMENTS.MESSAGES.NO_DATA' | translate }}</td>
         </tr>
       </table>
     </mat-card-content>

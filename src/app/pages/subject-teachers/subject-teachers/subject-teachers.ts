@@ -8,8 +8,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, of, firstValueFrom, from } from 'rxjs';
+import { Subject, of, firstValueFrom } from 'rxjs';
 import { catchError, filter, take, takeUntil, timeout } from 'rxjs/operators';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { DataService, SubjectTeacher, SchoolClass } from '../../../core/services/data.service';
 import { RoleService } from '../../../core/services/role.service';
@@ -35,9 +37,11 @@ import { SubjectTeacherFormDialog, ClassOption } from '../subject-teacher-form-d
     MatTableModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './subject-teachers.html',
-  styleUrls: ['./subject-teachers.scss'], // Assuming you use the same/similar styles
+  styleUrls: ['./subject-teachers.scss'],
 })
 export class SubjectTeachers implements OnInit, OnDestroy {
   private data = inject(DataService);
@@ -45,6 +49,7 @@ export class SubjectTeachers implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  private translate = inject(TranslateService);
   private destroy$ = new Subject<void>();
 
   loading = true;
@@ -56,7 +61,6 @@ export class SubjectTeachers implements OnInit, OnDestroy {
   classes: SchoolClass[] = [];
   classNameById = new Map<string, string>();
 
-  // Added 'subject' and changed 'classId' to 'classes'
   displayedColumns = ['name', 'email', 'subject', 'classes', 'actions'];
 
   get filtered(): SubjectTeacher[] {
@@ -74,9 +78,8 @@ export class SubjectTeachers implements OnInit, OnDestroy {
     });
   }
 
-  // Maps the array of classIds to a comma-separated string of class names
   classesLabel(t: SubjectTeacher): string {
-    if (!t.classIds || t.classIds.length === 0) return 'Unassigned';
+    if (!t.classIds || t.classIds.length === 0) return this.translate.instant('SUBJECT_TEACHERS.UNASSIGNED');
     return t.classIds
       .map(id => this.classNameById.get(id))
       .filter(name => !!name)
@@ -84,58 +87,38 @@ export class SubjectTeachers implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.zone.run(() => {
-      this.loading = true;
-      this.error = '';
-    });
+    this.zone.run(() => { this.loading = true; this.error = ''; });
 
-    this.role.claims$
-      .pipe(
-        timeout(12000),
-        catchError((err) => {
-          console.error('[SubjectTeachers] claims$ timeout/error:', err);
-          this.zone.run(() => {
-            this.error = 'Timeout loading school info. Please refresh.';
-            this.loading = false;
-          });
-          this.cdr.detectChanges();
-          return of(null);
-        }),
-        filter((c) => c !== null && c !== undefined),
-        take(1),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (claims) => {
-          if (claims && claims.schoolId) {
-            this.schoolId = claims.schoolId;
-            this.loadAll();
-          } else {
-            this.zone.run(() => {
-              this.error = 'Your school ID is not configured.';
-              this.loading = false;
-            });
-            this.cdr.detectChanges();
-          }
-        },
-        error: (err) => {
-          console.error('[SubjectTeachers] Claims subscription error:', err);
-          this.zone.run(() => {
-            this.error = 'Failed to load your school info.';
-            this.loading = false;
-          });
-          this.cdr.detectChanges();
-        },
-      });
+    this.role.claims$.pipe(
+      timeout(12000),
+      catchError(() => {
+        this.setError('SUBJECT_TEACHERS.ERRORS.TIMEOUT');
+        return of(null);
+      }),
+      filter(c => !!c),
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(claims => {
+      if (claims?.schoolId) {
+        this.schoolId = claims.schoolId;
+        this.loadAll();
+      } else {
+        this.setError('SUBJECT_TEACHERS.ERRORS.NO_SCHOOL');
+      }
+    });
+  }
+
+  private setError(key: string) {
+    this.zone.run(() => {
+      this.error = this.translate.instant(key);
+      this.loading = false;
+    });
+    this.cdr.detectChanges();
   }
 
   private async loadAll() {
     try {
-      if (!this.schoolId) throw new Error('School ID is empty');
-
       this.zone.run(() => (this.loading = true));
-      this.cdr.detectChanges();
-
       const [classes, teachers] = await Promise.all([
         this.data.getClasses(this.schoolId),
         this.data.getSubjectTeachers(this.schoolId),
@@ -143,153 +126,69 @@ export class SubjectTeachers implements OnInit, OnDestroy {
 
       this.zone.run(() => {
         this.classes = classes ?? [];
-        this.classNameById = new Map(
-          (this.classes ?? [])
-            .filter((c) => c && c.id)
-            .map((c) => [c.id!, c.name])
-        );
-
+        this.classNameById = new Map((this.classes ?? []).filter(c => c?.id).map(c => [c.id!, c.name]));
         this.subjectTeachers = teachers ?? [];
         this.loading = false;
-        this.error = '';
       });
-
       this.cdr.detectChanges();
     } catch (e) {
-      console.error('[SubjectTeachers] loadAll error:', e);
-      this.zone.run(() => {
-        this.error = `Error: ${e instanceof Error ? e.message : String(e)}`;
-        this.loading = false;
-      });
-      this.cdr.detectChanges();
+      this.setError('SUBJECT_TEACHERS.ERRORS.LOAD_FAILED');
     }
   }
 
   private classOptions(): ClassOption[] {
-    return (this.classes ?? [])
-      .filter((c) => c && c.id)
-      .map((c) => ({ id: c.id!, name: c.name }));
+    return (this.classes ?? []).filter(c => c?.id).map(c => ({ id: c.id!, name: c.name }));
   }
 
   async addSubjectTeacher() {
-    if (!this.schoolId) {
-      this.error = 'School ID not found';
-      return;
-    }
-
     const ref = this.dialog.open(SubjectTeacherFormDialog, {
       width: '520px',
-      data: { title: 'Add subject teacher', classes: this.classOptions() },
+      data: { title: this.translate.instant('SUBJECT_TEACHERS.DIALOG.ADD_TITLE'), classes: this.classOptions() },
     });
 
-    try {
-      const result = await firstValueFrom(ref.afterClosed());
-      if (!result) return;
-
-      this.zone.run(() => (this.loading = true));
-      this.cdr.detectChanges();
-
-      await this.data.createSubjectTeacher(this.schoolId, result);
-      await this.loadAll();
-    } catch (e) {
-      console.error('[SubjectTeachers] add error:', e);
-      this.zone.run(() => {
-        this.error = `Failed to create teacher: ${e instanceof Error ? e.message : String(e)}`;
-        this.loading = false;
-      });
-      this.cdr.detectChanges();
+    const result = await firstValueFrom(ref.afterClosed());
+    if (result) {
+      this.loading = true;
+      try { await this.data.createSubjectTeacher(this.schoolId, result); await this.loadAll(); }
+      catch { this.setError('SUBJECT_TEACHERS.ERRORS.CREATE_FAILED'); }
     }
   }
 
   async editSubjectTeacher(t: SubjectTeacher) {
-    if (!t.id) return;
-
     const ref = this.dialog.open(SubjectTeacherFormDialog, {
       width: '520px',
       data: {
-        title: 'Edit subject teacher',
+        title: this.translate.instant('SUBJECT_TEACHERS.DIALOG.EDIT_TITLE'),
         classes: this.classOptions(),
         initial: { fullName: t.fullName, email: t.email, subject: t.subject, classIds: t.classIds },
       },
     });
 
-    try {
-      const result = await firstValueFrom(ref.afterClosed());
-      if (!result) return;
-
-      this.zone.run(() => (this.loading = true));
-      this.cdr.detectChanges();
-
-      await this.data.updateSubjectTeacher(t.id, result);
-      await this.loadAll();
-    } catch (e) {
-      console.error('[SubjectTeachers] edit error:', e);
-      this.zone.run(() => {
-        this.error = `Failed to update teacher: ${e instanceof Error ? e.message : String(e)}`;
-        this.loading = false;
-      });
-      this.cdr.detectChanges();
+    const result = await firstValueFrom(ref.afterClosed());
+    if (result) {
+      this.loading = true;
+      try { await this.data.updateSubjectTeacher(t.id!, result); await this.loadAll(); }
+      catch { this.setError('SUBJECT_TEACHERS.ERRORS.UPDATE_FAILED'); }
     }
   }
 
   async deleteSubjectTeacher(t: SubjectTeacher) {
-    if (!t.id) return;
-
-    const ok = confirm(`Delete subject teacher "${t.fullName}"?`);
-    if (!ok) return;
-
-    try {
-      this.zone.run(() => (this.loading = true));
-      this.cdr.detectChanges();
-
-      await this.data.deleteSubjectTeacher(t.id);
-      await this.loadAll();
-    } catch (e) {
-      console.error('[SubjectTeachers] delete error:', e);
-      this.zone.run(() => {
-        this.error = `Failed to delete teacher: ${e instanceof Error ? e.message : String(e)}`;
-        this.loading = false;
-      });
-      this.cdr.detectChanges();
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    if (!confirm(this.translate.instant('SUBJECT_TEACHERS.MESSAGES.DELETE_CONFIRM', { name: t.fullName }))) return;
+    this.loading = true;
+    try { await this.data.deleteSubjectTeacher(t.id!); await this.loadAll(); }
+    catch { this.setError('SUBJECT_TEACHERS.ERRORS.DELETE_FAILED'); }
   }
 
   exportToCSV() {
-    if (this.subjectTeachers.length === 0) return;
-
-    // Define headers
     const headers = ['Full Name', 'Email', 'Subject', 'Assigned Classes'];
-    
-    // Map rows - note we use your existing classesLabel helper
-    const rows = this.subjectTeachers.map(t => [
-      `"${t.fullName || 'Unnamed'}"`,
-      `"${t.email || ''}"`,
-      `"${t.subject || ''}"`,
-      `"${this.classesLabel(t).replace(/"/g, '""')}"` // Handle potential commas/quotes in class list
-    ]);
-
-    // Create CSV content with BOM for Excel UTF-8 support
-    const csvContent = [headers, ...rows]
-      .map(row => row.join(','))
-      .join('\n');
-
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    const url = URL.createObjectURL(blob);
+    const rows = this.subjectTeachers.map(t => [t.fullName, t.email, t.subject, this.classesLabel(t)]);
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `subject_teachers_export_${new Date().toISOString().slice(0,10)}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
+    link.href = URL.createObjectURL(blob);
+    link.download = 'teachers.csv';
     link.click();
-    document.body.removeChild(link);
   }
+
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 }

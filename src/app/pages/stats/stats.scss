@@ -225,17 +225,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Metrics Compact ── */
-.metrics-compact {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
 
-/* Wider view - can use more space for metrics */
-.teacher-view .metrics-compact {
-  max-width: 900px;
-}
+
+
 
 .metric-card {
   display: flex;
@@ -474,9 +466,7 @@ mat-progress-bar.grade-bar {
     grid-template-columns: 1fr;
   }
 
-  .metrics-compact {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+
 }
 
 @media (max-width: 640px) {
@@ -490,9 +480,7 @@ mat-progress-bar.grade-bar {
     gap: 16px;
   }
 
-  .metrics-compact {
-    grid-template-columns: 1fr;
-  }
+
 
   .student-row {
     padding: 12px 16px;
@@ -534,10 +522,7 @@ mat-progress-bar.grade-bar {
   overflow: hidden;
 }
 
-/* 3. Prevent the top metrics cards from shrinking or scrolling away */
-.metrics-compact {
-  flex-shrink: 0;
-}
+
 
 /* 4. Set up the student section as a flexible column */
 .students-slide {
@@ -569,4 +554,66 @@ mat-progress-bar.grade-bar {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
   }
+}
+
+.metrics-compact {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metric-container {
+  position: relative;
+  flex: 1;
+
+  // The Slim Card
+  .metric-card {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px; // Narrower vertical padding
+    gap: 12px;
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s;
+  }
+
+  // Tooltip Styling
+  .metric-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  // Show tooltip on hover
+  &:hover .metric-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.metric-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  // Apply your existing icon background colors here
+}
+
+.metric-value {
+  font-weight: bold;
+  font-size: 1.1rem;
 }
