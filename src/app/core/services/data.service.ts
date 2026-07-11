@@ -66,8 +66,10 @@ export type Assignment = {
   classIds: string[];
   fileUrl?: string;
   createdAt: number;
-  fontFamily?: string; // e.g. 'Naskh', 'Ruqaa', 'Kufi'
-  fontSize?: number;   // px
+  fontFamily?: string;
+  fontSize?: number;
+  startTime?: string | null; // ✅ NEW
+  endTime?: string | null;   // ✅ NEW
 };
 @Injectable({ providedIn: 'root' })
 export class DataService {
@@ -565,22 +567,35 @@ async getStudentsForSubjectTeacher(schoolId: string, classIds: string[]): Promis
   }
 
   async createAssignment(
-    schoolId: string,
-    teacherId: string,
-    payload: { title: string; description: string; classIds: string[]; fileUrl?: string }
-  ) {
-    const ref = collection(db, 'assignments');
-    const docRef = await addDoc(ref, {
-      schoolId,
-      teacherId,
-      title: payload.title.trim(),
-      description: payload.description.trim(),
-      classIds: payload.classIds ?? [],
-      fileUrl: payload.fileUrl ?? '',
-      createdAt: Date.now()
-    });
-    return docRef.id;
+  schoolId: string,
+  teacherId: string,
+  payload: {
+    title: string;
+    description: string;
+    classIds: string[];
+    fileUrl?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    startTime?: string | null; // ✅ NEW
+    endTime?: string | null;   // ✅ NEW
   }
+) {
+  const ref = collection(db, 'assignments');
+  const docRef = await addDoc(ref, {
+    schoolId,
+    teacherId,
+    title: payload.title.trim(),
+    description: payload.description.trim(),
+    classIds: payload.classIds ?? [],
+    fileUrl: payload.fileUrl ?? '',
+    fontFamily: payload.fontFamily?.trim() || 'Naskh',
+    fontSize: payload.fontSize ?? 20,
+    startTime: payload.startTime ?? null, // ✅ NEW
+    endTime: payload.endTime ?? null,     // ✅ NEW
+    createdAt: Date.now(),
+  });
+  return docRef.id;
+}
 
   async deleteAssignment(assignmentId: string) {
     const ref = doc(db, 'assignments', assignmentId);
