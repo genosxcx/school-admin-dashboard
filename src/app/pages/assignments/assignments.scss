@@ -129,3 +129,6 @@
   .mat-mdc-cell:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
   .mat-mdc-cell:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
 }
+.clickable-row {
+  cursor: pointer;
+}

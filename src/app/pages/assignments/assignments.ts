@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { AssignmentSummaryDialog } from './assignment-summary-dialog/assignment-summary-dialog';
 
 // ✅ Added Translate Service and Pipe
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
@@ -192,7 +193,15 @@ export class Assignments implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
-
+openSummary(a: Assignment) {
+  this.dialog.open(AssignmentSummaryDialog, {
+    width: '400px',
+    data: {
+      ...a,
+      classNames: this.classesLabel(a), // ✅ NEW: resolved names as a string
+    },
+  });
+}
   async deleteAssignment(a: Assignment) {
     if (!a.id) return;
     // ✅ Use translation for native confirm
