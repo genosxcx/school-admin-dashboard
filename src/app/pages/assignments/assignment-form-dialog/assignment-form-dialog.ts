@@ -18,6 +18,8 @@ export type AssignmentFormResult = {
   classIds: string[];
   startTime: string | null;
   endTime: string | null;
+  fontFamily: string; // ✅ NEW
+  fontSize: number;   // ✅ NEW
 };
 
 @Component({
@@ -38,7 +40,8 @@ export type AssignmentFormResult = {
 
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'ASSIGNMENT_DIALOG.DESC_FIELD' | translate }}</mat-label>
-        <textarea matInput [(ngModel)]="description" rows="4" [placeholder]="'ASSIGNMENT_DIALOG.DESC_PLACEHOLDER' | translate"></textarea>
+        <textarea matInput [(ngModel)]="description" rows="4" [placeholder]="'ASSIGNMENT_DIALOG.DESC_PLACEHOLDER' | translate"
+                  [ngStyle]="{ 'font-family': fontStack, 'font-size.px': fontSize }"></textarea>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
@@ -61,6 +64,24 @@ export type AssignmentFormResult = {
           <input matInput type="datetime-local" [(ngModel)]="endTime" />
         </mat-form-field>
       </div>
+
+      <!-- ✅ NEW: font row -->
+      <div class="time-row">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>الخط</mat-label>
+          <mat-select [(ngModel)]="fontFamily">
+            <mat-option value="Naskh">خط النسخ</mat-option>
+            <mat-option value="Ruqaa">خط الرقعة</mat-option>
+            <mat-option value="Kufi">خط الكوفي</mat-option>
+            <mat-option value="Thuluth">خط الثلث</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>حجم الخط</mat-label>
+          <input matInput type="number" [(ngModel)]="fontSize" min="12" max="48" />
+        </mat-form-field>
+      </div>
     </div>
 
     <div mat-dialog-actions align="end">
@@ -74,7 +95,7 @@ export type AssignmentFormResult = {
     .content { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
     .full { width: 100%; }
     .time-row { display: flex; gap: 16px; width: 100%; }
-    .half { flex: 1; } 
+    .half { flex: 1; }
   `],
 })
 export class AssignmentFormDialog {
@@ -87,6 +108,22 @@ export class AssignmentFormDialog {
   startTime = '';
   endTime = '';
 
+  // ✅ NEW: defaults to خط النسخ / 20px
+  fontFamily = 'Naskh';
+  fontSize = 20;
+
+  // ✅ NEW: maps the key to a real CSS font stack, used to preview in the textarea
+  private readonly fontMap: Record<string, string> = {
+    Naskh: "'Noto Naskh Arabic', 'Traditional Arabic', serif",
+    Ruqaa: "'Aref Ruqaa', serif",
+    Kufi: "'Noto Kufi Arabic', sans-serif",
+    Thuluth: "'Aref Ruqaa', 'Amiri', serif",
+  };
+
+  get fontStack(): string {
+    return this.fontMap[this.fontFamily] || this.fontMap['Naskh'];
+  }
+
   close() { this.ref.close(null); }
 
   save() {
@@ -94,8 +131,10 @@ export class AssignmentFormDialog {
       title: this.title.trim(),
       description: this.description.trim(),
       classIds: this.classIds,
-      startTime: this.startTime || null, 
-      endTime: this.endTime || null,     
+      startTime: this.startTime || null,
+      endTime: this.endTime || null,
+      fontFamily: this.fontFamily, // ✅ NEW
+      fontSize: this.fontSize,     // ✅ NEW
     });
   }
 }

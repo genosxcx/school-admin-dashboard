@@ -51,6 +51,23 @@ export class Assignments implements OnInit, OnDestroy {
 
   displayedColumns = ['title', 'description', 'classes', 'date', 'actions'];
 
+  // ✅ NEW: maps stored fontFamily key -> real CSS font stack
+  readonly fontMap: Record<string, string> = {
+    Naskh: "'Noto Naskh Arabic', 'Traditional Arabic', serif",
+    Ruqaa: "'Aref Ruqaa', serif",
+    Kufi: "'Noto Kufi Arabic', sans-serif",
+    Thuluth: "'Aref Ruqaa', 'Amiri', serif",
+  };
+
+  // ✅ NEW: returns an ngStyle object for a given assignment
+  getAssignmentStyle(a: Assignment) {
+    const key = a.fontFamily || 'Naskh';
+    return {
+      'font-family': this.fontMap[key] || this.fontMap['Naskh'],
+      'font-size.px': a.fontSize || 20,
+    };
+  }
+
   get filtered(): Assignment[] {
     const s = this.q.trim().toLowerCase();
     if (!s) return this.assignments;

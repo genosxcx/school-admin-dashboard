@@ -1,21 +1,21 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient } from '@angular/common/http'; 
-import { provideTranslateService } from '@ngx-translate/core'; // ✅ Modern provider
-import { provideTranslateHttpLoader } from '@ngx-translate/http-loader'; // ✅ Modern loader
+import { provideHttpClient, withFetch } from '@angular/common/http'; // ✅ added withFetch
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(), 
+    provideHttpClient(withFetch()), // ✅ enables fetch backend, silences the warning
     provideTranslateService({
-      lang: 'en', 
+      lang: 'en',
       fallbackLang: 'en',
       loader: provideTranslateHttpLoader({
-        prefix: '/assets/i18n/', // ✅ Points perfectly to public/assets/i18n/
+        prefix: '/assets/i18n/',
         suffix: '.json'
       })
     })

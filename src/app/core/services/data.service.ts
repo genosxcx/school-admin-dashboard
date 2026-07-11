@@ -66,6 +66,8 @@ export type Assignment = {
   classIds: string[];
   fileUrl?: string;
   createdAt: number;
+  fontFamily?: string; // e.g. 'Naskh', 'Ruqaa', 'Kufi'
+  fontSize?: number;   // px
 };
 @Injectable({ providedIn: 'root' })
 export class DataService {
