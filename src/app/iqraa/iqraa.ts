@@ -124,7 +124,8 @@ export class PortfolioComponent {
   { 
     title: 'Student App', 
     desc: 'Interactive learning with AI-powered real-time feedback',
-    downloadLink: 'https://github.com/genosxcx/nadasoft/releases/download/v1.0.0/hya-naqraa.apk'
+    downloadLink: 'https://github.com/genosxcx/school-admin-dashboard/releases/download/hyanaqraa/app-release.apk'
+    //
   },
   { 
     title: 'Admin Dashboard App', 
