@@ -16,10 +16,10 @@
         <mat-icon>download</mat-icon> {{ 'SUBJECT_TEACHERS.EXPORT' | translate }}
       </button>
 
-<button mat-flat-button class="add-btn" (click)="addSubjectTeacher()">
-  <mat-icon>add</mat-icon>
-  <span>{{ 'SUBJECT_TEACHERS.ADD_BUTTON' | translate }}</span>
-</button>    </div>
+      <button mat-flat-button class="add-btn" (click)="addSubjectTeacher()" [disabled]="loading || !schoolId">
+        <mat-icon>add</mat-icon> {{ 'SUBJECT_TEACHERS.ADD_BUTTON' | translate }}
+      </button>
+    </div>
   </div>
   <div class="error-msg" *ngIf="error">
     <mat-icon>error_outline</mat-icon> {{ error }}
