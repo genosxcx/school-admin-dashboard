@@ -196,6 +196,10 @@ export class Stats implements OnInit, OnDestroy {
       }
 
       const safeStudents: Student[] = (students ?? []).map((s: Student) => ({ ...s, grade: Number(s.grade ?? 0), completion: Number(s.completion ?? 0), minutesRecorded: Number(s.minutesRecorded ?? 0), }));
+
+      // ✅ NEW: sort by grade, highest first
+      safeStudents.sort((a, b) => Number(b.grade ?? 0) - Number(a.grade ?? 0));
+
       const studentCount = safeStudents.length;
       const totalMinutes = safeStudents.reduce((sum: number, s: Student) => sum + Number(s.minutesRecorded ?? 0), 0);
       const completionValues: number[] = safeStudents.map((s: Student) => { const v = Number(s.completion ?? 0); return v <= 1 ? v * 100 : v; });
