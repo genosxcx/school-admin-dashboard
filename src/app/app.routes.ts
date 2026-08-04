@@ -15,28 +15,35 @@ import { PrincipalRegister } from './pages/principal-register/principal-register
 import { SuperadminLogin } from './pages/superadmin-login/superadmin-login';
 import { SuperadminRequests } from './pages/superadmin-requests/superadmin-requests';
 import { SubjectTeachers } from './pages/subject-teachers/subject-teachers/subject-teachers';
-
 import { Assignments } from './pages/assignments/assignments';
-import{PortfolioComponent} from './iqraa/iqraa';
+import { PortfolioComponent } from './iqraa/iqraa';
 import { ParentRegister } from './pages/parent-register/parent-register';
+import { MainPageComponent } from './pages/main-page/main-page.component';
 
 export const routes: Routes = [
-  { 
-    path: 'superadmin', 
-    component: SuperadminLogin 
-  },
-  { 
-    path: 'superadmin/requests', 
-    component: SuperadminRequests, 
-    canActivate: [superAdminGuard] 
+  // Main landing page
+  {
+    path: '',
+    component: MainPageComponent,
   },
 
+  // Superadmin routes
+  {
+    path: 'superadmin',
+    component: SuperadminLogin,
+  },
+  {
+    path: 'superadmin/requests',
+    component: SuperadminRequests,
+    canActivate: [superAdminGuard],
+  },
+
+  // Admin/Principal/Teacher routes
   {
     path: 'admin',
     children: [
       { path: 'login', component: Login },
       { path: 'register', component: PrincipalRegister },
-      
       { path: 'parent-register', component: ParentRegister },
 
       {
@@ -76,11 +83,10 @@ export const routes: Routes = [
       },
     ],
   },
-  { 
-    path: '', 
-    redirectTo: 'hya-naqraa', 
-    pathMatch: 'full' 
-  },
+
+  // Project routes
   { path: 'hya-naqraa', component: PortfolioComponent },
-  { path: '**', redirectTo: 'admin/login' },
+
+  // Wildcard - redirect to home
+  { path: '**', redirectTo: '' },
 ];

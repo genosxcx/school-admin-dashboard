@@ -1,0 +1,45 @@
+<div class="main-container">
+  <!-- NadaSoft Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="brand-name">NadaSoft</h1>
+    </div>
+  </header>
+
+  <!-- Projects Section -->
+  <section class="projects-section">
+    <h2 class="section-title">Our Projects</h2>
+    
+    <div class="projects-grid">
+      <div 
+        *ngFor="let project of projects" 
+        class="project-card"
+        (click)="navigateToProject(project.route)"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="navigateToProject(project.route)"
+        (keydown.space)="navigateToProject(project.route)"
+      >
+        <div class="project-image-wrapper">
+          <img 
+            [src]="project.image" 
+            [alt]="project.name"
+            class="project-image"
+          />
+          <div class="project-overlay">
+            <span class="overlay-text">Explore</span>
+          </div>
+        </div>
+        <div class="project-info">
+          <h3 class="project-name">{{ project.name }}</h3>
+          <p class="project-description">{{ project.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; {{ currentYear }} NadaSoft. All rights reserved.</p>
+  </footer>
+</div>
