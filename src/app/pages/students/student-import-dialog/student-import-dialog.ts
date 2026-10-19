@@ -4,15 +4,19 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { DataService } from '../../../core/services/data.service';
 import { generatePassword } from '../../../shared/generate-password';
-import { ImportRow, downloadExcel } from '../student-excel';
+import { ImportClass, ImportResult, ImportRow, downloadExcel } from '../student-excel';
 
-export type StudentImportData = {
+export type StudentImportData = ImportResult & {
   schoolId: string;
-  rows: ImportRow[];
+  /** Classes to choose from for students the file gives no class; empty for teachers. */
+  classes: ImportClass[];
   classNameById: Map<string, string>;
   rightToLeft: boolean;
 };
@@ -28,7 +32,7 @@ type FailedStudent = ImportRow & { error: string };
 @Component({
   selector: 'app-student-import-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatProgressBarModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, MatSelectModule, MatButtonModule, MatIconModule, MatProgressBarModule, TranslatePipe],
   template: `
     <h2 mat-dialog-title>{{ 'STUDENT_IMPORT.TITLE' | translate }}</h2>
 
@@ -37,6 +41,20 @@ type FailedStudent = ImportRow & { error: string };
         <p>
           {{ 'STUDENT_IMPORT.PREVIEW_SUMMARY' | translate: { ready: ready.length, skipped: skipped.length } }}
         </p>
+        @if (data.classes.length && rowsWithoutClass) {
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ 'STUDENT_IMPORT.DEFAULT_CLASS' | translate: { count: rowsWithoutClass } }}</mat-label>
+            <mat-select [(ngModel)]="defaultClassId">
+              <mat-option [value]="''">{{ 'STUDENT_DIALOG.UNASSIGNED' | translate }}</mat-option>
+              @for (c of data.classes; track c.id) {
+                <mat-option [value]="c.id">{{ c.name }}</mat-option>
+              }
+            </mat-select>
+            @if (data.title) {
+              <mat-hint>{{ 'STUDENT_IMPORT.FILE_TITLE' | translate: { title: data.title } }}</mat-hint>
+            }
+          </mat-form-field>
+        }
         <div class="table-wrap">
           <table class="rows">
             <thead>
@@ -118,6 +136,7 @@ type FailedStudent = ImportRow & { error: string };
   `,
   styles: [`
     .content { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+    .full { width: 100%; }
     .table-wrap { max-height: 50vh; overflow: auto; border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 8px; }
     table.rows { width: 100%; border-collapse: collapse; font-size: 13px; }
     table.rows th, table.rows td { padding: 6px 10px; text-align: start; border-bottom: 1px solid rgba(15, 23, 42, 0.06); }
@@ -142,12 +161,20 @@ export class StudentImportDialog {
   step: 'preview' | 'importing' | 'done' = 'preview';
   ready = this.data.rows.filter((r) => !r.skipReason);
   skipped = this.data.rows.filter((r) => r.skipReason);
+  rowsWithoutClass = this.ready.filter((r) => !r.classId && !r.classText).length;
+  /** Class for students the file gives none; starts from the class named in the file's title. */
+  defaultClassId = this.data.suggestedClassId;
   progress = 0;
   created: CreatedStudent[] = [];
   failed: FailedStudent[] = [];
 
+  private classIdFor(r: ImportRow): string {
+    return r.classId || (r.classText ? '' : this.defaultClassId);
+  }
+
   classLabel(r: ImportRow): string {
-    if (r.classId) return this.data.classNameById.get(r.classId) ?? r.classId;
+    const classId = this.classIdFor(r);
+    if (classId) return this.data.classNameById.get(classId) ?? classId;
     return r.classText || this.translate.instant('STUDENT_DIALOG.UNASSIGNED');
   }
 
@@ -164,10 +191,10 @@ export class StudentImportDialog {
           studentId: r.studentId,
           fullName: r.fullName,
           email: r.email || undefined,
-          classId: r.classId,
+          classId: this.classIdFor(r),
           password,
         });
-        this.created.push({ ...r, loginEmail, password });
+        this.created.push({ ...r, classId: this.classIdFor(r), loginEmail, password });
       } catch (e: any) {
         console.error('[StudentImport] createStudent failed for row', r.row, e);
         const error =

@@ -329,6 +329,8 @@
   "ERROR_SERVICE": "The password service is not set up yet. Deploy the Cloud Function with \"firebase deploy --only functions\"."
 },
 "STUDENT_IMPORT": {
+  "DEFAULT_CLASS": "Class for the {{count}} students with no class in the file",
+  "FILE_TITLE": "The file title says: {{title}}",
   "TITLE": "Import students from Excel",
   "PREVIEW_SUMMARY": "{{ready}} students will be added, {{skipped}} rows will be skipped. Each new student gets an initial password, and you can download them all as Excel at the end.",
   "STATUS": "Status",
