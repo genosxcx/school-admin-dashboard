@@ -428,11 +428,11 @@ async createStudent(
     if (authUid) {
       const docRef = doc(db, 'users', authUid);
       await setDoc(docRef, studentData);
-      return authUid;
+      return { id: authUid, loginEmail: authEmail };
     } else {
       const ref = collection(db, 'users');
       const docRef = await addDoc(ref, studentData);
-      return docRef.id;
+      return { id: docRef.id, loginEmail: authEmail };
     }
   }  async updateStudent(
     studentId: string,
