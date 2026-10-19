@@ -110,6 +110,15 @@ export class SubjectTeachers implements OnInit, OnDestroy {
     });
   }
 
+  private createErrorKey(code: string | undefined): string {
+    switch (code) {
+      case 'auth/email-already-in-use': return 'SUBJECT_TEACHERS.ERRORS.EMAIL_IN_USE';
+      case 'auth/invalid-email': return 'SUBJECT_TEACHERS.ERRORS.INVALID_EMAIL';
+      case 'auth/weak-password': return 'SUBJECT_TEACHERS.ERRORS.WEAK_PASSWORD';
+      default: return 'SUBJECT_TEACHERS.ERRORS.CREATE_FAILED';
+    }
+  }
+
   private setError(key: string) {
     this.zone.run(() => {
       this.error = this.translate.instant(key);
@@ -152,7 +161,10 @@ export class SubjectTeachers implements OnInit, OnDestroy {
     if (result) {
       this.loading = true;
       try { await this.data.createSubjectTeacher(this.schoolId, result); await this.loadAll(); }
-      catch { this.setError('SUBJECT_TEACHERS.ERRORS.CREATE_FAILED'); }
+      catch (e: any) {
+        console.error('[SubjectTeachers] create failed:', e);
+        this.setError(this.createErrorKey(e?.code));
+      }
     }
   }
 
