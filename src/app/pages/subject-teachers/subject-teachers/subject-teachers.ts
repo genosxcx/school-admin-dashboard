@@ -25,6 +25,7 @@ import { DataService, SubjectTeacher, SchoolClass } from '../../../core/services
 import { RoleService } from '../../../core/services/role.service';
 import { SubjectTeacherFormDialog, ClassOption } from '../subject-teacher-form-dialog/subject-teacher-form-dialog';
 import { SetPasswordFlow } from '../../../shared/set-password-dialog/set-password-dialog';
+import { StaffExcelFlow } from '../../../shared/excel/staff-import-dialog';
 
 @Component({
   selector: 'app-subject-teachers',
@@ -49,6 +50,7 @@ export class SubjectTeachers implements OnInit, OnDestroy {
   private role = inject(RoleService);
   private dialog = inject(MatDialog);
   private setPasswordFlow = inject(SetPasswordFlow);
+  private excel = inject(StaffExcelFlow);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private translate = inject(TranslateService);
@@ -198,15 +200,32 @@ export class SubjectTeachers implements OnInit, OnDestroy {
     catch { this.setError('SUBJECT_TEACHERS.ERRORS.DELETE_FAILED'); }
   }
 
-  exportToCSV() {
-    const headers = ['Full Name', 'Email', 'Subject', 'Assigned Classes'];
-    const rows = this.subjectTeachers.map(t => [t.fullName, t.email, t.subject, this.classesLabel(t)]);
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'teachers.csv';
-    link.click();
+  exportToExcel() {
+    if (this.subjectTeachers.length === 0) return;
+    this.excel.export(
+      'subject_teacher',
+      this.filtered.map((t) => [
+        t.fullName || '',
+        t.email || '',
+        t.subject || '',
+        (t.classIds ?? []).map((id) => this.classNameById.get(id)).filter(Boolean).join(', '),
+      ]),
+    );
+  }
+
+  downloadImportTemplate() {
+    this.excel.template('subject_teacher', this.classes.slice(0, 2).map((c) => c.name).join(', '));
+  }
+
+  async importFromExcel(input: HTMLInputElement) {
+    const created = await this.excel.import(
+      input,
+      'subject_teacher',
+      this.schoolId,
+      this.classOptions(),
+      this.subjectTeachers.map((t) => t.email ?? '').filter(Boolean),
+    );
+    if (created) await this.loadAll();
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }

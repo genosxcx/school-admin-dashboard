@@ -11,7 +11,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { DataService } from '../../../core/services/data.service';
 import { generatePassword } from '../../../shared/generate-password';
-import { ImportClass, ImportResult, ImportRow, downloadExcel } from '../student-excel';
+import { ImportClass, ImportResult, ImportRow } from '../student-excel';
+import { downloadExcel } from '../../../shared/excel/excel-sheet';
 
 export type StudentImportData = ImportResult & {
   schoolId: string;
