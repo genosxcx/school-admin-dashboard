@@ -22,8 +22,17 @@
         }
       </mat-form-field>
 
+      <div class="forgot-row">
+        <button type="button" class="forgot-link" [disabled]="loading" (click)="forgotPassword()">
+          Forgot password?
+        </button>
+      </div>
+
       @if (error) {
         <div class="err">{{ error }}</div>
+      }
+      @if (info) {
+        <div class="info">{{ info }}</div>
       }
 
       <button mat-raised-button color="primary" class="btn" [disabled]="loading">

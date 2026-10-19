@@ -50,6 +50,7 @@ export class Settings implements OnInit {
 
   // Forms
   form = this.fb.group({
+    currentPassword: ['', Validators.required],
     newPassword: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', Validators.required]
   }, { validators: this.passwordMatchValidator });
@@ -122,8 +123,10 @@ export class Settings implements OnInit {
   async submitPassword() {
     if (this.form.invalid) return;
     this.loading = true;
+    this.error = '';
+    this.cdr.detectChanges();
     try {
-      await this.auth.changePassword(this.form.value.newPassword!);
+      await this.auth.changePassword(this.form.value.currentPassword!, this.form.value.newPassword!);
       this.snackBar.open(
         this.translate.instant('SETTINGS.MESSAGES.PASS_UPDATED'), 
         this.translate.instant('SETTINGS.MESSAGES.CLOSE'), 
@@ -131,9 +134,25 @@ export class Settings implements OnInit {
       );
       this.form.reset();
     } catch (e: any) {
-      this.error = this.translate.instant('SETTINGS.MESSAGES.PASS_FAILED');
+      console.error('Settings: password change failed', e);
+      this.error = this.translate.instant(this.passwordErrorKey(e?.code));
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private passwordErrorKey(code: string | undefined): string {
+    switch (code) {
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        return 'SETTINGS.MESSAGES.PASS_WRONG_CURRENT';
+      case 'auth/weak-password':
+        return 'SETTINGS.MESSAGES.PASS_WEAK';
+      case 'auth/too-many-requests':
+        return 'SETTINGS.MESSAGES.PASS_TOO_MANY';
+      default:
+        return 'SETTINGS.MESSAGES.PASS_FAILED';
     }
   }
 

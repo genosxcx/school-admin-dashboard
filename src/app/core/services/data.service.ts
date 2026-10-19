@@ -15,7 +15,8 @@ import { initializeApp, deleteApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc } from 'firebase/firestore'; // Make sure setDoc is imported
 import { environment } from '../../../environments/environment';
-import { db } from '../../firebase';
+import { db, functions } from '../../firebase';
+import { httpsCallable } from 'firebase/functions';
 // Add these to your existing imports
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // ---------------- TYPES ----------------
@@ -153,6 +154,18 @@ export class DataService {
       });
       return docRef.id;
     }
+  }
+
+  // ---------------- PASSWORDS ----------------
+
+  // Sets a new login password for a teacher/student via the setUserPassword
+  // Cloud Function (functions/src/index.ts). The id is the user's auth uid.
+  async setUserPassword(uid: string, newPassword: string) {
+    const call = httpsCallable<{ uid: string; newPassword: string }, { ok: boolean }>(
+      functions,
+      'setUserPassword'
+    );
+    await call({ uid, newPassword });
   }
 
   async updateTeacher(

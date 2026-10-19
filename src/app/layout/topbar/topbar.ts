@@ -43,6 +43,7 @@ export class Topbar {
 
   async logout() {
     await this.auth.logout();
-    await this.router.navigateByUrl('/login');
+    // replaceUrl so the browser Back button can't return to a protected page
+    await this.router.navigateByUrl('/admin/login', { replaceUrl: true });
   }
 }

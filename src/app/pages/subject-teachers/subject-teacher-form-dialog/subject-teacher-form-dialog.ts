@@ -51,6 +51,10 @@ export class SubjectTeacherFormDialog {
     return Array.from({ length }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
   }
 
+  regeneratePassword() {
+    this.model.password = this.generateRandomPassword(8);
+  }
+
   copyPassword() {
     if (this.model.password) {
       navigator.clipboard.writeText(this.model.password);
@@ -59,6 +63,7 @@ export class SubjectTeacherFormDialog {
 
   save() {
     if (!this.model.fullName.trim() || !this.model.email.trim()) return;
+    if (!this.isEdit && this.model.password.length < 6) return;
     this.dialogRef.close(this.model);
   }
 }

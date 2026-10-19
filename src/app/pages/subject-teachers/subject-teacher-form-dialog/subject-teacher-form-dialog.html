@@ -12,10 +12,15 @@
       <input matInput type="email" [(ngModel)]="model.email" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline" *ngIf="model.password">
+    <mat-form-field appearance="outline" *ngIf="!isEdit">
       <mat-label>{{ 'SUBJECT_TEACHER_DIALOG.PASSWORD' | translate }}</mat-label>
-      <input matInput [value]="model.password" readonly />
-      <mat-icon matSuffix>content_copy</mat-icon>
+      <input matInput [(ngModel)]="model.password" minlength="6" autocomplete="new-password" />
+      <button mat-icon-button matSuffix type="button" (click)="regeneratePassword()" [attr.aria-label]="'PASSWORD_DIALOG.GENERATE' | translate">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matSuffix type="button" (click)="copyPassword()" [attr.aria-label]="'PASSWORD_DIALOG.COPY' | translate">
+        <mat-icon>content_copy</mat-icon>
+      </button>
       <mat-hint>{{ 'SUBJECT_TEACHER_DIALOG.HINT' | translate }}</mat-hint>
     </mat-form-field>
 
@@ -35,5 +40,5 @@
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>{{ 'SUBJECT_TEACHER_DIALOG.CANCEL' | translate }}</button>
-  <button mat-flat-button color="primary" (click)="save()">{{ 'SUBJECT_TEACHER_DIALOG.SAVE' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="!isEdit && model.password.length < 6">{{ 'SUBJECT_TEACHER_DIALOG.SAVE' | translate }}</button>
 </mat-dialog-actions>

@@ -23,6 +23,7 @@ import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { DataService, Student, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 import { StudentFormDialog, ClassOption } from './student-form-dialog/student-form-dialog';
+import { SetPasswordFlow } from '../../shared/set-password-dialog/set-password-dialog';
 
 @Component({
   selector: 'app-students',
@@ -45,6 +46,7 @@ export class Students implements OnInit, OnDestroy {
   private data = inject(DataService);
   private role = inject(RoleService);
   private dialog = inject(MatDialog);
+  private setPasswordFlow = inject(SetPasswordFlow);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private translate = inject(TranslateService);
@@ -232,6 +234,15 @@ export class Students implements OnInit, OnDestroy {
     }
   }
   
+  changePassword(st: Student) {
+    if (!st.id) return;
+    if (this.isTeacher && st.classId !== this.teacherClassId) {
+      alert(this.translate.instant('STUDENTS.MESSAGES.RESTRICT_EDIT'));
+      return;
+    }
+    this.setPasswordFlow.open(st.id, st.fullName, 6);
+  }
+
   async deleteStudent(st: Student) {
     if (!st.id) return;
     if (this.isTeacher && st.classId !== this.teacherClassId) {

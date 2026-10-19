@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataService, Teacher, SchoolClass } from '../../core/services/data.service';
 import { RoleService } from '../../core/services/role.service';
 import { TeacherFormDialog, ClassOption } from './teacher-form-dialog/teacher-form-dialog';
+import { SetPasswordFlow } from '../../shared/set-password-dialog/set-password-dialog';
 
 @Component({
   selector: 'app-teachers',
@@ -27,6 +28,7 @@ export class Teachers implements OnInit, OnDestroy {
   private data = inject(DataService);
   private role = inject(RoleService);
   private dialog = inject(MatDialog);
+  private setPasswordFlow = inject(SetPasswordFlow);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
@@ -214,6 +216,11 @@ export class Teachers implements OnInit, OnDestroy {
       });
       this.cdr.detectChanges();
     }
+  }
+
+  changePassword(t: Teacher) {
+    if (!t.id) return;
+    this.setPasswordFlow.open(t.id, t.fullName, 8);
   }
 
   async deleteTeacher(t: Teacher) {

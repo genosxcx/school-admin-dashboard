@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class Login {
   loading = false;
   error = '';
+  info = '';
 
   form;
 
@@ -73,8 +74,38 @@ export class Login {
     this.form.get('password')?.markAsTouched();
   }
 
+  async forgotPassword() {
+    this.error = '';
+    this.info = '';
+
+    const emailCtrl = this.form.get('email')!;
+    if (emailCtrl.invalid) {
+      emailCtrl.markAsTouched();
+      this.error = 'Enter your email above, then click "Forgot password?" again.';
+      return;
+    }
+
+    this.loading = true;
+    this.cdr.detectChanges();
+
+    try {
+      await this.auth.sendPasswordReset(emailCtrl.value!);
+      this.info = 'If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder.';
+    } catch (e: any) {
+      console.error('Password reset error:', e);
+      this.error =
+        e?.code === 'auth/too-many-requests'
+          ? 'Too many attempts. Please try again later.'
+          : 'Could not send the reset email. Please try again.';
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   async submit() {
     this.error = '';
+    this.info = '';
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
