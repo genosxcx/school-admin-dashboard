@@ -18,30 +18,18 @@ function classIdsOf(data: FirebaseFirestore.DocumentData): string[] {
 }
 
 /**
- * Lets staff set a new password on an account they manage. The client SDK can only
- * change the signed-in user's own password, so this runs with the Admin SDK.
- *
+ * Checks that the signed-in caller manages the target account and returns the db.
  * - Principals/admins: any teacher, subject teacher or student in their school.
  * - Teachers/subject teachers/parents: students in one of their classes.
  */
-export const setUserPassword = onCall<SetUserPasswordRequest>(async (request) => {
-  const callerUid = request.auth?.uid;
-  if (!callerUid) throw new HttpsError('unauthenticated', 'You must be signed in.');
-
-  const uid = (request.data?.uid ?? '').toString().trim();
-  const newPassword = (request.data?.newPassword ?? '').toString();
-  if (!uid) throw new HttpsError('invalid-argument', 'Missing user id.');
-  if (newPassword.length < 6) {
-    throw new HttpsError('invalid-argument', 'Password must be at least 6 characters.');
-  }
-
+async function assertCanManage(callerUid: string, uid: string) {
   const db = getFirestore();
   const [callerSnap, targetSnap] = await Promise.all([
     db.doc(`users/${callerUid}`).get(),
     db.doc(`users/${uid}`).get(),
   ]);
   if (!callerSnap.exists || !targetSnap.exists) {
-    throw new HttpsError('permission-denied', 'You are not allowed to change this password.');
+    throw new HttpsError('permission-denied', 'You are not allowed to manage this account.');
   }
 
   const caller = callerSnap.data()!;
@@ -57,8 +45,27 @@ export const setUserPassword = onCall<SetUserPasswordRequest>(async (request) =>
     allowed = classIdsOf(caller).includes((target['classId'] ?? '').toString());
   }
   if (!allowed) {
-    throw new HttpsError('permission-denied', 'You are not allowed to change this password.');
+    throw new HttpsError('permission-denied', 'You are not allowed to manage this account.');
   }
+  return db;
+}
+
+/**
+ * Lets staff set a new password on an account they manage. The client SDK can only
+ * change the signed-in user's own password, so this runs with the Admin SDK.
+ */
+export const setUserPassword = onCall<SetUserPasswordRequest>(async (request) => {
+  const callerUid = request.auth?.uid;
+  if (!callerUid) throw new HttpsError('unauthenticated', 'You must be signed in.');
+
+  const uid = (request.data?.uid ?? '').toString().trim();
+  const newPassword = (request.data?.newPassword ?? '').toString();
+  if (!uid) throw new HttpsError('invalid-argument', 'Missing user id.');
+  if (newPassword.length < 6) {
+    throw new HttpsError('invalid-argument', 'Password must be at least 6 characters.');
+  }
+
+  await assertCanManage(callerUid, uid);
 
   try {
     await getAuth().updateUser(uid, { password: newPassword });
@@ -68,6 +75,33 @@ export const setUserPassword = onCall<SetUserPasswordRequest>(async (request) =>
     }
     throw new HttpsError('internal', 'Could not update the password.');
   }
+
+  return { ok: true };
+});
+
+/**
+ * Deletes a teacher/student's Firestore profile and their Firebase Auth login, so the
+ * email can be used again. The client SDK can't delete other users' Auth accounts.
+ */
+export const deleteUserAccount = onCall<{ uid?: string }>(async (request) => {
+  const callerUid = request.auth?.uid;
+  if (!callerUid) throw new HttpsError('unauthenticated', 'You must be signed in.');
+
+  const uid = (request.data?.uid ?? '').toString().trim();
+  if (!uid) throw new HttpsError('invalid-argument', 'Missing user id.');
+  if (uid === callerUid) throw new HttpsError('permission-denied', 'You cannot delete yourself.');
+
+  const db = await assertCanManage(callerUid, uid);
+
+  try {
+    await getAuth().deleteUser(uid);
+  } catch (e: any) {
+    // Profiles created without a password never had an Auth account.
+    if (e?.code !== 'auth/user-not-found') {
+      throw new HttpsError('internal', 'Could not delete the login account.');
+    }
+  }
+  await db.doc(`users/${uid}`).delete();
 
   return { ok: true };
 });

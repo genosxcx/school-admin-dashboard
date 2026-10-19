@@ -211,6 +211,27 @@
   "TITLE_EDIT": "Edit student"
 },
 "SUBJECT_TEACHERS": {
+  "ADD_BUTTON": "Add Subject Teacher",
+  "SEARCH_LABEL": "Search subject teachers...",
+  "SEARCH_PLACEHOLDER": "Name, email, subject...",
+  "LOADING": "Loading subject teachers...",
+  "UNASSIGNED": "Unassigned",
+  "UNNAMED": "Unnamed Instructor",
+  "DIALOG": {
+    "ADD_TITLE": "Add subject teacher",
+    "EDIT_TITLE": "Edit subject teacher"
+  },
+  "ERRORS": {
+    "TIMEOUT": "Timeout loading school info. Please refresh.",
+    "NO_SCHOOL": "Your school ID is not configured.",
+    "LOAD_FAILED": "Failed to load subject teachers.",
+    "CREATE_FAILED": "Failed to create the subject teacher.",
+    "UPDATE_FAILED": "Failed to update the subject teacher.",
+    "DELETE_FAILED": "Failed to delete the subject teacher.",
+    "EMAIL_IN_USE": "This email already has an account. Use a different email for the subject teacher.",
+    "INVALID_EMAIL": "This email address is not valid.",
+    "WEAK_PASSWORD": "The password must be at least 6 characters."
+  },
   "TITLE": "Subject Teachers",
   "SUBTITLE": "Manage specialist instructors and multi-class assignments",
   "SEARCH": "Search subject teachers...",
