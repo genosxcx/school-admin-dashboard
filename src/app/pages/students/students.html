@@ -13,9 +13,20 @@
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
-        <button mat-stroked-button class="export-btn" (click)="exportToCSV()" [disabled]="loading || filtered.length === 0">
+        <button mat-stroked-button class="export-btn" (click)="exportToExcel()" [disabled]="loading || filtered.length === 0">
           <mat-icon>download</mat-icon>
           <span>{{ 'STUDENTS.EXPORT' | translate }}</span>
+        </button>
+
+        <input #importInput type="file" hidden
+          accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          (change)="importFromExcel(importInput)" />
+        <button mat-stroked-button class="export-btn" (click)="importInput.click()" [disabled]="loading || !schoolId">
+          <mat-icon>upload</mat-icon>
+          <span>{{ 'STUDENTS.IMPORT' | translate }}</span>
+        </button>
+        <button mat-icon-button (click)="downloadImportTemplate()" [disabled]="loading" [title]="'STUDENTS.IMPORT_TEMPLATE' | translate">
+          <mat-icon>description</mat-icon>
         </button>
 
         <button mat-flat-button class="add-btn" (click)="addStudent()">

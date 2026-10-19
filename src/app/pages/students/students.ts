@@ -24,6 +24,8 @@ import { DataService, Student, SchoolClass } from '../../core/services/data.serv
 import { RoleService } from '../../core/services/role.service';
 import { StudentFormDialog, ClassOption } from './student-form-dialog/student-form-dialog';
 import { SetPasswordFlow } from '../../shared/set-password-dialog/set-password-dialog';
+import { StudentImportDialog } from './student-import-dialog/student-import-dialog';
+import { downloadExcel, parseStudentSheet, readFirstSheet } from './student-excel';
 
 @Component({
   selector: 'app-students',
@@ -266,25 +268,80 @@ export class Students implements OnInit, OnDestroy {
     }
   }
 
-  exportToCSV() {
+  private get rightToLeft(): boolean {
+    return ['ar', 'he'].includes(this.translate.getCurrentLang() ?? '');
+  }
+
+  /** Excel of the students in the list. Passwords are never stored, so they can't be included. */
+  async exportToExcel() {
     if (this.filtered.length === 0) return;
-    const headers = ['Student ID', 'Full Name', 'Email', 'Assigned Class'];
-    const rows = this.filtered.map(s => [
-      `"${s.studentId || ''}"`,
-      `"${s.fullName || 'Unnamed'}"`,
-      `"${s.email || s.loginEmail || ''}"`,
-      `"${this.classLabel(s).replace(/"/g, '""')}"`
-    ]);
-    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `students_export_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const t = (key: string) => this.translate.instant(key);
+    await downloadExcel(
+      `students_export_${new Date().toISOString().slice(0, 10)}.xlsx`,
+      t('STUDENTS.TITLE'),
+      [t('STUDENTS.TABLE.ID'), t('STUDENTS.TABLE.NAME'), t('STUDENTS.TABLE.CLASS'), t('STUDENTS.TABLE.EMAIL'), t('STUDENT_DIALOG.EMAIL')],
+      this.filtered.map((s) => [
+        s.studentId || '',
+        s.fullName || '',
+        this.classLabel(s),
+        s.loginEmail || '',
+        s.email || '',
+      ]),
+      this.rightToLeft,
+    );
+  }
+
+  /** Empty Excel with the columns the import understands. */
+  async downloadImportTemplate() {
+    const t = (key: string) => this.translate.instant(key);
+    const exampleClass = this.isTeacher
+      ? this.classNameById.get(this.teacherClassId) ?? ''
+      : this.classes[0]?.name ?? '';
+    await downloadExcel(
+      'students_import_template.xlsx',
+      t('STUDENTS.TITLE'),
+      [t('STUDENTS.TABLE.ID'), t('STUDENTS.TABLE.NAME'), t('STUDENTS.TABLE.CLASS'), t('STUDENT_DIALOG.EMAIL')],
+      [['1001', t('STUDENT_IMPORT.TEMPLATE_EXAMPLE_NAME'), exampleClass, '']],
+      this.rightToLeft,
+    );
+  }
+
+  async importFromExcel(input: HTMLInputElement) {
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.schoolId) return;
+
+    let rows;
+    try {
+      const sheet = await readFirstSheet(file);
+      rows = parseStudentSheet(
+        sheet,
+        this.classOptions(),
+        this.students.map((s) => s.studentId ?? '').filter(Boolean),
+        this.isTeacher ? this.teacherClassId : undefined,
+      );
+    } catch (e) {
+      console.error('[Students] reading Excel failed:', e);
+      alert(this.translate.instant('STUDENT_IMPORT.ERROR_READ'));
+      return;
+    }
+    if (!rows.length) {
+      alert(this.translate.instant('STUDENT_IMPORT.ERROR_EMPTY'));
+      return;
+    }
+
+    const ref = this.dialog.open(StudentImportDialog, {
+      width: '760px',
+      maxWidth: '95vw',
+      data: {
+        schoolId: this.schoolId,
+        rows,
+        classNameById: this.classNameById,
+        rightToLeft: this.rightToLeft,
+      },
+    });
+    const created = await firstValueFrom(ref.afterClosed());
+    if (created) await this.loadAll();
   }
 
   ngOnDestroy(): void {
