@@ -292,6 +292,8 @@
   "ERROR_SERVICE": "שירות הסיסמאות עדיין לא מוגדר. פרוס את פונקציית הענן עם \"firebase deploy --only functions\"."
 },
 "STUDENT_IMPORT": {
+  "DEFAULT_CLASS": "כיתה עבור {{count}} התלמידים שאין להם כיתה בקובץ",
+  "FILE_TITLE": "כותרת הקובץ: {{title}}",
   "TITLE": "ייבוא תלמידים מ-Excel",
   "PREVIEW_SUMMARY": "{{ready}} תלמידים יתווספו, {{skipped}} שורות ידולגו. כל תלמיד חדש מקבל סיסמה ראשונית, ובסוף אפשר להוריד את כולן כקובץ Excel.",
   "STATUS": "סטטוס",

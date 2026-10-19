@@ -311,10 +311,10 @@ export class Students implements OnInit, OnDestroy {
     input.value = '';
     if (!file || !this.schoolId) return;
 
-    let rows;
+    let parsed;
     try {
       const sheet = await readFirstSheet(file);
-      rows = parseStudentSheet(
+      parsed = parseStudentSheet(
         sheet,
         this.classOptions(),
         this.students.map((s) => s.studentId ?? '').filter(Boolean),
@@ -325,7 +325,7 @@ export class Students implements OnInit, OnDestroy {
       alert(this.translate.instant('STUDENT_IMPORT.ERROR_READ'));
       return;
     }
-    if (!rows.length) {
+    if (!parsed.rows.length) {
       alert(this.translate.instant('STUDENT_IMPORT.ERROR_EMPTY'));
       return;
     }
@@ -335,7 +335,8 @@ export class Students implements OnInit, OnDestroy {
       maxWidth: '95vw',
       data: {
         schoolId: this.schoolId,
-        rows,
+        ...parsed,
+        classes: this.isTeacher ? [] : this.classOptions(),
         classNameById: this.classNameById,
         rightToLeft: this.rightToLeft,
       },

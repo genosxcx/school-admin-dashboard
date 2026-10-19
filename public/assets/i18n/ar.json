@@ -292,6 +292,8 @@
   "ERROR_SERVICE": "خدمة كلمات المرور غير مُعدّة بعد. انشر الدالة السحابية باستخدام \"firebase deploy --only functions\"."
 },
 "STUDENT_IMPORT": {
+  "DEFAULT_CLASS": "الصف للطلاب الـ {{count}} الذين لا يوجد لهم صف في الملف",
+  "FILE_TITLE": "عنوان الملف: {{title}}",
   "TITLE": "استيراد الطلاب من Excel",
   "PREVIEW_SUMMARY": "سيتم إضافة {{ready}} طالب، وسيتم تخطي {{skipped}} صف. يحصل كل طالب جديد على كلمة مرور أولية، ويمكنك تنزيلها جميعًا كملف Excel في النهاية.",
   "STATUS": "الحالة",
