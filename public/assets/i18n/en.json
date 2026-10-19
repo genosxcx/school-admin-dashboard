@@ -293,7 +293,7 @@
   "TITLE": "Change password",
   "DESC": "Set a new login password for {{name}}. Copy it and give it to them.",
   "NEW": "New password",
-  "HINT": "At least 6 characters.",
+  "HINT": "Type a password (at least 6 characters) or press refresh to generate one.",
   "GENERATE": "Generate a new password",
   "COPY": "Copy password",
   "CANCEL": "Cancel",
@@ -302,6 +302,7 @@
   "SUCCESS": "Password changed for {{name}}.",
   "ERROR": "Could not change the password. Please try again.",
   "ERROR_DENIED": "You are not allowed to change this password.",
-  "ERROR_NO_ACCOUNT": "This person has no login account yet."
+  "ERROR_NO_ACCOUNT": "This person has no login account yet.",
+  "ERROR_SERVICE": "The password service is not set up yet. Deploy the Cloud Function with \"firebase deploy --only functions\"."
 }
 }

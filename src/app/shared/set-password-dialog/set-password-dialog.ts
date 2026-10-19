@@ -61,7 +61,8 @@ export class SetPasswordDialog {
   data = inject(MAT_DIALOG_DATA) as SetPasswordDialogData;
   private ref = inject(MatDialogRef<SetPasswordDialog, string | null>);
 
-  password = this.generate();
+  // Start empty so the password only changes when the user types or presses generate.
+  password = '';
 
   private generate(): string {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -105,8 +106,10 @@ export class SetPasswordFlow {
       const key =
         e?.code === 'functions/permission-denied' ? 'PASSWORD_DIALOG.ERROR_DENIED'
         : e?.code === 'functions/not-found' ? 'PASSWORD_DIALOG.ERROR_NO_ACCOUNT'
+        // A missing (undeployed) function surfaces as internal/unavailable in the client SDK.
+        : e?.code === 'functions/internal' || e?.code === 'functions/unavailable' ? 'PASSWORD_DIALOG.ERROR_SERVICE'
         : 'PASSWORD_DIALOG.ERROR';
-      this.snackBar.open(this.translate.instant(key), close, { duration: 6000 });
+      this.snackBar.open(this.translate.instant(key), close, { duration: 10000 });
     }
   }
 }
