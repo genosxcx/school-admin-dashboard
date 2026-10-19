@@ -158,6 +158,23 @@ export class DataService {
 
   // ---------------- PASSWORDS ----------------
 
+  // Deletes the profile and the Firebase Auth login (so the email can be reused) via
+  // the deleteUserAccount Cloud Function. If the function isn't deployed yet, falls
+  // back to deleting only the profile, as before.
+  private async deleteUserAccount(uid: string) {
+    const call = httpsCallable<{ uid: string }, { ok: boolean }>(functions, 'deleteUserAccount');
+    try {
+      await call({ uid });
+    } catch (e: any) {
+      const notDeployed =
+        (e?.code === 'functions/internal' && e?.message === 'internal') ||
+        e?.code === 'functions/unavailable';
+      if (!notDeployed) throw e;
+      console.warn('deleteUserAccount function unavailable; deleting profile only.', e);
+      await deleteDoc(doc(db, 'users', uid));
+    }
+  }
+
   // Sets a new login password for a teacher/student via the setUserPassword
   // Cloud Function (functions/src/index.ts). The id is the user's auth uid.
   async setUserPassword(uid: string, newPassword: string) {
@@ -181,8 +198,7 @@ export class DataService {
   }
 
   async deleteTeacher(teacherId: string) {
-    const ref = doc(db, 'users', teacherId);
-    await deleteDoc(ref);
+    await this.deleteUserAccount(teacherId);
   }
 
   async countTeachers(schoolId: string): Promise<number> {
@@ -291,8 +307,7 @@ export class DataService {
   }
 
   async deleteSubjectTeacher(teacherId: string) {
-    const ref = doc(db, 'users', teacherId);
-    await deleteDoc(ref);
+    await this.deleteUserAccount(teacherId);
   }
 
   async countSubjectTeachers(schoolId: string): Promise<number> {
@@ -438,8 +453,7 @@ async createStudent(
   }
 
   async deleteStudent(studentId: string) {
-    const ref = doc(db, 'users', studentId);
-    await deleteDoc(ref);
+    await this.deleteUserAccount(studentId);
   }
 
   async countStudents(schoolId: string): Promise<number> {
