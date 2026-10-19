@@ -237,7 +237,7 @@
   "TITLE": "Subject Teachers",
   "SUBTITLE": "Manage specialist instructors and multi-class assignments",
   "SEARCH": "Search subject teachers...",
-  "EXPORT": "Export CSV",
+  "EXPORT": "Export Excel",
   "ADD": "Add Subject Teacher",
   "TABLE": {
     "NAME": "Full Name",
@@ -246,7 +246,7 @@
     "CLASSES": "Assigned Classes",
     "ACTIONS": "Actions",
   "ADD_BUTTON": "Add Subject Teacher",
-  "EXPORT": "Export CSV",
+  "EXPORT": "Export Excel",
   "SEARCH_LABEL": "Search subject teachers...",
   "SEARCH_PLACEHOLDER": "Name, email, subject..."
 
@@ -284,7 +284,7 @@
   "SUBTITLE": "Manage faculty and classroom assignments",
   "SEARCH_LABEL": "Search teachers...",
   "SEARCH_PLACEHOLDER": "Name, email, class...",
-  "EXPORT": "Export CSV",
+  "EXPORT": "Export Excel",
   "ADD_BTN": "Add Teacher",
   "LOADING": "Loading teachers...",
   "UNNAMED": "Unnamed Faculty",
@@ -353,5 +353,26 @@
   "TEMPLATE_EXAMPLE_NAME": "Example Student",
   "ERROR_READ": "Could not read this file. Please choose an Excel (.xlsx) file.",
   "ERROR_EMPTY": "No students were found in this file."
+},
+"STAFF_IMPORT": {
+  "IMPORT": "Import Excel",
+  "IMPORT_TEMPLATE": "Download an Excel template for importing",
+  "TITLE_TEACHER": "Import teachers from Excel",
+  "TITLE_SUBJECT": "Import subject teachers from Excel",
+  "PREVIEW_SUMMARY": "{{ready}} will be added, {{skipped}} rows will be skipped. Each new account gets an initial password, and you can download them all as Excel at the end.",
+  "DEFAULT_CLASS": "Class for the {{count}} rows with no class in the file",
+  "WARN_UNKNOWN_CLASS": "Class \"{{name}}\" not found, will be left out",
+  "SKIP_NO_NAME": "Skipped: no name",
+  "SKIP_NO_EMAIL": "Skipped: no email (teachers log in with their email)",
+  "SKIP_BAD_EMAIL": "Skipped: email is not valid",
+  "SKIP_DUPLICATE": "Skipped: this email already exists",
+  "CONFIRM": "Add {{count}}",
+  "IMPORTING": "Adding… {{done}} of {{total}}",
+  "DONE_SUMMARY": "Added {{created}}. {{failed}} failed.",
+  "ERROR_EMAIL_IN_USE": "This email already has an account",
+  "ERROR_CREATE": "Could not create this account",
+  "ERROR_EMPTY": "No teachers were found in this file.",
+  "TEMPLATE_EXAMPLE_NAME": "Example Teacher",
+  "TEMPLATE_EXAMPLE_SUBJECT": "Math"
 }
 }

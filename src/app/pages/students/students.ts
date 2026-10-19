@@ -25,7 +25,8 @@ import { RoleService } from '../../core/services/role.service';
 import { StudentFormDialog, ClassOption } from './student-form-dialog/student-form-dialog';
 import { SetPasswordFlow } from '../../shared/set-password-dialog/set-password-dialog';
 import { StudentImportDialog } from './student-import-dialog/student-import-dialog';
-import { downloadExcel, parseStudentSheet, readFirstSheet } from './student-excel';
+import { parseStudentSheet } from './student-excel';
+import { downloadExcel, readFirstSheet } from '../../shared/excel/excel-sheet';
 
 @Component({
   selector: 'app-students',

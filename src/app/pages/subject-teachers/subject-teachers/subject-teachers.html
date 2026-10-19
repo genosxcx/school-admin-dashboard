@@ -12,8 +12,18 @@
         <input matInput [(ngModel)]="q" [placeholder]="'SUBJECT_TEACHERS.SEARCH_PLACEHOLDER' | translate" />
       </mat-form-field>
 
-      <button mat-stroked-button (click)="exportToCSV()" [disabled]="loading || subjectTeachers.length === 0">
+      <button mat-stroked-button (click)="exportToExcel()" [disabled]="loading || subjectTeachers.length === 0">
         <mat-icon>download</mat-icon> {{ 'SUBJECT_TEACHERS.EXPORT' | translate }}
+      </button>
+
+      <input #importInput type="file" hidden
+        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        (change)="importFromExcel(importInput)" />
+      <button mat-stroked-button (click)="importInput.click()" [disabled]="loading || !schoolId">
+        <mat-icon>upload</mat-icon> {{ 'STAFF_IMPORT.IMPORT' | translate }}
+      </button>
+      <button mat-icon-button (click)="downloadImportTemplate()" [disabled]="loading" [matTooltip]="'STAFF_IMPORT.IMPORT_TEMPLATE' | translate">
+        <mat-icon>description</mat-icon>
       </button>
 
       <button mat-flat-button class="add-btn" (click)="addSubjectTeacher()" [disabled]="loading || !schoolId">

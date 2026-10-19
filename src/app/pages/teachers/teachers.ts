@@ -16,6 +16,7 @@ import { DataService, Teacher, SchoolClass } from '../../core/services/data.serv
 import { RoleService } from '../../core/services/role.service';
 import { TeacherFormDialog, ClassOption } from './teacher-form-dialog/teacher-form-dialog';
 import { SetPasswordFlow } from '../../shared/set-password-dialog/set-password-dialog';
+import { StaffExcelFlow } from '../../shared/excel/staff-import-dialog';
 
 @Component({
   selector: 'app-teachers',
@@ -29,6 +30,7 @@ export class Teachers implements OnInit, OnDestroy {
   private role = inject(RoleService);
   private dialog = inject(MatDialog);
   private setPasswordFlow = inject(SetPasswordFlow);
+  private excel = inject(StaffExcelFlow);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
@@ -250,34 +252,26 @@ export class Teachers implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Add this method to your Teachers class
-  exportToCSV() {
+  exportToExcel() {
     if (this.teachers.length === 0) return;
+    this.excel.export(
+      'teacher',
+      this.filtered.map((t) => [t.fullName || '', t.email || '', t.classId ? this.classLabel(t) : '']),
+    );
+  }
 
-    const headers = ['Full Name', 'Email', 'Assigned Class'];
-    const rows = this.teachers.map(t => [
-      `"${t.fullName || 'Unnamed'}"`,
-      `"${t.email || ''}"`,
-      `"${this.classLabel(t)}"`
-    ]);
+  downloadImportTemplate() {
+    this.excel.template('teacher', this.classes[0]?.name ?? '');
+  }
 
-    const csvContent = [headers, ...rows]
-      .map(row => row.join(','))
-      .join('\n');
-
-    // ✅ ADD THIS: Add the Byte Order Mark (BOM) for UTF-8 support in Excel
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `teachers_export_${new Date().toISOString().slice(0,10)}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  async importFromExcel(input: HTMLInputElement) {
+    const created = await this.excel.import(
+      input,
+      'teacher',
+      this.schoolId,
+      this.classOptions(),
+      this.teachers.map((t) => t.email ?? '').filter(Boolean),
+    );
+    if (created) await this.loadAll();
   }
 }
