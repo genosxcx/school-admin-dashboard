@@ -206,12 +206,18 @@ export class PrincipalRegister {
       const uid = cred.user.uid;
 
       // ✅ 2) Create principal request in database (NO password stored)
-      await this.svc.submitPrincipalRequest({
-        uid,
-        fullName: fullName.trim(),
-        email: email.trim(),
-        schoolName: schoolName.trim(),
-      });
+      try {
+        await this.svc.submitPrincipalRequest({
+          uid,
+          fullName: fullName.trim(),
+          email: email.trim(),
+          schoolName: schoolName.trim(),
+        });
+      } catch (requestError) {
+        // Roll back the Auth account so a retry isn't blocked by "email already in use"
+        await cred.user.delete().catch(() => {});
+        throw requestError;
+      }
 
       // ✅ 3) Sign out so they don't stay logged in while pending approval
       await signOut(auth);
@@ -232,6 +238,9 @@ export class PrincipalRegister {
       } else if (errorCode === 'auth/operation-not-allowed') {
         this.error =
           'Registration is currently disabled. Please contact support.';
+      } else if (errorCode === 'permission-denied') {
+        this.error =
+          'The server refused the registration request. Please contact support.';
       } else if (errorMessage) {
         this.error = errorMessage;
       } else {

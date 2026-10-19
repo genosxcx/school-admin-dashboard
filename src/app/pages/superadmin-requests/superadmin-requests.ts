@@ -68,16 +68,20 @@ export class SuperadminRequests implements OnInit {
     this.cdr.detectChanges();
 
     try {
-      // ✅ Fetch both concurrently
-      const [principals, parents] = await Promise.all([
+      // ✅ Fetch both concurrently; one failing list doesn't blank the other tab
+      const [principals, parents] = await Promise.allSettled([
         this.svc.listRequests(),
         this.svc.listParentRequests()
       ]);
 
       const statusOrder: { [key: string]: number } = { PENDING: 0, APPROVED: 1, REJECTED: 2 };
+      const byStatus = (a: any, b: any) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
 
-      this.principalRequests = principals.sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
-      this.parentRequests = parents.sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
+      this.principalRequests = principals.status === 'fulfilled' ? principals.value.sort(byStatus) : [];
+      this.parentRequests = parents.status === 'fulfilled' ? parents.value.sort(byStatus) : [];
+
+      const failed = [principals, parents].find((r) => r.status === 'rejected');
+      if (failed) throw (failed as PromiseRejectedResult).reason;
 
     } catch (error: any) {
       console.error('Failed to load requests:', error);
