@@ -24,6 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataService, SubjectTeacher, SchoolClass } from '../../../core/services/data.service';
 import { RoleService } from '../../../core/services/role.service';
 import { SubjectTeacherFormDialog, ClassOption } from '../subject-teacher-form-dialog/subject-teacher-form-dialog';
+import { SetPasswordFlow } from '../../../shared/set-password-dialog/set-password-dialog';
 
 @Component({
   selector: 'app-subject-teachers',
@@ -47,6 +48,7 @@ export class SubjectTeachers implements OnInit, OnDestroy {
   private data = inject(DataService);
   private role = inject(RoleService);
   private dialog = inject(MatDialog);
+  private setPasswordFlow = inject(SetPasswordFlow);
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private translate = inject(TranslateService);
@@ -170,6 +172,11 @@ export class SubjectTeachers implements OnInit, OnDestroy {
       try { await this.data.updateSubjectTeacher(t.id!, result); await this.loadAll(); }
       catch { this.setError('SUBJECT_TEACHERS.ERRORS.UPDATE_FAILED'); }
     }
+  }
+
+  changePassword(t: SubjectTeacher) {
+    if (!t.id) return;
+    this.setPasswordFlow.open(t.id, t.fullName, 8);
   }
 
   async deleteSubjectTeacher(t: SubjectTeacher) {

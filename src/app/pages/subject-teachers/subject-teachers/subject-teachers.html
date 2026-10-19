@@ -57,6 +57,7 @@
           <th mat-header-cell *matHeaderCellDef style="text-align: right;">{{ 'SUBJECT_TEACHERS.TABLE.ACTIONS' | translate }}</th>
           <td mat-cell *matCellDef="let t" style="text-align: right;">
             <button mat-icon-button (click)="editSubjectTeacher(t)"><mat-icon>edit_outlined</mat-icon></button>
+            <button mat-icon-button (click)="changePassword(t)" [matTooltip]="'PASSWORD_DIALOG.TITLE' | translate"><mat-icon>key</mat-icon></button>
             <button mat-icon-button (click)="deleteSubjectTeacher(t)"><mat-icon>delete_outline</mat-icon></button>
           </td>
         </ng-container>

@@ -77,6 +77,9 @@
                 <button mat-icon-button class="edit-btn" (click)="editStudent(s)" matTooltip="Edit">
                   <mat-icon>edit_outlined</mat-icon>
                 </button>
+                <button mat-icon-button class="edit-btn" (click)="changePassword(s)" [title]="'PASSWORD_DIALOG.TITLE' | translate">
+                  <mat-icon>key</mat-icon>
+                </button>
                 <button mat-icon-button class="delete-btn" (click)="deleteStudent(s)" matTooltip="Delete">
                   <mat-icon>delete_outline</mat-icon>
                 </button>

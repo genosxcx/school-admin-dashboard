@@ -36,12 +36,28 @@
       "NEW": "New Password",
       "CONFIRM": "Confirm New Password",
       "UPDATE": "Update Password",
-      "UPDATING": "Updating..."
+      "UPDATING": "Updating...",
+      "CURRENT": "Current Password",
+      "MIN_LENGTH": "Must be at least 6 characters",
+      "MISMATCH": "Passwords do not match"
     },
     "LANGUAGE": {
       "TITLE": "Display Language",
       "DESC": "Select your preferred language for the dashboard interface.",
       "LABEL": "Language"
+    },
+    "MESSAGES": {
+      "LANG_UPDATED": "Language updated successfully!",
+      "PASS_UPDATED": "Password updated!",
+      "PASS_FAILED": "Failed to update password.",
+      "PASS_WRONG_CURRENT": "Your current password is incorrect.",
+      "PASS_WEAK": "The new password is too weak. Use at least 6 characters.",
+      "PASS_TOO_MANY": "Too many attempts. Please try again later.",
+      "SCHOOL_ID_MISSING": "Error: School ID is missing. Please refresh.",
+      "UNAUTHORIZED": "Unauthorized or invalid form.",
+      "ORG_SAVED": "Organization details saved!",
+      "ORG_FAILED": "Failed to save branding.",
+      "CLOSE": "Close"
     },
     "TERMS": {
       "TITLE": "Terms and Conditions",
@@ -272,5 +288,20 @@
   "TOTAL_FACULTY": "Total Faculty",
   "ACTIVE_STUDENTS": "Active Students",
   "LEARNING_MINUTES": "Learning Minutes"
+},
+"PASSWORD_DIALOG": {
+  "TITLE": "Change password",
+  "DESC": "Set a new login password for {{name}}. Copy it and give it to them.",
+  "NEW": "New password",
+  "HINT": "At least 6 characters.",
+  "GENERATE": "Generate a new password",
+  "COPY": "Copy password",
+  "CANCEL": "Cancel",
+  "SAVE": "Save password",
+  "CLOSE": "Close",
+  "SUCCESS": "Password changed for {{name}}.",
+  "ERROR": "Could not change the password. Please try again.",
+  "ERROR_DENIED": "You are not allowed to change this password.",
+  "ERROR_NO_ACCOUNT": "This person has no login account yet."
 }
 }

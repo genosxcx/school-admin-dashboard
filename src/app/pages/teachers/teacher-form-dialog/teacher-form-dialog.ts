@@ -52,10 +52,15 @@ export type TeacherFormResult = {
         <input matInput [(ngModel)]="email" type="email" />
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full" *ngIf="password">
+      <mat-form-field appearance="outline" class="full" *ngIf="!isEdit">
         <mat-label>{{ 'TEACHERS.DIALOG.PASSWORD' | translate }}</mat-label>
-        <input matInput [value]="password" readonly />
-        <mat-icon matSuffix>content_copy</mat-icon>
+        <input matInput [(ngModel)]="password" minlength="6" autocomplete="new-password" />
+        <button mat-icon-button matSuffix type="button" (click)="regeneratePassword()" [attr.aria-label]="'PASSWORD_DIALOG.GENERATE' | translate">
+          <mat-icon>refresh</mat-icon>
+        </button>
+        <button mat-icon-button matSuffix type="button" (click)="copyPassword()" [attr.aria-label]="'PASSWORD_DIALOG.COPY' | translate">
+          <mat-icon>content_copy</mat-icon>
+        </button>
         <mat-hint>{{ 'TEACHERS.DIALOG.COPY_HINT' | translate }}</mat-hint>
       </mat-form-field>
 
@@ -72,7 +77,7 @@ export type TeacherFormResult = {
 
     <div mat-dialog-actions align="end">
       <button mat-button (click)="close()">{{ 'TEACHERS.DIALOG.CANCEL' | translate }}</button>
-      <button mat-flat-button color="primary" (click)="save()" [disabled]="!fullName.trim() || !email.trim()">
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="!fullName.trim() || !email.trim() || (!isEdit && password.length < 6)">
         {{ 'TEACHERS.DIALOG.SAVE' | translate }}
       </button>
     </div>
@@ -90,7 +95,14 @@ export class TeacherFormDialog {
   email = this.data.initial?.email ?? '';
   classId = this.data.initial?.classId ?? '';
   
-  password = this.data.initial ? '' : this.generateRandomPassword(8);
+  isEdit = !!this.data.initial;
+  password = this.isEdit ? '' : this.generateRandomPassword(8);
+
+  regeneratePassword() { this.password = this.generateRandomPassword(8); }
+
+  copyPassword() {
+    if (this.password) navigator.clipboard.writeText(this.password);
+  }
 
   private generateRandomPassword(length: number): string {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';

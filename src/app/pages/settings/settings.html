@@ -54,13 +54,23 @@
       @if (error) { <div class="error-msg">{{ error }}</div> }
       <form [formGroup]="form" (ngSubmit)="submitPassword()" class="form-layout">
         <mat-form-field appearance="outline">
+          <mat-label>{{ 'SETTINGS.PASSWORD.CURRENT' | translate }}</mat-label>
+          <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'SETTINGS.PASSWORD.NEW' | translate }}</mat-label>
-          <input matInput type="password" formControlName="newPassword" />
+          <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+          @if (form.get('newPassword')?.touched && form.get('newPassword')?.hasError('minlength')) {
+            <mat-error>{{ 'SETTINGS.PASSWORD.MIN_LENGTH' | translate }}</mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>{{ 'SETTINGS.PASSWORD.CONFIRM' | translate }}</mat-label>
-          <input matInput type="password" formControlName="confirmPassword" />
+          <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
         </mat-form-field>
+        @if (form.hasError('mismatch') && form.get('confirmPassword')?.value) {
+          <div class="error-msg">{{ 'SETTINGS.PASSWORD.MISMATCH' | translate }}</div>
+        }
         <button mat-flat-button color="primary" [disabled]="form.invalid || loading">
           {{ loading ? ('SETTINGS.PASSWORD.UPDATING' | translate) : ('SETTINGS.PASSWORD.UPDATE' | translate) }}
         </button>

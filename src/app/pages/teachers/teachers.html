@@ -62,11 +62,14 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef style="width: 100px; text-align: right;">{{ 'TEACHERS.TABLE.ACTIONS' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef style="width: 140px; text-align: right;">{{ 'TEACHERS.TABLE.ACTIONS' | translate }}</th>
             <td mat-cell *matCellDef="let t">
               <div class="action-buttons" style="justify-content: flex-end;">
                 <button mat-icon-button class="edit-btn" (click)="editTeacher(t)" [matTooltip]="'TEACHERS.EDIT' | translate">
                   <mat-icon>edit_outlined</mat-icon>
+                </button>
+                <button mat-icon-button class="edit-btn" (click)="changePassword(t)" [matTooltip]="'PASSWORD_DIALOG.TITLE' | translate">
+                  <mat-icon>key</mat-icon>
                 </button>
                 <button mat-icon-button class="delete-btn" (click)="deleteTeacher(t)" [matTooltip]="'TEACHERS.DELETE' | translate">
                   <mat-icon>delete_outline</mat-icon>

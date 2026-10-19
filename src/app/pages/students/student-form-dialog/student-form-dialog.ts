@@ -59,10 +59,15 @@ export type StudentFormResult = {
         <input matInput [(ngModel)]="email" type="email" />
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full" *ngIf="password">
+      <mat-form-field appearance="outline" class="full" *ngIf="!isEdit">
         <mat-label>{{ 'STUDENT_DIALOG.PASSWORD' | translate }}</mat-label>
-        <input matInput [value]="password" readonly />
-        <mat-icon matSuffix style="cursor: pointer;" (click)="copyPassword()">content_copy</mat-icon>
+        <input matInput [(ngModel)]="password" minlength="6" autocomplete="new-password" />
+        <button mat-icon-button matSuffix type="button" (click)="regeneratePassword()" [attr.aria-label]="'PASSWORD_DIALOG.GENERATE' | translate">
+          <mat-icon>refresh</mat-icon>
+        </button>
+        <button mat-icon-button matSuffix type="button" (click)="copyPassword()" [attr.aria-label]="'PASSWORD_DIALOG.COPY' | translate">
+          <mat-icon>content_copy</mat-icon>
+        </button>
         <mat-hint>{{ 'STUDENT_DIALOG.HINT' | translate }}</mat-hint>
       </mat-form-field>
 
@@ -79,7 +84,7 @@ export type StudentFormResult = {
 
     <div mat-dialog-actions align="end">
       <button mat-button (click)="close()">{{ 'STUDENT_DIALOG.CANCEL' | translate }}</button>
-      <button mat-flat-button color="primary" (click)="save()" [disabled]="!studentId.trim() || !fullName.trim()">
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="!studentId.trim() || !fullName.trim() || (!isEdit && password.length < 6)">
         {{ 'STUDENT_DIALOG.SAVE' | translate }}
       </button>
     </div>
@@ -99,6 +104,8 @@ export class StudentFormDialog {
   email = this.data.initial?.email ?? '';
   classId = this.data.initial?.classId ?? '';
   password = this.isEdit ? '' : this.generateRandomPassword(6);
+
+  regeneratePassword() { this.password = this.generateRandomPassword(6); }
 
   private generateRandomPassword(length: number): string {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

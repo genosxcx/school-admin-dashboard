@@ -2,8 +2,11 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import {
+  EmailAuthProvider,
   User,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
@@ -81,9 +84,17 @@ export class AuthService {
     return signOut(auth);
   }
 
-  async changePassword(newPassword: string): Promise<void> {
+  // Firebase rejects updatePassword with auth/requires-recent-login unless the user
+  // signed in very recently, so re-authenticate with the current password first.
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     const user = auth.currentUser;
-    if (!user) throw new Error('No user is currently logged in.');
+    if (!user || !user.email) throw new Error('No user is currently logged in.');
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    await reauthenticateWithCredential(user, credential);
     await updatePassword(user, newPassword);
+  }
+
+  sendPasswordReset(email: string) {
+    return sendPasswordResetEmail(auth, email.trim());
   }
 }
