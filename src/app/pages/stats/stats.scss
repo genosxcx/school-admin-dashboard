@@ -3,19 +3,19 @@
    ───────────────────────────────────────── */
 
 :host {
-  --primary:      #4f46e5;
-  --primary-soft: #eef2ff;
-  --green:        #10b981;
-  --green-soft:   #d1fae5;
-  --amber:        #f59e0b;
-  --amber-soft:   #fef3c7;
-  --blue:         #3b82f6;
-  --blue-soft:    #dbeafe;
+  --primary:      var(--ns-ink);
+  --primary-soft: var(--ns-paper-deep);
+  --green:        var(--ns-ink);
+  --green-soft:   var(--ns-paper-deep);
+  --amber:        var(--ns-accent);
+  --amber-soft:   var(--ns-accent-soft);
+  --blue:         var(--ns-ink);
+  --blue-soft:    var(--ns-paper-deep);
   --surface:      #ffffff;
-  --bg:           #f8fafc;
+  --bg:           var(--ns-paper);
   --border:       rgba(0, 0, 0, 0.07);
-  --text:         #0f172a;
-  --muted:        #64748b;
+  --text:         var(--ns-ink);
+  --muted:        var(--ns-muted);
   --radius-sm:    10px;
   --radius-md:    16px;
   --radius-lg:    20px;
@@ -31,7 +31,7 @@
   padding: 24px;
   background: var(--bg);
   min-height: 100vh;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--ns-font);
   color: var(--text);
 }
 
@@ -64,9 +64,9 @@
   gap: 10px;
   padding: 16px 20px;
   border-radius: var(--radius-md);
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: var(--ns-danger-soft);
+  color: #a3271b;
+  border: 1px solid #f6c9c3;
 
   mat-icon { opacity: 0.8; }
   p { margin: 0; font-weight: 500; }
@@ -146,17 +146,17 @@
   border-radius: var(--radius-md);
   background: transparent;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: background 0.15s, border-color 0.15s;
   width: 100%;
 
   &:hover {
-    background: #f1f5f9;
+    background: var(--ns-paper-deep);
   }
 
   &.active {
     background: var(--primary-soft);
-    border-color: rgba(79, 70, 229, 0.2);
+    border-color: rgba(17, 19, 24, 0.2);
 
     .class-avatar { background: var(--primary); color: #fff; }
     .class-name   { color: var(--primary); }
@@ -168,7 +168,7 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-sm);
-  background: #e2e8f0;
+  background: var(--ns-line);
   display: grid;
   place-items: center;
   font-weight: 800;
@@ -272,7 +272,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
-  margin-left: 2px;
+  margin-inline-start: 2px;
 }
 
 .metric-label {
@@ -303,7 +303,7 @@
   justify-content: space-between;
   padding: 16px 20px;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--ns-paper) 0%, var(--ns-paper-deep) 100%);
 }
 
 .students-title {
@@ -356,7 +356,7 @@
   transition: background 0.15s;
 
   &:hover {
-    background: #f8fafc;
+    background: var(--ns-paper);
   }
 
   &:last-child {
@@ -416,7 +416,7 @@
   font-size: 11px;
   color: var(--muted);
   font-weight: 600;
-  text-align: right;
+  text-align: end;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
@@ -425,17 +425,20 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--text);
-  text-align: right;
+  text-align: end;
 }
 
 mat-progress-bar {
   border-radius: 99px;
   height: 6px;
-  --mdc-linear-progress-track-color: #e2e8f0;
+  --mat-progress-bar-track-color: var(--ns-paper-deep);
+  --mat-progress-bar-active-indicator-color: var(--ns-ink);
+  --mat-progress-bar-track-shape: 99px;
+  overflow: hidden;
 }
 
 mat-progress-bar.grade-bar {
-  --mdc-linear-progress-active-indicator-color: var(--amber);
+  --mat-progress-bar-active-indicator-color: var(--ns-accent);
 }
 
 /* ── Empty Panel ── */
@@ -447,7 +450,7 @@ mat-progress-bar.grade-bar {
   gap: 12px;
   padding: 60px 20px;
   background: var(--surface);
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed #c9c4b8;
   border-radius: var(--radius-lg);
   color: var(--muted);
   text-align: center;
@@ -573,7 +576,7 @@ mat-progress-bar.grade-bar {
     padding: 8px 16px; // Narrower vertical padding
     gap: 12px;
     box-shadow: none;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--ns-line);
     transition: transform 0.2s;
   }
 
@@ -583,7 +586,7 @@ mat-progress-bar.grade-bar {
     bottom: -30px;
     left: 50%;
     transform: translateX(-50%);
-    background: #333;
+    background: var(--ns-ink);
     color: white;
     padding: 4px 8px;
     border-radius: 4px;

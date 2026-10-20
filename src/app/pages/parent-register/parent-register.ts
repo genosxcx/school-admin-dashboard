@@ -7,6 +7,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { NsLogo } from '../../shared/ns-logo/ns-logo';
 
 import { auth, db } from '../../firebase';
 import { createUserWithEmailAndPassword, signOut } from 'firebase/auth'; // ✅ Added signOut
@@ -23,6 +25,8 @@ import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
+    NsLogo,
   ],
   templateUrl: './parent-register.html',
   styleUrls: ['./parent-register.scss'],

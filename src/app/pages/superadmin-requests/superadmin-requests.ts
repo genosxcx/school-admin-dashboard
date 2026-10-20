@@ -9,6 +9,7 @@ import {
 
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { NsLogo } from '../../shared/ns-logo/ns-logo';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs'; // ✅ Imported Tabs
@@ -20,6 +21,7 @@ import { MatTabsModule } from '@angular/material/tabs'; // ✅ Imported Tabs
     CommonModule,
     MatCardModule,
     MatButtonModule,
+    NsLogo,
     MatIconModule,
     MatProgressSpinnerModule,
     MatTabsModule, // ✅ Added to imports

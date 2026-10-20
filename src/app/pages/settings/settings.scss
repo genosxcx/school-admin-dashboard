@@ -3,13 +3,13 @@
    ───────────────────────────────────────── */
 
 :host {
-  --primary:      #4f46e5;
+  --primary:      var(--ns-ink);
   --surface:      #ffffff;
-  --border:       rgba(15, 23, 42, 0.06);
-  --text:         #0f172a;
-  --muted:        #64748b;
+  --border:       rgba(17, 19, 24, 0.06);
+  --text:         var(--ns-ink);
+  --muted:        var(--ns-muted);
   --radius-lg:    18px;
-  --shadow-sm:    0 2px 4px rgba(15, 23, 42, 0.03);
+  --shadow-sm:    0 2px 4px rgba(17, 19, 24, 0.03);
 }
 
 .settings-page {
@@ -80,7 +80,7 @@
   padding: 24px;
   margin: 0 auto 24px auto;
   max-width: 500px;
-  h3 { color: #3f51b5; margin-top: 0; }
+  h3 { color: var(--ns-ink); margin-top: 0; }
 }
 
 .form-layout {
@@ -96,6 +96,60 @@
 .footer-section {
   text-align: center;
   margin-top: 60px;
-  color: #777;
-  .powered-by { font-size: 0.9em; margin-top: 4px; color: #3f51b5; }
+  color: var(--ns-muted);
+  .powered-by { font-size: 0.9em; margin-top: 4px; color: var(--ns-ink); }
+}
+// Section switcher: one pill row, the open section is ink.
+.settings-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px;
+  margin: 0 auto 8px;
+  border-radius: 999px;
+  background: var(--ns-card);
+  box-shadow: var(--ns-shadow-sm);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.section-tab.mat-mdc-button-base {
+  --mat-button-protected-container-color: transparent;
+  --mat-button-protected-label-text-color: var(--ns-muted);
+  --mat-button-protected-container-elevation-shadow: none;
+  --mat-button-protected-hover-container-elevation-shadow: none;
+  --mat-button-protected-focus-container-elevation-shadow: none;
+  --mat-button-protected-pressed-container-elevation-shadow: none;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    --mat-button-protected-label-text-color: var(--ns-ink);
+  }
+
+  &.active {
+    --mat-button-protected-container-color: var(--ns-ink);
+    --mat-button-protected-label-text-color: #ffffff;
+
+    .mat-icon {
+      color: var(--ns-accent);
+    }
+  }
+}
+
+.settings-card {
+  border: 0;
+  box-shadow: var(--ns-shadow-sm) !important;
+  border-radius: var(--ns-radius-lg) !important;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-actions {
+    border-radius: 20px;
+    justify-content: flex-start;
+  }
 }

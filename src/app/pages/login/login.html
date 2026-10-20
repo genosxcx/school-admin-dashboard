@@ -1,58 +1,75 @@
-<div class="login-wrapper">
-  <div class="login-card">
-    <div class="login-header">
-      <h1>Sign In</h1>
-      <p>Welcome back to your school portal</p>
+<div class="ns-auth">
+  <aside class="ns-auth-brand">
+    <a routerLink="/" aria-label="NadaSoft home"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+
+    <div class="ns-auth-pitch">
+      <span class="ns-auth-pill">School portal</span>
+      <h2>Your whole school, in <em>one calm place.</em></h2>
+      <p>Teachers, classes, students and reading progress for Hya Naqra'a, all in one dashboard.</p>
     </div>
 
-    <form (ngSubmit)="submit()" [formGroup]="form">
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="email" />
-        @if (form.get('email')!.touched && form.get('email')!.invalid) {
-          <mat-error>Enter a valid email</mat-error>
+    <div class="ns-auth-foot">&copy; NadaSoft</div>
+  </aside>
+
+  <main class="ns-auth-main">
+    <div class="ns-auth-card">
+      <div class="ns-auth-head">
+        <span class="ns-eyebrow">Welcome back</span>
+        <h1>Sign In</h1>
+        <p>Welcome back to your school portal</p>
+      </div>
+
+      <form (ngSubmit)="submit()" [formGroup]="form">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" />
+          @if (form.get('email')!.touched && form.get('email')!.invalid) {
+            <mat-error>Enter a valid email</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" />
+          @if (form.get('password')!.touched && form.get('password')!.invalid) {
+            <mat-error>Password must be at least 6 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="forgot-row">
+          <button type="button" class="ns-auth-link forgot-link" [disabled]="loading" (click)="forgotPassword()">
+            Forgot password?
+          </button>
+        </div>
+
+        @if (error) {
+          <div class="ns-alert error">{{ error }}</div>
         }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Password</mat-label>
-        <input matInput formControlName="password" type="password" />
-        @if (form.get('password')!.touched && form.get('password')!.invalid) {
-          <mat-error>Password must be at least 6 characters</mat-error>
+        @if (info) {
+          <div class="ns-alert info">{{ info }}</div>
         }
-      </mat-form-field>
 
-      <div class="forgot-row">
-        <button type="button" class="forgot-link" [disabled]="loading" (click)="forgotPassword()">
-          Forgot password?
+        <button mat-raised-button color="primary" class="ns-auth-submit" [disabled]="loading">
+          {{ loading ? 'Signing in...' : 'Sign in' }}
         </button>
-      </div>
 
-      @if (error) {
-        <div class="err">{{ error }}</div>
-      }
-      @if (info) {
-        <div class="info">{{ info }}</div>
-      }
+        <div class="ns-auth-divider">New here?</div>
 
-      <button mat-raised-button color="primary" class="btn" [disabled]="loading">
-        {{ loading ? 'Signing in...' : 'Sign in' }}
-      </button>
-      
-      <div style="margin-top: 24px; text-align: center; font-size: 14px; color: #666; padding-bottom: 16px;">
-        Homeschooling your kids? <a routerLink="/admin/parent-register" style="color: #3f51b5; text-decoration: none; font-weight: 500;">Register here</a>
-      </div>
+        <div class="register-row">
+          <button
+            mat-stroked-button
+            type="button"
+            class="ns-auth-secondary"
+            [disabled]="loading"
+            routerLink="/admin/register">
+            Register as Principal
+          </button>
+        </div>
 
-      <div class="register-row">
-        <button
-          mat-stroked-button
-          type="button"
-          class="btn"
-          [disabled]="loading"
-          routerLink="/admin/register">
-          Register as Principal
-        </button>
-      </div>
-    </form>
-  </div>
+        <p class="ns-auth-note">
+          Homeschooling your kids? <a class="ns-auth-link" routerLink="/admin/parent-register">Register here</a>
+        </p>
+      </form>
+    </div>
+  </main>
 </div>

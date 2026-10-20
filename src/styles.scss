@@ -1,38 +1,585 @@
-
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// Global theme: NadaSoft look (dark ink on warm off-white, one coral accent).
+// Angular Material reads its colors from the --mat-sys-* variables, so we
+// generate a base theme and then override the system tokens with our palette.
 @use '@angular/material' as mat;
+
+:root {
+  --ns-ink: #111318;
+  --ns-ink-soft: #2a2e37;
+  --ns-paper: #f7f5f0;
+  --ns-paper-deep: #efece4;
+  --ns-card: #ffffff;
+  --ns-line: #e6e2d9;
+  --ns-muted: #646a76;
+  --ns-accent: #ff5b3a;
+  --ns-accent-dark: #e8462a;
+  --ns-accent-soft: #ffe6df;
+  --ns-success: #1f8a5b;
+  --ns-success-soft: #e3f3ea;
+  --ns-danger: #d63b2b;
+  --ns-danger-soft: #fdecea;
+  --ns-radius-sm: 10px;
+  --ns-radius-md: 14px;
+  --ns-radius-lg: 20px;
+  --ns-shadow-sm: 0 1px 2px rgba(17, 19, 24, 0.04), 0 0 0 1px rgba(17, 19, 24, 0.04);
+  --ns-shadow-md: 0 18px 40px -22px rgba(17, 19, 24, 0.35);
+  --ns-font: 'Plus Jakarta Sans', 'Noto Kufi Arabic', 'Noto Sans Hebrew', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
 
 html {
   height: 100%;
   @include mat.theme((
     color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
+      primary: mat.$orange-palette,
+      tertiary: mat.$red-palette,
     ),
-    typography: Roboto,
+    typography: (
+      plain-family: var(--ns-font),
+      brand-family: var(--ns-font),
+      bold-weight: 700,
+      medium-weight: 600,
+      regular-weight: 400,
+    ),
     density: 0,
+  ));
+
+  @include mat.theme-overrides((
+    primary: #111318,
+    on-primary: #ffffff,
+    primary-container: #ffe6df,
+    on-primary-container: #111318,
+    secondary: #2a2e37,
+    on-secondary: #ffffff,
+    secondary-container: #efece4,
+    on-secondary-container: #111318,
+    tertiary: #ff5b3a,
+    on-tertiary: #ffffff,
+    surface: #f7f5f0,
+    on-surface: #111318,
+    on-surface-variant: #646a76,
+    surface-container-lowest: #ffffff,
+    surface-container-low: #ffffff,
+    surface-container: #ffffff,
+    surface-container-high: #ffffff,
+    surface-container-highest: #f3f0e9,
+    outline: #c9c4b8,
+    outline-variant: #e6e2d9,
+    error: #d63b2b,
   ));
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
+  background-color: var(--ns-paper);
+  color: var(--ns-ink);
   font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
+  font-family: var(--ns-font);
+  -webkit-font-smoothing: antialiased;
   margin: 0;
   height: 100%;
 }
-/* You can add global styles to this file, and also import other style files */
+
+::selection {
+  background: var(--ns-accent-soft);
+  color: var(--ns-ink);
+}
+
+// Material buttons: pill shaped, no uppercase, bolder.
+.mat-mdc-button-base:not(.mat-mdc-icon-button) {
+  --mat-button-filled-container-shape: 999px;
+  --mat-button-outlined-container-shape: 999px;
+  --mat-button-protected-container-shape: 999px;
+  --mat-button-text-container-shape: 999px;
+  --mat-button-filled-label-text-weight: 700;
+  --mat-button-outlined-label-text-weight: 700;
+  --mat-button-protected-label-text-weight: 700;
+  --mat-button-text-label-text-weight: 600;
+  --mat-button-outlined-outline-color: var(--ns-line);
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+// Outlined form fields: white fill, soft line, ink when focused.
+.mat-mdc-form-field {
+  --mat-form-field-outlined-container-shape: 12px;
+  --mat-form-field-outlined-outline-color: var(--ns-line);
+  --mat-form-field-outlined-hover-outline-color: #c9c4b8;
+  --mat-form-field-outlined-focus-outline-color: var(--ns-ink);
+  --mat-form-field-outlined-focus-label-text-color: var(--ns-ink);
+  --mat-form-field-outlined-focus-outline-width: 1.5px;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-text-field-wrapper {
+  background: var(--ns-card);
+  border-radius: 12px;
+}
+
+// Dialogs and menus pick up the warm palette.
+.mat-mdc-dialog-container {
+  --mat-dialog-container-shape: 20px;
+  --mat-dialog-container-color: var(--ns-card);
+  --mat-dialog-headline-text-weight: 800;
+}
+
+.mat-mdc-snack-bar-container {
+  --mat-snack-bar-container-color: var(--ns-ink);
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: var(--ns-accent);
+}
+
+.mat-mdc-tooltip {
+  --mat-tooltip-container-color: var(--ns-ink);
+}
+
+// Shared "page header" pattern used across dashboard pages.
+.ns-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ns-muted);
+}
+
+.ns-eyebrow::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ns-accent);
+}
+
+/* ─────────────────────────────────────────
+   Auth pages (login, register, super admin)
+   Split layout: ink brand panel + form on paper.
+   ───────────────────────────────────────── */
+.ns-auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(380px, 0.9fr) 1.1fr;
+  background: var(--ns-paper);
+  color: var(--ns-ink);
+  font-family: var(--ns-font);
+}
+
+.ns-auth-brand {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 40px 48px;
+  background: var(--ns-ink);
+  color: #ffffff;
+}
+
+// Dot grid texture, same as the homepage hero.
+.ns-auth-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse at 30% 70%, #000 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 30% 70%, #000 10%, transparent 70%);
+  pointer-events: none;
+}
+
+// Big coral "nun" shape from the logo, drifting in the corner.
+.ns-auth-brand::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: -90px;
+  bottom: -90px;
+  width: 320px;
+  height: 320px;
+  border: 46px solid var(--ns-accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  opacity: 0.95;
+  animation: ns-float 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ns-auth-brand > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ns-auth-brand a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ns-auth-pitch {
+  max-width: 420px;
+  animation: ns-rise 0.6s ease-out both;
+}
+
+.ns-auth-pitch h2 {
+  margin: 18px 0 14px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.ns-auth-pitch h2 em {
+  font-style: normal;
+  color: var(--ns-accent);
+}
+
+.ns-auth-pitch p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.ns-auth-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.ns-auth-pill::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ns-accent);
+  animation: ns-pulse 2s infinite;
+}
+
+.ns-auth-foot {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.ns-auth-main {
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+}
+
+.ns-auth-card {
+  width: 100%;
+  max-width: 420px;
+  animation: ns-rise 0.5s ease-out both;
+}
+
+.ns-auth-card.wide {
+  max-width: 480px;
+}
+
+.ns-auth-head {
+  margin-bottom: 28px;
+}
+
+.ns-auth-head h1 {
+  margin: 14px 0 8px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.ns-auth-head p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ns-muted);
+  line-height: 1.5;
+}
+
+.ns-auth form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ns-auth .mat-mdc-form-field {
+  width: 100%;
+}
+
+.ns-auth-submit.mat-mdc-button-base {
+  width: 100%;
+  height: 52px;
+  margin-top: 6px;
+  font-size: 15px;
+  --mat-button-filled-container-color: var(--ns-accent);
+  --mat-button-filled-label-text-color: #ffffff;
+  --mat-button-protected-container-color: var(--ns-accent);
+  --mat-button-protected-label-text-color: #ffffff;
+  --mat-button-protected-container-elevation-shadow: 0 10px 24px -10px rgba(255, 91, 58, 0.7);
+  --mat-button-protected-hover-container-elevation-shadow: 0 16px 30px -10px rgba(255, 91, 58, 0.8);
+  box-shadow: 0 10px 24px -10px rgba(255, 91, 58, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ns-auth-submit.mat-mdc-button-base:not([disabled]):hover {
+  transform: translateY(-2px);
+}
+
+.ns-auth-submit.mat-mdc-button-base[disabled] {
+  box-shadow: none;
+}
+
+.ns-auth-secondary.mat-mdc-button-base {
+  width: 100%;
+  height: 48px;
+  --mat-button-outlined-label-text-color: var(--ns-ink);
+  --mat-button-outlined-outline-color: var(--ns-line);
+  transition: box-shadow 0.2s ease;
+}
+
+.ns-auth-secondary.mat-mdc-button-base:not([disabled]):hover {
+  box-shadow: inset 0 0 0 1.5px var(--ns-ink);
+}
+
+.ns-auth-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ns-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ns-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.ns-auth-link:hover {
+  color: var(--ns-accent-dark);
+}
+
+.ns-auth-link[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ns-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ns-muted);
+}
+
+.ns-auth-divider::before,
+.ns-auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ns-line);
+}
+
+.ns-auth-note {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ns-muted);
+}
+
+.ns-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.ns-alert .mat-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.ns-alert.error {
+  background: var(--ns-danger-soft);
+  color: #a3271b;
+}
+
+.ns-alert.info {
+  background: var(--ns-card);
+  color: var(--ns-ink);
+  box-shadow: inset 0 0 0 1px var(--ns-line);
+}
+
+.ns-alert.success {
+  background: var(--ns-success-soft);
+  color: #17643f;
+}
+
+@media (max-width: 900px) {
+  .ns-auth {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-auth-brand {
+    padding: 22px 20px 28px;
+    gap: 22px;
+  }
+
+  .ns-auth-brand::after {
+    width: 120px;
+    height: 120px;
+    border-width: 20px;
+    inset-inline-end: -36px;
+    top: -52px;
+    bottom: auto;
+  }
+
+  .ns-auth-pitch {
+    max-width: 82%;
+  }
+
+  .ns-auth-pitch h2 {
+    font-size: 26px;
+    margin: 14px 0 0;
+  }
+
+  .ns-auth-pitch p,
+  .ns-auth-foot {
+    display: none;
+  }
+
+  .ns-auth-main {
+    place-items: start center;
+    padding: 32px 20px 48px;
+  }
+
+  .ns-auth-head h1 {
+    font-size: 28px;
+  }
+}
+
+@keyframes ns-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ns-float {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  50% { translate: 0 -12px; rotate: 8deg; }
+}
+
+@keyframes ns-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 91, 58, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(255, 91, 58, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 91, 58, 0); }
+}
+
+@keyframes ns-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-auth *,
+  .ns-auth *::before,
+  .ns-auth *::after,
+  .ns-auth-brand::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Dashboard pages (inside the shell)
+   Shared touches so every page feels like one product.
+   ───────────────────────────────────────── */
+.ns-shell .header-title h1,
+.ns-shell .page-header h1 {
+  font-size: 34px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.1 !important;
+}
+
+.ns-shell .header-title .subtitle,
+.ns-shell .header-title p {
+  font-size: 15px !important;
+  color: var(--ns-muted) !important;
+}
+
+// The main "Add ..." action on each page is the one coral button.
+.ns-shell .add-btn.mat-mdc-button-base {
+  background: var(--ns-accent) !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 10px 24px -12px rgba(255, 91, 58, 0.8) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+
+.ns-shell .add-btn.mat-mdc-button-base:not([disabled]):hover {
+  background: var(--ns-accent-dark) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -12px rgba(255, 91, 58, 0.85) !important;
+}
+
+.ns-shell .add-btn.mat-mdc-button-base[disabled] {
+  background: var(--ns-line) !important;
+  color: var(--ns-muted) !important;
+  box-shadow: none !important;
+}
+
+.ns-shell .export-btn.mat-mdc-button-base {
+  border-radius: 999px !important;
+  color: var(--ns-ink) !important;
+  border-color: var(--ns-line) !important;
+  background: var(--ns-card) !important;
+}
+
+.ns-shell .export-btn.mat-mdc-button-base:not([disabled]):hover {
+  border-color: var(--ns-ink) !important;
+}
+
+// Tables and cards: white on paper, hairline instead of heavy shadows.
+.ns-shell .mat-mdc-card {
+  --mat-card-elevated-container-color: var(--ns-card);
+  --mat-card-outlined-container-color: var(--ns-card);
+  --mat-card-elevated-container-shape: 20px;
+}
+
+.ns-shell .mat-mdc-table {
+  --mat-table-background-color: transparent;
+  --mat-table-header-headline-color: var(--ns-muted);
+  --mat-table-row-item-outline-color: var(--ns-line);
+}
+
+.ns-shell .mat-mdc-row:hover {
+  background: #fbfaf7;
+}
+
+.ns-shell .mat-mdc-icon-button:not([disabled]):hover {
+  color: var(--ns-ink);
+}
+
+.ns-shell .delete-btn.mat-mdc-icon-button:not([disabled]):hover {
+  color: var(--ns-danger) !important;
+}
+
+@media (max-width: 640px) {
+  .ns-shell .header-title h1,
+  .ns-shell .page-header h1 {
+    font-size: 28px !important;
+  }
+}

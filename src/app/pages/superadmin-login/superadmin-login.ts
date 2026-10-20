@@ -1,22 +1,25 @@
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { NsLogo } from '../../shared/ns-logo/ns-logo';
 
 @Component({
   selector: 'app-superadmin-login',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    NsLogo,
   ],
   templateUrl: './superadmin-login.html',
   styleUrls: ['./superadmin-login.scss'],

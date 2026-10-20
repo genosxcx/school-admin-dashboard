@@ -5,16 +5,16 @@
   </div>
 
   <div class="settings-actions">
-    <button mat-raised-button color="primary" (click)="activeSection = 'org'">
+    <button mat-raised-button color="primary" class="section-tab" [class.active]="activeSection === 'org'" (click)="activeSection = 'org'">
       <mat-icon>business</mat-icon> {{ 'SETTINGS.ACTIONS.ORG' | translate }}
     </button>
-    <button mat-raised-button color="primary" (click)="activeSection = 'password'">
+    <button mat-raised-button color="primary" class="section-tab" [class.active]="activeSection === 'password'" (click)="activeSection = 'password'">
       <mat-icon>lock</mat-icon> {{ 'SETTINGS.ACTIONS.PASSWORD' | translate }}
     </button>
-    <button mat-raised-button color="primary" (click)="activeSection = 'language'">
+    <button mat-raised-button color="primary" class="section-tab" [class.active]="activeSection === 'language'" (click)="activeSection = 'language'">
       <mat-icon>language</mat-icon> {{ 'SETTINGS.ACTIONS.LANGUAGE' | translate }}
     </button>
-    <button mat-raised-button color="accent" (click)="activeSection = 'terms'">
+    <button mat-raised-button color="accent" class="section-tab" [class.active]="activeSection === 'terms'" (click)="activeSection = 'terms'">
       <mat-icon>description</mat-icon> {{ 'SETTINGS.ACTIONS.TERMS' | translate }}
     </button>
   </div>

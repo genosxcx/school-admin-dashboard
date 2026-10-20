@@ -1,46 +1,61 @@
-<div class="login-wrapper">
-  <div class="login-card">
-    <div class="login-header">
-      <h1>Super Admin</h1>
-      <p>Login to review principal registration requests</p>
+<div class="ns-auth">
+  <aside class="ns-auth-brand">
+    <a routerLink="/" aria-label="NadaSoft home"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+
+    <div class="ns-auth-pitch">
+      <span class="ns-auth-pill">Super Admin</span>
+      <h2>Every new school starts <em>right here.</em></h2>
+      <p>Review and approve principal and parent registration requests.</p>
     </div>
 
-    <!-- <div class="quick-fill">
-      <button
-        mat-stroked-button
-        type="button"
-        class="quick-btn"
-        (click)="fillSuperAdmin()"
-        [disabled]="loading"
-      >
-        Super Admin Login
-      </button>
-    </div> -->
+    <div class="ns-auth-foot">&copy; NadaSoft</div>
+  </aside>
 
-    <form (ngSubmit)="submit()" [formGroup]="form">
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="email" />
-        @if (form.get('email')!.touched && form.get('email')!.invalid) {
-          <mat-error>Enter a valid email</mat-error>
+  <main class="ns-auth-main">
+    <div class="ns-auth-card">
+      <div class="ns-auth-head">
+        <span class="ns-eyebrow">Restricted area</span>
+        <h1>Super Admin</h1>
+        <p>Login to review principal registration requests</p>
+      </div>
+
+      <!-- <div class="quick-fill">
+        <button
+          mat-stroked-button
+          type="button"
+          class="quick-btn"
+          (click)="fillSuperAdmin()"
+          [disabled]="loading"
+        >
+          Super Admin Login
+        </button>
+      </div> -->
+
+      <form (ngSubmit)="submit()" [formGroup]="form">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" />
+          @if (form.get('email')!.touched && form.get('email')!.invalid) {
+            <mat-error>Enter a valid email</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" />
+          @if (form.get('password')!.touched && form.get('password')!.invalid) {
+            <mat-error>Password must be at least 6 characters</mat-error>
+          }
+        </mat-form-field>
+
+        @if (error) {
+          <div class="ns-alert error">{{ error }}</div>
         }
-      </mat-form-field>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Password</mat-label>
-        <input matInput formControlName="password" type="password" />
-        @if (form.get('password')!.touched && form.get('password')!.invalid) {
-          <mat-error>Password must be at least 6 characters</mat-error>
-        }
-      </mat-form-field>
-
-      @if (error) {
-        <div class="err">{{ error }}</div>
-      }
-
-      <button mat-raised-button color="primary" class="btn" [disabled]="loading">
-        {{ loading ? 'Signing in...' : 'Sign in' }}
-      </button>
-    </form>
-  </div>
+        <button mat-raised-button color="primary" class="ns-auth-submit" [disabled]="loading">
+          {{ loading ? 'Signing in...' : 'Sign in' }}
+        </button>
+      </form>
+    </div>
+  </main>
 </div>

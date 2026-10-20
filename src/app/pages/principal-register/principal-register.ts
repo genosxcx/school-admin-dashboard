@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { NsLogo } from '../../shared/ns-logo/ns-logo';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SuperadminService } from '../../core/services/superadmin.service';
@@ -30,6 +31,7 @@ import { SuperadminService } from '../../core/services/superadmin.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    NsLogo,
     MatIconModule,
     MatProgressSpinnerModule,
   ],
