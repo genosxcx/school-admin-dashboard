@@ -1,17 +1,17 @@
 <aside class="sidebar">
   <div class="brand">
     <div class="logo-row">
-  @if (schoolLogo) {
-    <img [src]="schoolLogo" alt="School Logo" class="sidebar-logo" />
-  } @else {
-    <div class="logo-mark">{{ 'BRAND.LOGO_MARK' | translate }}</div>
-  }
-  
-  <div class="brand-text">
-    <div class="logo">{{ schoolName || ('BRAND.TITLE' | translate) }}</div>
-    <div class="sub">{{ 'BRAND.SUBTITLE' | translate }}</div>
-  </div>
-</div>
+      @if (schoolLogo) {
+        <img [src]="schoolLogo" alt="School Logo" class="sidebar-logo" />
+      } @else {
+        <div class="logo-mark">{{ 'BRAND.LOGO_MARK' | translate }}</div>
+      }
+
+      <div class="brand-text">
+        <div class="logo">{{ schoolName || ('BRAND.TITLE' | translate) }}</div>
+        <div class="sub">{{ 'BRAND.SUBTITLE' | translate }}</div>
+      </div>
+    </div>
   </div>
 
   <mat-nav-list class="nav">
@@ -73,6 +73,9 @@
     <div class="hint">
       <mat-icon>help_outline</mat-icon>
       <span>{{ 'FOOTER.NEED_ASSISTANCE' | translate }}</span>
+    </div>
+    <div class="powered">
+      <app-ns-logo [size]="20" [inverted]="true"></app-ns-logo>
     </div>
   </div>
 </aside>

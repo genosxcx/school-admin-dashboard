@@ -1,19 +1,20 @@
 :host {
   display: block;
   height: 100%;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: var(--ns-font);
 }
 
 .shell {
   height: 100vh;
-  background: #f8fafc;
+  background: var(--ns-paper);
+  color: var(--ns-ink);
 }
 
 .shell-sidenav {
-  width: 260px;
-  border-right: 1px solid rgba(15, 23, 42, 0.06) !important;
-  background: #ffffff;
-  box-shadow: 1px 0 10px rgba(0, 0, 0, 0.02);
+  width: 264px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ns-ink);
   transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -22,16 +23,16 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  background: var(--ns-paper);
 }
 
 .page {
   flex: 1;
-  padding: 32px;
+  padding: 32px 36px 48px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-/* Smooth custom scrollbar for the main content area */
 .page::-webkit-scrollbar {
   width: 8px;
 }
@@ -39,22 +40,22 @@
   background: transparent;
 }
 .page::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
+  background: rgba(17, 19, 24, 0.14);
   border-radius: 999px;
 }
 .page::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
+  background: rgba(17, 19, 24, 0.24);
 }
 
 @media (max-width: 1024px) {
   .page {
-    padding: 20px;
+    padding: 24px;
   }
 }
 
 @media (max-width: 768px) {
   .shell-sidenav {
-    width: 76px; /* Sleek mini-rail on tablets/mobile */
+    width: 72px;
   }
   .page {
     padding: 16px;

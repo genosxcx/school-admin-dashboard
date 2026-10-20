@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { NsLogo } from '../../shared/ns-logo/ns-logo';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    NsLogo,
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],

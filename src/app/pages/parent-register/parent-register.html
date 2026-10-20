@@ -1,18 +1,32 @@
-<div class="register-container">
-  <mat-card class="register-card">
-    <mat-card-header>
-      <mat-card-title>Parent Registration</mat-card-title>
-      <mat-card-subtitle>Create an account to homeschool your kids</mat-card-subtitle>
-    </mat-card-header>
+<div class="ns-auth">
+  <aside class="ns-auth-brand">
+    <a routerLink="/" aria-label="NadaSoft home"><app-ns-logo [inverted]="true"></app-ns-logo></a>
 
-<mat-card-content>
-      <div *ngIf="success" style="text-align: center; padding: 24px 0;">
-        <h3 style="color: #4caf50; margin-bottom: 16px;">Registration Successful!</h3>
+    <div class="ns-auth-pitch">
+      <span class="ns-auth-pill">For parents</span>
+      <h2>Homeschool, with a <em>little help.</em></h2>
+      <p>Follow your kids' reading, assignments and progress from one simple dashboard.</p>
+    </div>
+
+    <div class="ns-auth-foot">&copy; NadaSoft</div>
+  </aside>
+
+  <main class="ns-auth-main">
+    <div class="ns-auth-card">
+      <div class="ns-auth-head">
+        <span class="ns-eyebrow">New account</span>
+        <h1>Parent Registration</h1>
+        <p>Create an account to homeschool your kids</p>
+      </div>
+
+      <div *ngIf="success" class="success-box">
+        <div class="success-icon"><mat-icon>check</mat-icon></div>
+        <h3>Registration Successful!</h3>
         <p>Your account has been created and is currently pending approval.</p>
         <p>You will be redirected to the login page shortly.</p>
       </div>
 
-      <div class="error-msg" *ngIf="error">{{ error }}</div>
+      <div class="ns-alert error" *ngIf="error">{{ error }}</div>
 
       <form *ngIf="!success" [formGroup]="form" (ngSubmit)="submit()" class="form-layout">
         <mat-form-field appearance="outline">
@@ -42,13 +56,14 @@
           </mat-error>
         </mat-form-field>
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading" class="submit-btn">
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading" class="ns-auth-submit">
           {{ loading ? 'Creating Account...' : 'Sign Up' }}
         </button>
       </form>
-    </mat-card-content>
-    <div class="card-footer">
-      Already have an account? <a routerLink="/admin/login">Log In</a>
+
+      <p class="ns-auth-note">
+        Already have an account? <a class="ns-auth-link" routerLink="/admin/login">Log In</a>
+      </p>
     </div>
-  </mat-card>
+  </main>
 </div>

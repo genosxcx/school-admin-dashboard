@@ -9,6 +9,7 @@ import { DataService } from '../../core/services/data.service'; // ✅ Added
 
 // ✅ Import TranslatePipe directly instead of the module
 import { TranslatePipe } from '@ngx-translate/core';
+import { NsLogo } from '../../shared/ns-logo/ns-logo';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,7 +20,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     AsyncPipe,
     MatListModule,
     MatIconModule,
-    TranslatePipe 
+    TranslatePipe,
+    NsLogo,
   ],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss'],

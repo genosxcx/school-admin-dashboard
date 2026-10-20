@@ -75,15 +75,15 @@ type AssignmentSummaryData = Assignment & { classNames?: string };
   styles: [`
     .content { display: flex; flex-direction: column; gap: 20px; padding-top: 8px; max-width: 420px; }
     .section { display: flex; flex-direction: column; gap: 6px; }
-    .label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
-    .description { margin: 0; line-height: 1.6; color: #0f172a; white-space: pre-wrap; }
+    .label { font-size: 12px; font-weight: 700; color: var(--ns-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .description { margin: 0; line-height: 1.6; color: var(--ns-ink); white-space: pre-wrap; }
     .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .meta-item { display: flex; align-items: flex-start; gap: 8px; }
-    .meta-item mat-icon { color: #4f46e5; font-size: 20px; width: 20px; height: 20px; margin-top: 2px; }
+    .meta-item mat-icon { color: var(--ns-ink); font-size: 20px; width: 20px; height: 20px; margin-top: 2px; }
     .meta-item div { display: flex; flex-direction: column; gap: 2px; }
-    .meta-item .value { font-size: 13px; font-weight: 600; color: #0f172a; }
+    .meta-item .value { font-size: 13px; font-weight: 600; color: var(--ns-ink); }
     .pills { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pill { background: #eef2ff; color: #4f46e5; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .pill { background: var(--ns-paper-deep); color: var(--ns-ink); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
   `],
 })
 export class AssignmentSummaryDialog {

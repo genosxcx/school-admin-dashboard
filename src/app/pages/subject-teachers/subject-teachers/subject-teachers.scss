@@ -3,27 +3,27 @@
    ───────────────────────────────────────── */
 
 :host {
-  --primary:      #4f46e5;
-  --primary-soft: #eef2ff;
-  --primary-dark: #3730a3;
-  --green:        #10b981;
-  --green-soft:   #d1fae5;
-  --blue:         #3b82f6;
-  --blue-soft:    #dbeafe;
-  --amber:        #f59e0b;
-  --amber-soft:   #fef3c7;
-  --red:          #ef4444;
-  --red-soft:     #fef2f2;
+  --primary:      var(--ns-ink);
+  --primary-soft: var(--ns-paper-deep);
+  --primary-dark: var(--ns-ink-soft);
+  --green:        var(--ns-success);
+  --green-soft:   var(--ns-success-soft);
+  --blue:         var(--ns-ink);
+  --blue-soft:    var(--ns-paper-deep);
+  --amber:        var(--ns-accent);
+  --amber-soft:   var(--ns-accent-soft);
+  --red:          var(--ns-danger);
+  --red-soft:     var(--ns-danger-soft);
   --surface:      #ffffff;
-  --bg:           #f8fafc;
-  --border:       rgba(15, 23, 42, 0.06);
-  --text:         #0f172a;
-  --muted:        #64748b;
+  --bg:           var(--ns-paper);
+  --border:       rgba(17, 19, 24, 0.06);
+  --text:         var(--ns-ink);
+  --muted:        var(--ns-muted);
   --radius-sm:    8px;
   --radius-md:    12px;
   --radius-lg:    18px;
-  --shadow-sm:    0 2px 4px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-md:    0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+  --shadow-sm:    0 2px 4px rgba(17, 19, 24, 0.03), 0 1px 2px rgba(17, 19, 24, 0.04);
+  --shadow-md:    0 10px 25px -5px rgba(17, 19, 24, 0.06), 0 8px 10px -6px rgba(17, 19, 24, 0.03);
 }
 
 .teachers-container {
@@ -86,7 +86,7 @@
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
-      border-color: rgba(15, 23, 42, 0.12) !important;
+      border-color: rgba(17, 19, 24, 0.12) !important;
     }
 
     &.mat-focused {
@@ -124,12 +124,12 @@
   font-weight: 600 !important;
   font-size: 14px !important;
   letter-spacing: 0.3px;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(17, 19, 24, 0.25) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
   &:hover:not([disabled]) {
     background: var(--primary-dark) !important;
-    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35) !important;
+    box-shadow: 0 6px 16px rgba(17, 19, 24, 0.35) !important;
     transform: translateY(-1px);
   }
 
@@ -139,7 +139,7 @@
   }
 
   mat-icon {
-    margin-right: 6px;
+    margin-inline-end: 6px;
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -150,9 +150,9 @@
 .error-msg {
   padding: 14px 18px;
   border-radius: var(--radius-md);
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: var(--ns-danger-soft);
+  color: #a3271b;
+  border: 1px solid #f6c9c3;
   font-size: 14px;
   font-weight: 600;
   display: flex;
@@ -186,8 +186,8 @@
 
   /* Header Row */
   .mat-mdc-header-row {
-    background: #f8fafc;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    background: var(--ns-paper);
+    border-bottom: 1px solid rgba(17, 19, 24, 0.08);
     height: 52px;
 
     .mat-mdc-header-cell {
@@ -208,7 +208,7 @@
     height: 68px;
 
     &:hover {
-      background-color: #f8fafc;
+      background-color: var(--ns-paper);
     }
 
     &:last-child {
@@ -272,8 +272,8 @@
 .classes-text {
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
-  background: #f1f5f9;
+  color: var(--ns-ink-soft);
+  background: var(--ns-paper-deep);
   padding: 4px 10px;
   border-radius: 6px;
   display: inline-block;
@@ -281,7 +281,7 @@
 
 /* Action Buttons */
 .action-cell {
-  text-align: right;
+  text-align: end;
 }
 
 .action-buttons {
@@ -333,7 +333,7 @@
   .spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid #e2e8f0;
+    border: 3px solid var(--ns-line);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -402,19 +402,19 @@
   height: 44px !important;
   padding: 0 20px !important;
   border-radius: var(--radius-md) !important;
-  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  border: 1px solid rgba(17, 19, 24, 0.12) !important;
   font-weight: 600 !important;
   font-size: 14px !important;
   color: var(--muted) !important;
   transition: all 0.2s ease !important;
 
   &:hover:not([disabled]) {
-    background: #f1f5f9 !important;
+    background: var(--ns-paper-deep) !important;
     color: var(--text) !important;
   }
 
   mat-icon {
-    margin-right: 6px;
+    margin-inline-end: 6px;
     font-size: 18px;
     width: 18px;
     height: 18px;

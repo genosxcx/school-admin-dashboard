@@ -2,104 +2,121 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  height: 68px !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-  padding: 0 32px !important;
+  height: 72px !important;
+  background: rgba(247, 245, 240, 0.82) !important;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid rgba(17, 19, 24, 0.06);
+  padding: 0 36px !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  font-family: var(--ns-font);
 }
 
 .left {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .title {
   font-size: 18px;
   font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.4px;
+  color: var(--ns-ink);
+  letter-spacing: -0.03em;
+  white-space: nowrap;
 }
 
 .badge-tag {
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 10px;
+  padding: 5px 12px 5px 10px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #4f46e5;
+  background: var(--ns-card);
+  color: var(--ns-ink);
+  box-shadow: 0 0 0 1px var(--ns-line);
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ns-accent);
+  }
 }
 
 .right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px 6px 6px;
-  background: #f8fafc;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  padding-block: 5px;
+  padding-inline: 5px 14px;
+  background: var(--ns-card);
+  box-shadow: 0 0 0 1px var(--ns-line);
   border-radius: 999px;
 }
 
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #4f46e5;
+  background: var(--ns-ink);
   color: #ffffff;
   display: grid;
   place-items: center;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .user-name {
   font-size: 13px;
-  font-weight: 600;
-  color: #334155;
-  padding-right: 4px;
+  font-weight: 700;
+  color: var(--ns-ink);
 }
 
 .logout-btn {
-  border-radius: 10px !important;
-  font-weight: 600 !important;
+  height: 40px !important;
   font-size: 13px !important;
-  color: #64748b !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
-  height: 38px !important;
-  transition: all 0.15s ease !important;
+  --mat-button-outlined-label-text-color: var(--ns-ink);
+  --mat-button-outlined-outline-color: var(--ns-line);
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 
   &:hover {
-    background: #fef2f2 !important;
-    color: #ef4444 !important;
-    border-color: #fecaca !important;
+    background: var(--ns-ink) !important;
+    --mat-button-outlined-label-text-color: #ffffff;
+    --mat-button-outlined-outline-color: var(--ns-ink);
   }
 
   mat-icon {
     font-size: 18px;
     width: 18px;
     height: 18px;
-    margin-right: 4px;
   }
+}
+
+// The logout arrow points the other way in RTL.
+:host-context([dir='rtl']) .logout-btn mat-icon {
+  transform: scaleX(-1);
 }
 
 @media (max-width: 768px) {
   .topbar {
     padding: 0 16px !important;
   }
-  .user-name {
-    display: none; // Keep topbar clean on small screens
+  .user-name,
+  .badge-tag {
+    display: none;
   }
 }
