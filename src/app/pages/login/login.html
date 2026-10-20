@@ -1,11 +1,14 @@
 <div class="ns-auth">
   <aside class="ns-auth-brand">
-    <a routerLink="/" aria-label="NadaSoft home"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+    <div class="ns-auth-top">
+      <a routerLink="/" [attr.aria-label]="'AUTH.HOME_LINK' | translate"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+      <app-lang-switch></app-lang-switch>
+    </div>
 
     <div class="ns-auth-pitch">
-      <span class="ns-auth-pill">School portal</span>
-      <h2>Your whole school, in <em>one calm place.</em></h2>
-      <p>Teachers, classes, students and reading progress for Hya Naqra'a, all in one dashboard.</p>
+      <span class="ns-auth-pill">{{ 'AUTH.LOGIN.PILL' | translate }}</span>
+      <h2>{{ 'AUTH.LOGIN.PITCH_1' | translate }} <em>{{ 'AUTH.LOGIN.PITCH_2' | translate }}</em></h2>
+      <p>{{ 'AUTH.LOGIN.PITCH_DESC' | translate }}</p>
     </div>
 
     <div class="ns-auth-foot">&copy; NadaSoft</div>
@@ -14,46 +17,46 @@
   <main class="ns-auth-main">
     <div class="ns-auth-card">
       <div class="ns-auth-head">
-        <span class="ns-eyebrow">Welcome back</span>
-        <h1>Sign In</h1>
-        <p>Welcome back to your school portal</p>
+        <span class="ns-eyebrow">{{ 'AUTH.LOGIN.EYEBROW' | translate }}</span>
+        <h1>{{ 'AUTH.LOGIN.TITLE' | translate }}</h1>
+        <p>{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
       </div>
 
       <form (ngSubmit)="submit()" [formGroup]="form">
         <mat-form-field appearance="outline" class="field">
-          <mat-label>Email</mat-label>
+          <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
           <input matInput formControlName="email" type="email" />
           @if (form.get('email')!.touched && form.get('email')!.invalid) {
-            <mat-error>Enter a valid email</mat-error>
+            <mat-error>{{ 'AUTH.INVALID_EMAIL' | translate }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="field">
-          <mat-label>Password</mat-label>
+          <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
           <input matInput formControlName="password" type="password" />
           @if (form.get('password')!.touched && form.get('password')!.invalid) {
-            <mat-error>Password must be at least 6 characters</mat-error>
+            <mat-error>{{ 'AUTH.PASSWORD_MIN' | translate }}</mat-error>
           }
         </mat-form-field>
 
         <div class="forgot-row">
           <button type="button" class="ns-auth-link forgot-link" [disabled]="loading" (click)="forgotPassword()">
-            Forgot password?
+            {{ 'AUTH.LOGIN.FORGOT' | translate }}
           </button>
         </div>
 
         @if (error) {
-          <div class="ns-alert error">{{ error }}</div>
+          <div class="ns-alert error">{{ error | translate }}</div>
         }
         @if (info) {
-          <div class="ns-alert info">{{ info }}</div>
+          <div class="ns-alert info">{{ info | translate }}</div>
         }
 
         <button mat-raised-button color="primary" class="ns-auth-submit" [disabled]="loading">
-          {{ loading ? 'Signing in...' : 'Sign in' }}
+          {{ (loading ? 'AUTH.SIGNING_IN' : 'AUTH.SIGN_IN') | translate }}
         </button>
 
-        <div class="ns-auth-divider">New here?</div>
+        <div class="ns-auth-divider">{{ 'AUTH.LOGIN.NEW_HERE' | translate }}</div>
 
         <div class="register-row">
           <button
@@ -62,12 +65,12 @@
             class="ns-auth-secondary"
             [disabled]="loading"
             routerLink="/admin/register">
-            Register as Principal
+            {{ 'AUTH.LOGIN.REGISTER_PRINCIPAL' | translate }}
           </button>
         </div>
 
         <p class="ns-auth-note">
-          Homeschooling your kids? <a class="ns-auth-link" routerLink="/admin/parent-register">Register here</a>
+          {{ 'AUTH.LOGIN.HOMESCHOOL' | translate }} <a class="ns-auth-link" routerLink="/admin/parent-register">{{ 'AUTH.LOGIN.REGISTER_HERE' | translate }}</a>
         </p>
       </form>
     </div>

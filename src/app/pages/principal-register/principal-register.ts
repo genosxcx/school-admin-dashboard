@@ -16,6 +16,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { NsLogo } from '../../shared/ns-logo/ns-logo';
+import { LangSwitch } from '../../shared/lang-switch/lang-switch';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SuperadminService } from '../../core/services/superadmin.service';
@@ -32,6 +34,8 @@ import { SuperadminService } from '../../core/services/superadmin.service';
     MatInputModule,
     MatButtonModule,
     NsLogo,
+    LangSwitch,
+    TranslatePipe,
     MatIconModule,
     MatProgressSpinnerModule,
   ],
@@ -189,7 +193,7 @@ export class PrincipalRegister {
 
     // Check password match
     if (!this.passwordsMatch()) {
-      this.error = 'Passwords do not match';
+      this.error = 'AUTH.PASSWORDS_MISMATCH';
       return;
     }
 
@@ -232,22 +236,22 @@ export class PrincipalRegister {
       const errorMessage = error?.message;
 
       if (errorCode === 'auth/email-already-in-use') {
-        this.error = 'This email is already registered. Please try another.';
+        this.error = 'AUTH.PRINCIPAL.EMAIL_IN_USE';
       } else if (errorCode === 'auth/invalid-email') {
-        this.error = 'Invalid email address. Please check and try again.';
+        this.error = 'AUTH.PRINCIPAL.INVALID_EMAIL';
       } else if (errorCode === 'auth/weak-password') {
-        this.error = 'Password is too weak. Please use a stronger password.';
+        this.error = 'AUTH.PRINCIPAL.WEAK_PASSWORD';
       } else if (errorCode === 'auth/operation-not-allowed') {
         this.error =
-          'Registration is currently disabled. Please contact support.';
+          'AUTH.PRINCIPAL.DISABLED';
       } else if (errorCode === 'permission-denied') {
         this.error =
-          'The server refused the registration request. Please contact support.';
+          'AUTH.PRINCIPAL.REFUSED';
       } else if (errorMessage) {
         this.error = errorMessage;
       } else {
         this.error =
-          'Failed to submit registration request. Please try again.';
+          'AUTH.PRINCIPAL.SUBMIT_FAILED';
       }
 
       console.error('Registration error:', error);
