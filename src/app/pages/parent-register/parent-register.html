@@ -1,11 +1,14 @@
 <div class="ns-auth">
   <aside class="ns-auth-brand">
-    <a routerLink="/" aria-label="NadaSoft home"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+    <div class="ns-auth-top">
+      <a routerLink="/" [attr.aria-label]="'AUTH.HOME_LINK' | translate"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+      <app-lang-switch></app-lang-switch>
+    </div>
 
     <div class="ns-auth-pitch">
-      <span class="ns-auth-pill">For parents</span>
-      <h2>Homeschool, with a <em>little help.</em></h2>
-      <p>Follow your kids' reading, assignments and progress from one simple dashboard.</p>
+      <span class="ns-auth-pill">{{ 'AUTH.PARENT.PILL' | translate }}</span>
+      <h2>{{ 'AUTH.PARENT.PITCH_1' | translate }} <em>{{ 'AUTH.PARENT.PITCH_2' | translate }}</em></h2>
+      <p>{{ 'AUTH.PARENT.PITCH_DESC' | translate }}</p>
     </div>
 
     <div class="ns-auth-foot">&copy; NadaSoft</div>
@@ -14,55 +17,55 @@
   <main class="ns-auth-main">
     <div class="ns-auth-card">
       <div class="ns-auth-head">
-        <span class="ns-eyebrow">New account</span>
-        <h1>Parent Registration</h1>
-        <p>Create an account to homeschool your kids</p>
+        <span class="ns-eyebrow">{{ 'AUTH.PARENT.EYEBROW' | translate }}</span>
+        <h1>{{ 'AUTH.PARENT.TITLE' | translate }}</h1>
+        <p>{{ 'AUTH.PARENT.SUBTITLE' | translate }}</p>
       </div>
 
       <div *ngIf="success" class="success-box">
         <div class="success-icon"><mat-icon>check</mat-icon></div>
-        <h3>Registration Successful!</h3>
-        <p>Your account has been created and is currently pending approval.</p>
-        <p>You will be redirected to the login page shortly.</p>
+        <h3>{{ 'AUTH.PARENT.SUCCESS_TITLE' | translate }}</h3>
+        <p>{{ 'AUTH.PARENT.SUCCESS_1' | translate }}</p>
+        <p>{{ 'AUTH.PARENT.SUCCESS_2' | translate }}</p>
       </div>
 
-      <div class="ns-alert error" *ngIf="error">{{ error }}</div>
+      <div class="ns-alert error" *ngIf="error">{{ error | translate }}</div>
 
       <form *ngIf="!success" [formGroup]="form" (ngSubmit)="submit()" class="form-layout">
         <mat-form-field appearance="outline">
-          <mat-label>Full Name</mat-label>
-          <input matInput formControlName="fullName" placeholder="e.g. John Doe" />
-          <mat-error *ngIf="form.get('fullName')?.hasError('required')">Name is required</mat-error>
+          <mat-label>{{ 'AUTH.FULL_NAME' | translate }}</mat-label>
+          <input matInput formControlName="fullName" [placeholder]="'AUTH.PARENT.NAME_PLACEHOLDER' | translate" />
+          <mat-error *ngIf="form.get('fullName')?.hasError('required')">{{ 'AUTH.PARENT.NAME_REQUIRED' | translate }}</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Email Address</mat-label>
+          <mat-label>{{ 'AUTH.EMAIL_ADDRESS' | translate }}</mat-label>
           <input matInput type="email" formControlName="email" placeholder="john@example.com" />
-          <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
-          <mat-error *ngIf="form.get('email')?.hasError('email')">Invalid email address</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('required')">{{ 'AUTH.PARENT.EMAIL_REQUIRED' | translate }}</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">{{ 'AUTH.PARENT.EMAIL_INVALID' | translate }}</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Password</mat-label>
+          <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
           <input matInput type="password" formControlName="password" />
-          <mat-error *ngIf="form.get('password')?.hasError('minlength')">Must be at least 6 characters</mat-error>
+          <mat-error *ngIf="form.get('password')?.hasError('minlength')">{{ 'AUTH.PARENT.PASSWORD_MIN' | translate }}</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Confirm Password</mat-label>
+          <mat-label>{{ 'AUTH.CONFIRM_PASSWORD' | translate }}</mat-label>
           <input matInput type="password" formControlName="confirmPassword" />
           <mat-error *ngIf="form.hasError('mismatch') && form.get('confirmPassword')?.touched">
-            Passwords do not match
+            {{ 'AUTH.PASSWORDS_MISMATCH' | translate }}
           </mat-error>
         </mat-form-field>
 
         <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading" class="ns-auth-submit">
-          {{ loading ? 'Creating Account...' : 'Sign Up' }}
+          {{ (loading ? 'AUTH.PARENT.CREATING' : 'AUTH.PARENT.SIGN_UP') | translate }}
         </button>
       </form>
 
       <p class="ns-auth-note">
-        Already have an account? <a class="ns-auth-link" routerLink="/admin/login">Log In</a>
+        {{ 'AUTH.PARENT.HAVE_ACCOUNT' | translate }} <a class="ns-auth-link" routerLink="/admin/login">{{ 'AUTH.PARENT.LOG_IN' | translate }}</a>
       </p>
     </div>
   </main>

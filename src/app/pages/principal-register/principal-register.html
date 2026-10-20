@@ -1,11 +1,14 @@
 <div class="ns-auth">
   <aside class="ns-auth-brand">
-    <a routerLink="/" aria-label="NadaSoft home"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+    <div class="ns-auth-top">
+      <a routerLink="/" [attr.aria-label]="'AUTH.HOME_LINK' | translate"><app-ns-logo [inverted]="true"></app-ns-logo></a>
+      <app-lang-switch></app-lang-switch>
+    </div>
 
     <div class="ns-auth-pitch">
-      <span class="ns-auth-pill">For principals</span>
-      <h2>Bring your school <em>on board.</em></h2>
-      <p>Send a request, we approve it, and you can start adding teachers, classes and students.</p>
+      <span class="ns-auth-pill">{{ 'AUTH.PRINCIPAL.PILL' | translate }}</span>
+      <h2>{{ 'AUTH.PRINCIPAL.PITCH_1' | translate }} <em>{{ 'AUTH.PRINCIPAL.PITCH_2' | translate }}</em></h2>
+      <p>{{ 'AUTH.PRINCIPAL.PITCH_DESC' | translate }}</p>
     </div>
 
     <div class="ns-auth-foot">&copy; NadaSoft</div>
@@ -14,92 +17,92 @@
   <main class="ns-auth-main">
     <div class="ns-auth-card wide">
       <div class="ns-auth-head">
-        <span class="ns-eyebrow">New school</span>
-        <h1>Principal Registration</h1>
-        <p>Submit a request — Super Admin must approve it</p>
+        <span class="ns-eyebrow">{{ 'AUTH.PRINCIPAL.EYEBROW' | translate }}</span>
+        <h1>{{ 'AUTH.PRINCIPAL.TITLE' | translate }}</h1>
+        <p>{{ 'AUTH.PRINCIPAL.SUBTITLE' | translate }}</p>
       </div>
 
     <form (ngSubmit)="submit()" [formGroup]="form" class="registration-form">
         <!-- Full Name Field -->
         <div class="form-group">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Full Name</mat-label>
+            <mat-label>{{ 'AUTH.FULL_NAME' | translate }}</mat-label>
             <input matInput formControlName="fullName" />
             <mat-icon matPrefix>person</mat-icon>
           </mat-form-field>
           @if (form.get('fullName')?.touched && form.get('fullName')?.invalid) {
-            <span class="field-error">Please enter your full name</span>
+            <span class="field-error">{{ 'AUTH.PRINCIPAL.NAME_ERROR' | translate }}</span>
           }
         </div>
 
         <!-- Email Field -->
         <div class="form-group">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Email Address</mat-label>
+            <mat-label>{{ 'AUTH.EMAIL_ADDRESS' | translate }}</mat-label>
             <input matInput formControlName="email" type="email" />
             <mat-icon matPrefix>mail</mat-icon>
           </mat-form-field>
           @if (form.get('email')?.touched && form.get('email')?.invalid) {
-            <span class="field-error">Please enter a valid email address</span>
+            <span class="field-error">{{ 'AUTH.PRINCIPAL.EMAIL_ERROR' | translate }}</span>
           }
         </div>
 
         <!-- School Name Field -->
         <div class="form-group">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>School Name</mat-label>
+            <mat-label>{{ 'AUTH.PRINCIPAL.SCHOOL_NAME' | translate }}</mat-label>
             <input matInput formControlName="schoolName" />
             <mat-icon matPrefix>school</mat-icon>
           </mat-form-field>
           @if (form.get('schoolName')?.touched && form.get('schoolName')?.invalid) {
-            <span class="field-error">Please enter your school name</span>
+            <span class="field-error">{{ 'AUTH.PRINCIPAL.SCHOOL_ERROR' | translate }}</span>
           }
         </div>
 
         <!-- Password Field -->
         <div class="form-group">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Password</mat-label>
+            <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
             <input matInput formControlName="password" [type]="showPassword ? 'text' : 'password'" />
             <button 
               mat-icon-button 
               matSuffix 
               (click)="togglePasswordVisibility()" 
               type="button"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              [attr.aria-label]="(showPassword ? 'AUTH.PRINCIPAL.HIDE_PASSWORD' : 'AUTH.PRINCIPAL.SHOW_PASSWORD') | translate">
               <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </mat-form-field>
           <div class="password-requirements">
             <span class="req" [class.met]="form.get('password')?.value?.length! >= 6">
               <mat-icon>{{ form.get('password')?.value?.length! >= 6 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-              At least 6 characters
+              {{ 'AUTH.PRINCIPAL.AT_LEAST_6' | translate }}
             </span>
           </div>
           @if (form.get('password')?.touched && form.get('password')?.invalid) {
-            <span class="field-error">Password must be at least 6 characters</span>
+            <span class="field-error">{{ 'AUTH.PASSWORD_MIN' | translate }}</span>
           }
         </div>
 
         <!-- Confirm Password Field -->
         <div class="form-group">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Confirm Password</mat-label>
+            <mat-label>{{ 'AUTH.CONFIRM_PASSWORD' | translate }}</mat-label>
             <input matInput formControlName="confirmPassword" [type]="showPassword ? 'text' : 'password'" />
             <button 
               mat-icon-button 
               matSuffix 
               (click)="togglePasswordVisibility()" 
               type="button"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              [attr.aria-label]="(showPassword ? 'AUTH.PRINCIPAL.HIDE_PASSWORD' : 'AUTH.PRINCIPAL.SHOW_PASSWORD') | translate">
               <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </mat-form-field>
           @if (form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value && form.get('password')?.value !== form.get('confirmPassword')?.value) {
-            <span class="field-error">Passwords do not match</span>
+            <span class="field-error">{{ 'AUTH.PASSWORDS_MISMATCH' | translate }}</span>
           }
           @if (form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value && form.get('password')?.value === form.get('confirmPassword')?.value) {
-            <span class="field-success">Passwords match</span>
+            <span class="field-success">{{ 'AUTH.PRINCIPAL.PASSWORDS_MATCH' | translate }}</span>
           }
         </div>
 
@@ -107,7 +110,7 @@
         @if (error) {
           <div class="ns-alert error">
             <mat-icon>error_outline</mat-icon>
-            <span>{{ error }}</span>
+            <span>{{ error | translate }}</span>
           </div>
         }
 
@@ -119,7 +122,7 @@
             class="ns-auth-submit btn-submit" 
             [disabled]="loading || !form.valid">
             <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
-            <span>{{ loading ? 'Sending request...' : 'Send request' }}</span>
+            <span>{{ (loading ? 'AUTH.PRINCIPAL.SENDING' : 'AUTH.PRINCIPAL.SEND') | translate }}</span>
           </button>
           <button 
             mat-stroked-button 
@@ -128,13 +131,13 @@
             routerLink="/admin/login" 
             [disabled]="loading">
             <mat-icon>arrow_back</mat-icon>
-            <span>Back to login</span>
+            <span>{{ 'AUTH.PRINCIPAL.BACK' | translate }}</span>
           </button>
         </div>
 
         <!-- Footer text -->
         <p class="footer-text">
-          By registering, you agree to our <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>
+          {{ 'AUTH.PRINCIPAL.TERMS_PREFIX' | translate }} <a href="#terms">{{ 'AUTH.PRINCIPAL.TERMS' | translate }}</a> {{ 'AUTH.PRINCIPAL.AND' | translate }} <a href="#privacy">{{ 'AUTH.PRINCIPAL.PRIVACY' | translate }}</a>
         </p>
       </form>
     </div>

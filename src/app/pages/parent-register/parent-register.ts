@@ -9,6 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NsLogo } from '../../shared/ns-logo/ns-logo';
+import { LangSwitch } from '../../shared/lang-switch/lang-switch';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { auth, db } from '../../firebase';
 import { createUserWithEmailAndPassword, signOut } from 'firebase/auth'; // ✅ Added signOut
@@ -27,6 +29,8 @@ import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
     MatButtonModule,
     MatIconModule,
     NsLogo,
+    LangSwitch,
+    TranslatePipe,
   ],
   templateUrl: './parent-register.html',
   styleUrls: ['./parent-register.scss'],
@@ -103,7 +107,7 @@ export class ParentRegister {
 
     } catch (e: any) {
       console.error('[ParentRegister] error:', e);
-      this.error = e.message || 'Failed to create account.';
+      this.error = e.message || 'AUTH.PARENT.FAILED';
     } finally {
       this.loading = false;
     }

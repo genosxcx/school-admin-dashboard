@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { NsLogo } from '../../shared/ns-logo/ns-logo';
+import { LangSwitch } from '../../shared/lang-switch/lang-switch';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-superadmin-login',
@@ -20,6 +22,8 @@ import { NsLogo } from '../../shared/ns-logo/ns-logo';
     MatInputModule,
     MatButtonModule,
     NsLogo,
+    LangSwitch,
+    TranslatePipe,
   ],
   templateUrl: './superadmin-login.html',
   styleUrls: ['./superadmin-login.scss'],
@@ -58,14 +62,14 @@ export class SuperadminLogin {
       const { email, password } = this.form.getRawValue();
 
       if ((email ?? '').toLowerCase() !== this.SUPERADMIN_EMAIL.toLowerCase()) {
-        throw new Error('Access denied.');
+        throw new Error('AUTH.SUPER.ACCESS_DENIED');
       }
 
       await this.auth.login(email!, password!);
       await this.router.navigateByUrl('/superadmin/requests');
 
     } catch (e: any) {
-      this.error = e?.message ?? 'Login failed';
+      this.error = e?.message ?? 'AUTH.SUPER.LOGIN_FAILED';
     } finally {
       this.loading = false;
     }

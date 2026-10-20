@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { NsLogo } from '../../shared/ns-logo/ns-logo';
+import { LangSwitch } from '../../shared/lang-switch/lang-switch';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +22,8 @@ import { NsLogo } from '../../shared/ns-logo/ns-logo';
     MatInputModule,
     MatButtonModule,
     NsLogo,
+    LangSwitch,
+    TranslatePipe,
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
@@ -83,7 +87,7 @@ export class Login {
     const emailCtrl = this.form.get('email')!;
     if (emailCtrl.invalid) {
       emailCtrl.markAsTouched();
-      this.error = 'Enter your email above, then click "Forgot password?" again.';
+      this.error = 'AUTH.LOGIN.FORGOT_NEED_EMAIL';
       return;
     }
 
@@ -92,13 +96,13 @@ export class Login {
 
     try {
       await this.auth.sendPasswordReset(emailCtrl.value!);
-      this.info = 'If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder.';
+      this.info = 'AUTH.LOGIN.RESET_SENT';
     } catch (e: any) {
       console.error('Password reset error:', e);
       this.error =
         e?.code === 'auth/too-many-requests'
-          ? 'Too many attempts. Please try again later.'
-          : 'Could not send the reset email. Please try again.';
+          ? 'AUTH.LOGIN.TOO_MANY'
+          : 'AUTH.LOGIN.RESET_FAILED';
     } finally {
       this.loading = false;
       this.cdr.detectChanges();
@@ -126,7 +130,7 @@ export class Login {
       
     } catch (e: any) {
       console.error('Login Error:', e);
-      this.error = e?.message ?? 'Login failed. Please check your credentials.';
+      this.error = e?.message ?? 'AUTH.LOGIN.LOGIN_FAILED';
     } finally {
       this.loading = false;
       this.cdr.detectChanges(); // ✅ Force UI to stop spinning and show error
