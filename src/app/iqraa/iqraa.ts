@@ -31,6 +31,13 @@ interface Content {
   roleDesc: string;
   downloadBtn: string;
   downloadSubtext: string;
+  byLine: string;
+  appsTitle: string;
+  visitBtn: string;
+  webSubtext: string;
+  screenshotsTitle: string;
+  studentTab: string;
+  teacherTab: string;
 }
 
 @Component({
@@ -42,6 +49,7 @@ interface Content {
 })
 export class PortfolioComponent {
   language: string = 'en';
+  currentYear = new Date().getFullYear();
 
   languages: Language[] = [
     { code: 'en', label: 'EN' },
@@ -113,13 +121,13 @@ export class PortfolioComponent {
   // ✅ Your existing content (unchanged)
   content: Record<string, Content> = {
     en: {
-      title: 'hya naqraa',
+      title: 'Hya Naqra\'a',
       subtitle: 'Smart Arabic Reading & Literacy System',
       description:
         'An intelligent educational platform that leverages AI to help students master Arabic reading with personalized feedback and progress tracking.',
       overview: 'Overview',
       overviewText:
-        'hy naqraa is a comprehensive educational system designed to improve Arabic reading skills using deep learning and modern technology.',
+        'Hya Naqra\'a is a comprehensive educational system designed to improve Arabic reading skills using deep learning and modern technology.',
       components: [
   { 
     title: 'Student App', 
@@ -161,7 +169,14 @@ export class PortfolioComponent {
       roleDesc:
         'Designed and developed the entire system from the ground up, including the student app, role-based dashboard, Firebase backend, and AI integration.',
       downloadBtn: 'Download APK',
-      downloadSubtext: 'Android 8.0 or later'
+      downloadSubtext: 'Android 8.0 or later',
+      byLine: 'A NadaSoft project',
+      appsTitle: 'Three apps, one system',
+      visitBtn: 'Visit website',
+      webSubtext: 'Works in any browser',
+      screenshotsTitle: 'See it in action',
+      studentTab: 'Student app',
+      teacherTab: 'Teacher app'
     },
 
     ar: {
@@ -212,17 +227,24 @@ export class PortfolioComponent {
       roleDesc:
         'تطوير النظام بالكامل من البداية، بما في ذلك التطبيق ولوحة التحكم والبنية الخلفية وتكامل الذكاء الاصطناعي.',
       downloadBtn: 'تحميل التطبيق',
-      downloadSubtext: 'Android 8.0 أو أحدث'
+      downloadSubtext: 'Android 8.0 أو أحدث',
+      byLine: 'مشروع من NadaSoft',
+      appsTitle: 'ثلاثة تطبيقات، نظام واحد',
+      visitBtn: 'زيارة الموقع',
+      webSubtext: 'يعمل في أي متصفح',
+      screenshotsTitle: 'لقطات من التطبيق',
+      studentTab: 'تطبيق الطالب',
+      teacherTab: 'تطبيق المعلم'
     },
 
     he: {
-      title: 'hya naqraa',
+      title: 'Hya Naqra\'a',
       subtitle: 'מערכת חכמה להוראת קריאה בערבית',
       description:
         'פלטפורמה חינוכית המשתמשת בבינה מלאכותית לעזרה לתלמידים בשליטה בקריאה בערבית עם משוב בזמן אמת.',
       overview: 'סקירה כללית',
       overviewText:
-        'hy naqraa היא מערכת חינוכית מקיפה לשיפור כישורי קריאה בערבית באמצעות למידה עמוקה וטכנולוגיה מודרנית.',
+        'Hya Naqra\'a היא מערכת חינוכית מקיפה לשיפור כישורי קריאה בערבית באמצעות למידה עמוקה וטכנולוגיה מודרנית.',
       components: [
   { 
     title: 'אפליקציית תלמיד', 
@@ -263,7 +285,14 @@ export class PortfolioComponent {
       roleDesc:
         'פיתוח כל המערכת מקצה לקצה, כולל האפליקציה, לוח הבקרה, הבקאנד והשילוב של AI.',
       downloadBtn: 'הורד אפליקציה',
-      downloadSubtext: 'Android 8.0 ואילך'
+      downloadSubtext: 'Android 8.0 ואילך',
+      byLine: 'פרויקט של NadaSoft',
+      appsTitle: 'שלוש אפליקציות, מערכת אחת',
+      visitBtn: 'כניסה לאתר',
+      webSubtext: 'עובד בכל דפדפן',
+      screenshotsTitle: 'צילומי מסך',
+      studentTab: 'אפליקציית תלמיד',
+      teacherTab: 'אפליקציית מורה'
     }
   };
 

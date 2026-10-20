@@ -1,11 +1,21 @@
 <div class="portfolio" [dir]="textDirection">
   <!-- Header -->
   <header class="header">
-    <div class="header-container">
-      <div class="header-title">{{ currentContent.title }}</div>
-      <div class="language-switcher">
+    <div class="container header-inner">
+      <a class="brand" href="/">
+        <svg class="nada-mark" viewBox="0 0 40 40" aria-hidden="true">
+          <rect width="40" height="40" rx="11" fill="currentColor" />
+          <path d="M10 17v4a10 10 0 0 0 20 0v-4" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" />
+          <circle cx="20" cy="11" r="3.4" class="nada-dot" />
+        </svg>
+        <span class="brand-word">nadasoft</span>
+        <span class="brand-sep">/</span>
+        <span class="brand-product">{{ currentContent.title }}</span>
+      </a>
+      <div class="language-switcher" role="group" aria-label="Language">
         @for (lang of languages; track lang.code) {
           <button
+            type="button"
             [class.active]="language === lang.code"
             (click)="changeLanguage(lang.code)"
             class="lang-btn"
@@ -17,67 +27,92 @@
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Hero Section -->
+  <main>
+    <!-- Hero -->
     <section class="hero">
-      <div class="container">
-        <h1 class="hero-title">{{ currentContent.title }}</h1>
-        <h2 class="hero-subtitle">{{ currentContent.subtitle }}</h2>
-        <p class="hero-description">{{ currentContent.description }}</p>
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <span class="pill"><span class="pulse"></span>{{ currentContent.byLine }}</span>
+          <h1 class="hero-title">
+            {{ currentContent.title }}
+            @if (language !== 'ar') {
+              <span class="hero-arabic" lang="ar" dir="rtl">هيّا نقرأ</span>
+            }
+          </h1>
+          <h2 class="hero-subtitle">{{ currentContent.subtitle }}</h2>
+          <p class="hero-description">{{ currentContent.description }}</p>
+          <div class="hero-actions">
+            <a
+              class="btn btn-accent"
+              [href]="currentContent.components[0].downloadLink"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M12 4v11m0 0-5-5m5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              {{ currentContent.downloadBtn }}
+            </a>
+            <a
+              class="btn btn-ghost"
+              [href]="currentContent.components[2].link"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ currentContent.components[2].title }}
+            </a>
+          </div>
+          <p class="hero-note">{{ currentContent.downloadSubtext }}</p>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="logo-tile">
+            <img src="/assets/hya-naqraa.jpeg" alt="" />
+          </div>
+          <div class="phone">
+            <img src="/assets/screenshots/student/student3.jpg" alt="" />
+          </div>
+          <span class="float-letter fl-1">ب</span>
+          <span class="float-letter fl-2">ق</span>
+          <span class="float-letter fl-3">ر</span>
+        </div>
       </div>
     </section>
 
-    <!-- Overview Section -->
-    <section class="overview">
+    <!-- Apps -->
+    <section class="section">
       <div class="container">
-        <h3 class="section-title">{{ currentContent.overview }}</h3>
-        <p class="section-text">{{ currentContent.overviewText }}</p>
-      </div>
-    </section>
+        <div class="section-head">
+          <span class="kicker">{{ currentContent.overview }}</span>
+          <h2 class="section-title">{{ currentContent.appsTitle }}</h2>
+          <p class="section-lead">{{ currentContent.overviewText }}</p>
+        </div>
 
-    <!-- Components Section -->
-    <section class="components">
-      <div class="container">
-        <div class="components-grid">
+        <div class="apps-grid">
           @for (comp of currentContent.components; track $index; let i = $index) {
-            <div class="component-card">
-              <div 
-                class="component-header"
-                [class.clickable]="comp.link"
-              >
-                <h4 class="component-title">{{ comp.title }}</h4>
-                <p class="component-desc">{{ comp.desc }}</p>
-              </div>
+            <div class="app-card">
+              <span class="app-icon" [class.accent]="i === 0">
+                @if (i === 2) {
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="2" /><path d="M10.5 18h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                }
+              </span>
+              <h3 class="app-title">{{ comp.title }}</h3>
+              <p class="app-desc">{{ comp.desc }}</p>
 
-              @if (i === 0 || i === 1) {
-                <a
-                  [href]="comp.downloadLink"
-                  class="cta-button"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <span class="button-icon">⬇</span>
-                  Download APK
-                  <span class="button-subtext">
-                    (Android 8.0 or later)
-                  </span>
+              @if (comp.downloadLink) {
+                <a [href]="comp.downloadLink" class="app-link" target="_blank" rel="noopener">
+                  {{ currentContent.downloadBtn }}
+                  <svg class="arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 </a>
-              }
-
-              @if (i === 2) {
-                <a
-                  [href]="comp.link"
-                  class="cta-button"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <span class="button-icon">→</span>
-                  Visit Website
-                  <span class="button-subtext">
-                    (Web-based)
-                  </span>
+                <span class="app-sub">{{ currentContent.downloadSubtext }}</span>
+              } @else if (comp.link) {
+                <a [href]="comp.link" class="app-link" target="_blank" rel="noopener">
+                  {{ currentContent.visitBtn }}
+                  <svg class="arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 </a>
+                <span class="app-sub">{{ currentContent.webSubtext }}</span>
               }
             </div>
           }
@@ -85,29 +120,36 @@
       </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="how-it-works">
+    <!-- How it works -->
+    <section class="section section-dark">
       <div class="container">
-        <h3 class="section-title">{{ currentContent.aiTitle }}</h3>
-        <div class="points-grid">
-          @for (point of currentContent.aiPoints; track $index) {
-            <div class="point-item">
-              <div class="point-dot"></div>
+        <div class="section-head">
+          <h2 class="section-title">{{ currentContent.aiTitle }}</h2>
+        </div>
+        <ol class="steps">
+          @for (point of currentContent.aiPoints; track $index; let i = $index) {
+            <li class="step">
+              <span class="step-num">0{{ i + 1 }}</span>
               <p>{{ point }}</p>
-            </div>
+            </li>
           }
-        </div>
+        </ol>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
+    <!-- Features -->
+    <section class="section">
       <div class="container">
-        <h3 class="section-title">{{ currentContent.featuresTitle }}</h3>
+        <div class="section-head">
+          <span class="kicker">{{ currentContent.title }}</span>
+          <h2 class="section-title">{{ currentContent.featuresTitle }}</h2>
+        </div>
         <div class="features-grid">
           @for (feature of currentContent.features; track $index) {
-            <div class="feature-item">
-              <div class="feature-dot"></div>
+            <div class="feature">
+              <span class="check">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </span>
               <p>{{ feature }}</p>
             </div>
           }
@@ -115,57 +157,50 @@
       </div>
     </section>
 
-    <!-- Tech Stack Section -->
-    <section class="tech-stack">
+    <!-- Screenshots -->
+    <section class="section section-tint">
       <div class="container">
-        <h3 class="section-title">{{ currentContent.techTitle }}</h3>
-        <div class="tech-list">
-          @for (tech of currentContent.tech; track $index) {
-            <span class="tech-badge">
-              {{ tech }}
-            </span>
+        <div class="section-head section-head-row">
+          <h2 class="section-title">{{ currentContent.screenshotsTitle }}</h2>
+          <div class="segmented" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              [class.active]="activeShotsTab === 'student'"
+              [attr.aria-selected]="activeShotsTab === 'student'"
+              (click)="setShotsTab('student')"
+            >
+              {{ currentContent.studentTab }}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [class.active]="activeShotsTab === 'teacher'"
+              [attr.aria-selected]="activeShotsTab === 'teacher'"
+              (click)="setShotsTab('teacher')"
+            >
+              {{ currentContent.teacherTab }}
+            </button>
+          </div>
+        </div>
+
+        <div class="shots-row">
+          @for (img of currentScreenshots; track img; let i = $index) {
+            <button type="button" class="shot" (click)="openLightbox(i)">
+              <img [src]="img" alt="App screenshot" />
+            </button>
           }
         </div>
       </div>
     </section>
 
-    <!-- Screenshots Section -->
-    <section class="screenshots">
-      <div class="container">
-        <h3 class="section-title">
-          {{ language === 'ar' ? 'لقطات من التطبيق' : (language === 'he' ? 'צילומי מסך' : 'Screenshots') }}
-        </h3>
-
-        <div class="screenshots-tabs">
-          <button
-            type="button"
-            class="tab-btn"
-            [class.active]="activeShotsTab === 'student'"
-            (click)="setShotsTab('student')"
-          >
-            {{ language === 'ar' ? 'تطبيق الطالب' : (language === 'he' ? 'אפליקציית תלמיד' : 'Student App') }}
-          </button>
-
-          <button
-            type="button"
-            class="tab-btn"
-            [class.active]="activeShotsTab === 'teacher'"
-            (click)="setShotsTab('teacher')"
-          >
-            {{ language === 'ar' ? 'تطبيق المعلم' : (language === 'he' ? 'אפליקציית מורה' : 'Teacher App') }}
-          </button>
-        </div>
-
-        <!-- Organized Grid -->
-        <div class="shots-grid">
-          @for (img of currentScreenshots; track $index; let i = $index) {
-            <button
-              type="button"
-              class="shot-card"
-              (click)="openLightbox(i)"
-            >
-              <img class="shot-img" [src]="img" alt="App screenshot" loading="lazy" />
-            </button>
+    <!-- Tech -->
+    <section class="section">
+      <div class="container tech">
+        <h2 class="tech-title">{{ currentContent.techTitle }}</h2>
+        <div class="tech-list">
+          @for (tech of currentContent.tech; track $index) {
+            <span class="tech-badge">{{ tech }}</span>
           }
         </div>
       </div>
@@ -174,8 +209,16 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 hya-naqraa</p>
+    <div class="container footer-inner">
+      <a class="brand brand-small" href="/">
+        <svg class="nada-mark" viewBox="0 0 40 40" aria-hidden="true">
+          <rect width="40" height="40" rx="11" fill="currentColor" />
+          <path d="M10 17v4a10 10 0 0 0 20 0v-4" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" />
+          <circle cx="20" cy="11" r="3.4" class="nada-dot" />
+        </svg>
+        <span class="brand-word">nadasoft</span>
+      </a>
+      <p>&copy; {{ currentYear }} NadaSoft · {{ currentContent.title }}</p>
     </div>
   </footer>
 
@@ -183,10 +226,10 @@
   @if (lightboxOpen) {
     <div class="lightbox" (click)="closeLightbox()">
       <div class="lightbox-content" (click)="$event.stopPropagation()">
-        <button type="button" class="lb-close" (click)="closeLightbox()">✕</button>
-        <button type="button" class="lb-nav left" (click)="prevShot()">‹</button>
+        <button type="button" class="lb-close" (click)="closeLightbox()" aria-label="Close">✕</button>
+        <button type="button" class="lb-nav prev" (click)="prevShot()" aria-label="Previous">‹</button>
         <img class="lb-img" [src]="lightboxSrc" alt="Preview" />
-        <button type="button" class="lb-nav right" (click)="nextShot()">›</button>
+        <button type="button" class="lb-nav next" (click)="nextShot()" aria-label="Next">›</button>
       </div>
     </div>
   }
