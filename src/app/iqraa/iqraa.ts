@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { TranslateService } from '@ngx-translate/core';
 
 interface Language {
   code: string;
@@ -48,7 +49,19 @@ interface Content {
   styleUrls: ['./iqraa.scss']
 })
 export class PortfolioComponent {
-  language: string = 'en';
+  private translate = inject(TranslateService);
+  private platformId = inject(PLATFORM_ID);
+
+  // Shares the saved appLang with the homepage, login pages and dashboard.
+  language: string = this.savedLang();
+
+  private savedLang(): string {
+    if (isPlatformBrowser(this.platformId)) {
+      const saved = localStorage.getItem('appLang');
+      if (saved === 'en' || saved === 'ar' || saved === 'he') return saved;
+    }
+    return 'en';
+  }
   currentYear = new Date().getFullYear();
 
   languages: Language[] = [
@@ -310,6 +323,13 @@ export class PortfolioComponent {
 
   changeLanguage(lang: string): void {
     this.language = lang;
+    this.translate.use(lang);
+
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('appLang', lang);
+      document.documentElement.dir = this.textDirection;
+      document.documentElement.lang = lang;
+    }
   }
   onComponentClick(comp: any) {
   if (comp.link) {
