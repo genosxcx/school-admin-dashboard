@@ -1,15 +1,16 @@
-import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { Component, inject, input, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-// EN / AR / HE switcher for the public auth pages. Saves the choice the same
-// way Settings does, so the dashboard opens in the language picked here.
+// EN / AR / HE switcher for the public pages (homepage and auth). Saves the
+// choice the same way Settings does, so the dashboard opens in the language
+// picked here. Use [light]="true" on light backgrounds.
 @Component({
   selector: 'app-lang-switch',
   standalone: true,
   imports: [TranslatePipe],
   template: `
-    <div class="switch" role="group" [attr.aria-label]="'AUTH.LANGUAGE' | translate">
+    <div class="switch" [class.light]="light()" role="group" [attr.aria-label]="'AUTH.LANGUAGE' | translate">
       @for (l of langs; track l.code) {
         <button
           type="button"
@@ -50,6 +51,20 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
       background: #fff;
       color: var(--ns-ink);
     }
+    .light {
+      background: var(--ns-card, #fff);
+      box-shadow: inset 0 0 0 1px var(--ns-line);
+    }
+    .light button {
+      color: var(--ns-muted);
+    }
+    .light button:hover {
+      color: var(--ns-ink);
+    }
+    .light button.active {
+      background: var(--ns-ink);
+      color: #fff;
+    }
     button:focus-visible {
       outline: 2px solid var(--ns-accent);
       outline-offset: 2px;
@@ -59,6 +74,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 export class LangSwitch {
   private translate = inject(TranslateService);
   private platformId = inject(PLATFORM_ID);
+
+  light = input(false);
 
   langs = [
     { code: 'en', label: 'EN' },
