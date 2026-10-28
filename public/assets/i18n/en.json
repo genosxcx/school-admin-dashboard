@@ -115,7 +115,8 @@
   "START_TIME": "Start Time (Shows to students)",
   "END_TIME": "End Time (Due Date)",
   "CANCEL": "Cancel",
-  "SAVE": "Save Assignment"
+  "SAVE": "Save Assignment",
+  "PICK_DATE": "Pick date and time"
 },
 "CLASSES": {
   "TITLE": "Classes",
