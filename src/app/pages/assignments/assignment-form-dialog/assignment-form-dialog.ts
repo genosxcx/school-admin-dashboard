@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 // ✅ Import TranslatePipe
 import { TranslatePipe } from '@ngx-translate/core';
@@ -27,7 +28,7 @@ export type AssignmentFormResult = {
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatButtonModule, TranslatePipe // ✅ Added Pipe
+    MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, TranslatePipe // ✅ Added Pipe
   ],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
@@ -53,17 +54,27 @@ export type AssignmentFormResult = {
         </mat-select>
       </mat-form-field>
 
-      <div class="time-row">
-        <mat-form-field appearance="outline" class="half">
-          <mat-label>{{ 'ASSIGNMENT_DIALOG.START_TIME' | translate }}</mat-label>
-          <input matInput type="datetime-local" [(ngModel)]="startTime" />
-        </mat-form-field>
+      <!-- Angular Material hides the browser's calendar icon on matInput, so the
+           date fields get their own picker button (and open the picker on click). -->
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'ASSIGNMENT_DIALOG.START_TIME' | translate }}</mat-label>
+        <input matInput #startInput type="datetime-local" [(ngModel)]="startTime"
+               (click)="openPicker(startInput)" />
+        <button mat-icon-button matSuffix type="button" (click)="openPicker(startInput)"
+                [attr.aria-label]="'ASSIGNMENT_DIALOG.PICK_DATE' | translate">
+          <mat-icon>calendar_month</mat-icon>
+        </button>
+      </mat-form-field>
 
-        <mat-form-field appearance="outline" class="half">
-          <mat-label>{{ 'ASSIGNMENT_DIALOG.END_TIME' | translate }}</mat-label>
-          <input matInput type="datetime-local" [(ngModel)]="endTime" />
-        </mat-form-field>
-      </div>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'ASSIGNMENT_DIALOG.END_TIME' | translate }}</mat-label>
+        <input matInput #endInput type="datetime-local" [(ngModel)]="endTime" [min]="startTime"
+               (click)="openPicker(endInput)" />
+        <button mat-icon-button matSuffix type="button" (click)="openPicker(endInput)"
+                [attr.aria-label]="'ASSIGNMENT_DIALOG.PICK_DATE' | translate">
+          <mat-icon>calendar_month</mat-icon>
+        </button>
+      </mat-form-field>
 
       <!-- ✅ NEW: font row -->
       <div class="time-row">
@@ -122,6 +133,14 @@ export class AssignmentFormDialog {
 
   get fontStack(): string {
     return this.fontMap[this.fontFamily] || this.fontMap['Naskh'];
+  }
+
+  openPicker(input: HTMLInputElement) {
+    try {
+      input.showPicker();
+    } catch {
+      input.focus(); // showPicker() is missing on older browsers
+    }
   }
 
   close() { this.ref.close(null); }
